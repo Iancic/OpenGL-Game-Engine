@@ -1,27 +1,22 @@
 #pragma once
 #include "Program.h"
 
-// Game Specific Header Files Only
 #include "common.h"
 #include "UserInterface.h"
 #include "Star.h"
-#include "Creature.h"
-#include "Player.h"
+#include "Boid.h"
 
-class Game : public Program
+class Flock : public Program
 {
 public:
-	Game();
-	~Game();
+	Flock();
+	~Flock();
 
 	void Init(const char* title, int x, int y, int width, int height, bool fullscreen);
 	void Update();
 	void Render();
 	void HandleEvents();
 	void Quit();
-	void Time();
-
-	void UserInterfaceUpdate(Creature* creatureArg);
 
 	bool Running() { return isRunning; };
 
@@ -33,41 +28,37 @@ private:
 		GAME_PAUSED,
 	};
 
-	glm::vec2 galaxyOffset = { 0, 0 };
-	glm::vec2 screenSector = { 0, 0 }; // Coordinates of the sector
-
 	ResourceManager* Resources = ResourceManager::getInstance();
 
 	FrameBuffer* RenderingBuffer = nullptr;
 
-	SDL_GLContext glContext;
-	SDL_Window* window;
-
 	UserInterface* UI = UserInterface::getInstance();
 
-	Transform* cameraTarget = new Transform();
-	Transform weaponsTarget{};
+	Transform* cameraTarget = new Transform(); // This is for camera
+	Transform target{}; // This is for boids
 
-	Camera* ActiveCamera = nullptr;
+	SDL_GLContext glContext;
 
-	Player* playerPtr = nullptr;
+	Camera* ActiveCamera;
 
-	std::vector<Creature*> creaturePool;
-	unordered_map< uint32_t, Star*> starCache;
+	std::vector<Boid*> boidPool;
 
-	const Uint8* keyState = SDL_GetKeyboardState(NULL);
-	bool keyPressedOnce[SDL_NUM_SCANCODES] = { false };
+	const Uint8* keyState;
 	bool keyPressed[SDL_NUM_SCANCODES] = { false };
 
 	int milisecondsPreviousFrame;
 	double deltaTime;
 	float timeElapsed;
 
+	const float CAMERA_SHIFT_INCREMENT_WIDTH = SCREEN_WIDTH;
+	const float CAMERA_SHIFT_INCREMENT_HEIGHT = SCREEN_HEIGHT;
 	int counterLeft = 0, counterRight = 0, counterTop = 0, counterBot = 0;
 
 	int sectorOffset = 1;
 	int nSectorsX = SCREEN_WIDTH / SECTOR_WIDTH;
 	int nSectorsY = SCREEN_HEIGHT / SECTOR_HEIGHT;
+
+	unordered_map< uint32_t, Star*> starCache;
 
 	SDL_Joystick* joystickPlayer1 = nullptr;
 	const int deadZone = 1500;
@@ -76,4 +67,9 @@ private:
 
 	bool isRunning;
 
+	SDL_Window* window;
+
+	void Time();
+
+	void UserInterface(Creature* creatureArg);
 };

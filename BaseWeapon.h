@@ -1,9 +1,9 @@
 #pragma once
-#include <SDL.h>
 #include <vector>
 #include "Transform.h"
 #include "Bullet.h"
 #include "Camera.h"
+#include "Line.h"
 
 class BaseWeapon
 {
@@ -16,7 +16,9 @@ public:
 	float reloadTime = 2.5f;
 	float reloadCounter = 0.f;
 	float lenght = 30.f;
-	float bulletSpeed = 180.f;
+	float bulletSpeed = 500.f;
+
+	bool canShoot = false;
 
 	std::vector<Bullet*> ammunition{};
 
@@ -30,7 +32,7 @@ public:
 	glm::vec2 vector{}, normalized{}, magnitude{}, direction{};
 
 	void Update(Transform Target, float deltaTime);
-	void Render();
+	void Render(Camera* activeCamera);
 
 	void Shoot();
 

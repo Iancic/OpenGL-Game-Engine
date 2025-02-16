@@ -66,6 +66,7 @@ void Line::Render(glm::vec3 startPosition, glm::vec3 endPosition, glm::vec4 colo
     shaderPtr->setVec4("ARGB", color);
 
     // Draw Line
+    glLineWidth(2.0f);
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 2);
 

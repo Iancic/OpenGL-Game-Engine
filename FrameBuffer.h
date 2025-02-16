@@ -21,7 +21,7 @@ public:
 
 	const std::vector<float>* vertices;
 
-	void DrawRenderBuffer(float iTime);
+	void DrawRenderBuffer(float iTime, bool isPostProcessed);
 
 private:
 

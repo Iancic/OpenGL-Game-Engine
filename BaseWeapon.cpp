@@ -12,6 +12,12 @@ BaseWeapon::BaseWeapon(Transform* Slot, Camera* camera)
 
 void BaseWeapon::Update(Transform Target, float deltaTime)
 {
+	// Bullet Updates
+	for (auto& bullet : ammunition)
+	{
+		bullet->Update(deltaTime, bulletSpeed);
+	}
+
 	// Weapon Updates
 	transform.position = slotPosition->position;
 
@@ -23,18 +29,11 @@ void BaseWeapon::Update(Transform Target, float deltaTime)
 	reloadCounter += deltaTime;
 	if (reloadCounter >= reloadTime)
 	{
-		reloadCounter = 0.f;
-		Shoot();
-	}
-
-	// Bullet Updates
-	for (auto& bullet : ammunition)
-	{
-		bullet->Update(deltaTime, bulletSpeed);
+		canShoot = true;
 	}
 }
 
-void BaseWeapon::Render()
+void BaseWeapon::Render(Camera* activeCamera)
 {
 	magnitude.x = target.position.x - transform.position.x;
 	magnitude.y = target.position.y - transform.position.y;
@@ -49,11 +48,11 @@ void BaseWeapon::Render()
 	float finalposX = normalizedX * lenght;
 	float finalposY = normalizedY * lenght;
 
-	/*SDL_RenderDrawLine(renderer, 
-		transform.position.x - activeCamera->transform->position.x,
-		transform.position.y - activeCamera->transform->position.y,
-		transform.position.x + finalposX - activeCamera->transform->position.x,
-		transform.position.y + finalposY - activeCamera->transform->position.y);*/
+	Line::getInstance()->Render(
+		glm::vec3(transform.position.x - activeCamera->transform->position.x, transform.position.y - activeCamera->transform->position.y, 0.f),
+		glm::vec3(transform.position.x + finalposX - activeCamera->transform->position.x, transform.position.y + finalposY - activeCamera->transform->position.y, 0.f),
+		glm::vec4(255, 255, 255, 255)
+	);
 
 	// Bullet Rendering
 	for (auto& bullet : ammunition)
@@ -65,4 +64,6 @@ void BaseWeapon::Render()
 void BaseWeapon::Shoot()
 {
 	ammunition.push_back(new Bullet(transform, activeCamera, direction));
+	reloadCounter = 0.f;
+	canShoot = false;
 }

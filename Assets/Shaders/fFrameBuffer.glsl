@@ -7,8 +7,24 @@ in vec4 gl_FragCoord;
 
 uniform sampler2D screenTexture;
 
+uniform bool isPostProcessed;
+
 uniform float iTime;
 uniform vec2 iResolution;
+
+float character(int n, vec2 p)
+{
+	p = floor(p*vec2(-4.0, 4.0) + 2.5);
+
+    if (clamp(p.x, 0.0, 4.0) == p.x && clamp(p.y, 0.0, 4.0) == p.y)
+	{
+        int a = int(round(p.x) + 5.0 * round(p.y));
+		if (((n >> a) & 1) == 1) return 1.0;
+    }
+
+	return 0.0;
+}
+
 
 vec2 CRTCurveUV( vec2 uv )
 {
@@ -54,17 +70,25 @@ vec3 ChromaticAbberation(sampler2D tex, in vec2 uv, float distortionAmount)
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    vec3 render = ChromaticAbberation(screenTexture, uv, 0.15f);
-
-    vec2 crtUV = CRTCurveUV( uv );
-    if ( crtUV.x < 0.0 || crtUV.x > 1.0 || crtUV.y < 0.0 || crtUV.y > 1.0 )
+    if (isPostProcessed)
     {
-        render = vec3( 0.0, 0.0, 0.0 );
+        vec2 uv = gl_FragCoord.xy / iResolution.xy;
+        vec3 render = ChromaticAbberation(screenTexture, uv, 0.15f);
+
+        vec2 crtUV = CRTCurveUV( uv );
+        if ( crtUV.x < 0.0 || crtUV.x > 1.0 || crtUV.y < 0.0 || crtUV.y > 1.0 )
+        {
+            render = vec3( 0.0, 0.0, 0.0 );
+        }
+
+        DrawVignette( render, crtUV, 0.2f );
+        DrawScanline( render, uv );
+
+	    FragColor = vec4(render, 1.0f);
+    }
+    else
+    {
+        FragColor = texture(screenTexture, TexCoord);
     }
 
-    DrawVignette( render, crtUV, 0.2f );
-    DrawScanline( render, uv );
-
-	FragColor = vec4(render, 1.0f);
 }

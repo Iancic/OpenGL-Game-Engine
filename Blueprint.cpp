@@ -7,10 +7,9 @@ Blueprint::Blueprint(int difficulty)
 	srand(time(NULL));
 
 	// Creature Lenght
-	int baseLenght = 15;
-	int extraLenght = rand() % 3; // Can be 0 extra segments, 1 extra segment or 2 extra segments
-	creatureLenght = (difficulty / 10) + baseLenght + extraLenght;
-
+	int baseLenght = 3;
+	creatureLenght = (difficulty / 10) + baseLenght;
+	
 	// Creature Width
 	segmentSpacing = 10;
 	int baseCreatureWidth = 10;

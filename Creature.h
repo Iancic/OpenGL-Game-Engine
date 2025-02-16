@@ -28,12 +28,13 @@ public:
 
 	std::vector<Segment*> segments;
 	std::vector<BaseWeapon*> weapons;
+	int weaponsCreated = 0;
 
 	Blueprint* identity;
 
 	Camera* activeCamera = nullptr;
 
-	void Update(Transform target, float deltaTime);
+	virtual void Update(Transform target, float deltaTime);
 	void Render();
 
 	void Spine();
@@ -44,6 +45,8 @@ public:
 	void IncreaseSpeed();
 	void IncreaseSlots();
 	void IncreaseHealth();
+
+	void Shoot();
 
 protected:
 

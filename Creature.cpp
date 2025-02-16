@@ -17,11 +17,13 @@ Creature::Creature(int difficulty, Camera* camera)
 			segments.push_back(new Segment(segments[i - 1], identity->segmentShape[i], identity->creatureShape[i], identity->segmentSpacing));
 	}
 
-	// Create Weapons On Even Segments
-	for (int i = 0; i <= identity->creatureLenght; i++)
+	for (int i = 0; i <= identity->creatureLenght; i += 2)
 	{
-		if (i % 2 == 0)
-			weapons.push_back(new BaseWeapon(&segments[i]->transform, camera));
+		if (weaponsCreated < identity->weaponSlots)
+		{
+				weapons.push_back(new BaseWeapon(&segments[i]->transform, activeCamera));
+				weaponsCreated++;
+		}
 	}
 
 	// Spawn Position
@@ -37,32 +39,7 @@ Creature::Creature(int difficulty, Camera* camera)
 
 void Creature::Update(Transform target, float deltaTime)
 {
-	if (points >= maxPoints)
-	{
-		DNA++;
-		level++;
-		points = points - maxPoints; // Remainder of points
-	}
-
-	// Update each segment
-	for (auto& element : segments)
-	{
-		element->Update();
-	}
-
-	// Update each weapons
-	for (auto& element : weapons)
-	{
-		element->Update(target, deltaTime);
-	}
-	 
-	// Direction vectors
-	for (int i = 0; i < identity->creatureLenght; i++)
-	{
-		segments[i]->direction = {
-			segments[i + 1]->transform.position.x - segments[i]->transform.position.x,
-			segments[i + 1]->transform.position.y - segments[i]->transform.position.y };
-	}
+	
 }
 
 void Creature::Render()
@@ -81,7 +58,7 @@ void Creature::Render()
 	{
 		for (auto& element : weapons)
 		{
-			element->Render();
+			element->Render(activeCamera);
 		}
 	}
 
@@ -147,7 +124,10 @@ void Creature::IncreaseLenght()
 	{
 		DNA--;
 		identity->creatureLenght += 1;
-		segments.push_back(new Segment(segments[identity->creatureLenght - 1], 20, 20, 10));
+		segments.push_back(new Segment(segments[identity->creatureLenght - 1], 
+										segments[identity->creatureLenght - 1]->segmentShape, 
+										segments[identity->creatureLenght - 1]->segmentRadius,
+										10));
 	}
 }
 
@@ -166,6 +146,15 @@ void Creature::IncreaseSlots()
 	{
 		DNA--;
 		identity->weaponSlots += 1;
+
+		for (int i = weaponsCreated; i <= identity->creatureLenght; i+=2)
+		{
+			if (weaponsCreated < identity->weaponSlots)
+			{
+					weapons.push_back(new BaseWeapon(&segments[i]->transform, activeCamera));
+					weaponsCreated++;
+			}
+		}
 	}
 }
 
@@ -175,5 +164,13 @@ void Creature::IncreaseHealth()
 	{
 		DNA--;
 		identity->hitpoints += 50;
+	}
+}
+
+void Creature::Shoot()
+{
+	for (auto& element : weapons)
+	{
+		element->Shoot();
 	}
 }

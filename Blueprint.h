@@ -12,7 +12,7 @@ public:
 	float movementSpeed = 225.f;
 	int hitpoints = 100;
 	int regen = 10;
-	int weaponSlots;
+	int weaponSlots = 0;
 
 	int creatureLenght;
 	int segmentSpacing;
@@ -20,6 +20,6 @@ public:
 	std::vector<int> creatureShape;
 	std::vector<int> segmentShape;
 
-	bool hasSpine = true, hasGeometry = false, hasWeapons = false;
+	bool hasSpine = true, hasGeometry = false, hasWeapons = true;
 
 };

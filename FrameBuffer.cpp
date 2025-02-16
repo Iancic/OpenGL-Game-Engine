@@ -55,12 +55,13 @@ FrameBuffer::~FrameBuffer()
 
 }
 
-void FrameBuffer::DrawRenderBuffer(float iTime)
+void FrameBuffer::DrawRenderBuffer(float iTime, bool isPostProcessed)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	shader->use();
 	shader->setFloat("iTime", iTime);
+	shader->setBool("isPostProcessed", isPostProcessed);
 	shader->setVec2("iResolution", glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	glBindVertexArray(rectVAO);
 

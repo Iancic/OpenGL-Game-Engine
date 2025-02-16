@@ -22,6 +22,9 @@
     <Filter Include="Game\Shaders">
       <UniqueIdentifier>{e4a41b86-ecc8-4c10-8f2b-a5a34c8c2556}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Flock">
+      <UniqueIdentifier>{f28996ff-6825-4d51-aa94-73e2b0cdda06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libraries\imgui-master\imgui.cpp">
@@ -120,7 +123,16 @@
     <ClCompile Include="Actor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="UserInterface.cpp" />
+    <ClCompile Include="UserInterface.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Boid.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Flock.cpp">
+      <Filter>Flock</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\imgui-master\imconfig.h">
@@ -222,7 +234,16 @@
     <ClInclude Include="Actor.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="UserInterface.h" />
+    <ClInclude Include="UserInterface.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Boid.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Flock.h">
+      <Filter>Flock</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vTest.glsl">
