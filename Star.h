@@ -15,7 +15,7 @@ class Star
 {
 
 public:
-	Star(float x, float y);
+	Star(float x, float y, int difficulty);
 
 
 	float positionX;

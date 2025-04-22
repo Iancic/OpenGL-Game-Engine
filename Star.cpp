@@ -1,14 +1,14 @@
 #include "Star.h"
 #include <iostream>
 
-Star::Star(float x, float y)
+Star::Star(float x, float y, int difficulty)
 {
 	nLehmer = (static_cast<uint32_t>(x) & 0xFFFF) << 16 | (static_cast<uint32_t>(y) & 0xFFFF); // More bits bigger universe
 
-	starExists = (rndInt(0, 80) == 1); 
+	starExists = (rndInt(0, 100) == 1); 
 	if (!starExists) return;
 
-	starDiameter = rndDouble(15.f, 30.f);
+	starDiameter = rndDouble(10.f + difficulty, 15.f + difficulty * 2);
 	starColour = starColours[rndInt(0, 3)];
 
 	positionX = rndDouble(-15.f, 15.f);

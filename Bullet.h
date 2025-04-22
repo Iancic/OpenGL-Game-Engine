@@ -10,7 +10,7 @@ public:
 	~Bullet() = default;
 
 	float elapsedTime = 0.f;
-	float bulletLifespan = 2.f; // How many seconds till bullet gets destroyed.
+	float bulletLifespan = 2.f;
 
 	glm::vec2 direction;
 

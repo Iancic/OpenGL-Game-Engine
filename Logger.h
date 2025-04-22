@@ -26,6 +26,7 @@ public:
 	static void Log(const std::string& message);
 	static void Error(const std::string& message);
 
+	static const std::vector<LogEntry>& GetMessages() { return messages; }
 private:
 };
 

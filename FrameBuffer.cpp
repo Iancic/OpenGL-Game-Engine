@@ -65,6 +65,7 @@ void FrameBuffer::DrawRenderBuffer(float iTime, bool isPostProcessed)
 	shader->setVec2("iResolution", glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	glBindVertexArray(rectVAO);
 
+	glEnable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST); // prevents framebuffer rectangle from being discarded
 
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);

@@ -1,19 +1,24 @@
 #pragma once
-#include "Game.h"
-#include "Flock.h"
 #include "Engine.h"
+
+// USAGE INSTRUCTIONS:
+// 1. Engine takes as argument a derived Program class (your game)
+// 2. Your game class can override HandleInput(), Update(), Render(), Init() and Shutdown()
+// 3. Implement your logic inside these 5 functions
+#include "Game.h"
+
+// Template also comes with: Camera Class, Resource Manager, FrameBuffer, Sprite Class, Particle Emitter
 
 int main(int argc, char* argv[])
 {
-    Game* game = new Game();
-    game->Init("Cosmoboros", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, false);
-    Engine* engine = new Engine(game);
+    Program* game = new Game("Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, false);
+    game->Init();
 
-    //Flock* flock = new Flock();
-    //flock->Init("Flock", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, false);
-    //Engine* engine = new Engine(flock);
-    
+    Engine* engine = new Engine(game);
     engine->Run();
+
+    delete game;
+    delete engine;
 
     return 0;
 }

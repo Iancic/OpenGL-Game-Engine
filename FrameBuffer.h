@@ -11,7 +11,6 @@ class FrameBuffer
 public:
 	FrameBuffer();
 	~FrameBuffer();
-
 	
 	GLuint rectVAO, rectVBO;
 	GLuint FBO, RBO;

@@ -22,5 +22,4 @@ void Bullet::Update(float deltaTime, float bulletSpeed)
 void Bullet::Render()
 {
 	Circle::getInstance()->DrawCircle(transform.position.x, transform.position.y, 5.f, 36, glm::vec4(255, 255, 255, 255));
-	//DrawCircle(renderer, transform.position.x, transform.position.y, 5.f);
 }

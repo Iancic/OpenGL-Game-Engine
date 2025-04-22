@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "Texture2D.h"
+#include <stb/stb_image.h>
 
 class ResourceManager
 {
@@ -28,7 +29,12 @@ public:
 
 	void loadResources();
 
-	// Resources:
+	// Shaders:
 	Shader* frameBufferShader = nullptr;
 	Shader* lineShader = nullptr;
+	Shader* spriteShader = nullptr;
+	Shader* spineShader = nullptr;
+
+	// Textures:
+	Texture2D* smileyFace = nullptr;
 };

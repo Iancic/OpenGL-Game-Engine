@@ -6,7 +6,7 @@
 #include <string>
 
 #include "common.h"
-#include "Creature.h"
+#include "Player.h"
 
 class UserInterface
 {
@@ -31,18 +31,30 @@ public:
 		return ui_Instance;
 	}
 
-	ImGuiWindowFlags windowflags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+	// -------- IMGUI --------
+
+	ImGuiWindowFlags placeholderWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground;
 	bool open = true;
 
+	void ImGui(Player* creatureArg, GLuint fboID, Camera* maincam);
 	void Start();
 	void Init(SDL_Window* windowArg, void* glContextArg);
 	void Shutdown();
+	void DockSpace();
+	void GameViewport(GLuint fboID);
 	void Style();
+	void CreatureMenu(Player* creatureArg);
+	void CameraMenu(Player* creatureArg, Camera* maincam);
+	void Logger();
+	void HeaderBar();
 
-	void InfoHUD(Creature* creatureArg);
-	void UpgradeMenu(Creature* creatureArg);
-	void ClassPopUp();
-	void LevelBar(Creature* creatureArg);
+	// -------- Game UI --------
+
+	ImGuiWindowFlags editorWindowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+
+	void Game();
+
+	//
 
 };

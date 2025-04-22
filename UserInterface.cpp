@@ -1,6 +1,19 @@
-#include "UserInterface.h"
+﻿#include "UserInterface.h"
+#include "Logger.h"
 
 UserInterface* UserInterface::ui_Instance = nullptr;
+
+void UserInterface::ImGui(Player* creatureArg, GLuint fboID, Camera* maincam)
+{
+	Start();
+	Style();
+	DockSpace();
+	CreatureMenu(creatureArg);
+	CameraMenu(creatureArg, maincam);
+	GameViewport(fboID);
+	Logger();
+	Shutdown();
+}
 
 void UserInterface::Start()
 {
@@ -16,7 +29,10 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;;
+	io.FontGlobalScale = 1.f;
+	io.Fonts->AddFontFromFileTTF("Assets/fonts/MonaspaceNeonFrozen-Regular.ttf", 16.0f);
+	io.Fonts->Build();
 	ImGui_ImplSDL2_InitForOpenGL(windowArg, glContextArg);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 }
@@ -25,6 +41,39 @@ void UserInterface::Shutdown()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void UserInterface::DockSpace()
+{
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+	ImGui::Begin("DockSpace_Window", nullptr, window_flags);
+	ImGui::PopStyleVar(2);
+
+	ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+	ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+	HeaderBar();
+
+	ImGui::End();
+}
+
+void UserInterface::GameViewport(GLuint fboID)
+{
+	ImGui::Begin("Game View");
+	ImTextureID imguiTexture = static_cast<ImTextureID>(static_cast<uintptr_t>(fboID));
+	ImGui::Image(imguiTexture, ImVec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT), ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::End();
 }
 
 void UserInterface::Style()
@@ -61,108 +110,159 @@ void UserInterface::Style()
 	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
 }
 
-void UserInterface::InfoHUD(Creature* creatureArg)
+void UserInterface::CreatureMenu(Player* creatureArg)
 {
-	ImGui::SetNextWindowPos(ImVec2(100, 100));
-	ImGui::SetNextWindowSize(ImVec2(400, 300), open);
+	ImGui::Begin("Creature", &open);
 
-	ImGui::Begin("Info", &open, windowflags);
 
-	// Hitpoints
-	ImGui::TextColored(ImVec4(255, 0, 0, 255), "Hitpoints");
-	ImGui::SameLine(); ImGui::Text("%i", creatureArg->identity->hitpoints);
 
-	// Movement Speed
-	ImGui::TextColored(ImVec4(0, 255, 0, 255), "Movement Speed");
-	ImGui::SameLine(); ImGui::Text("%i", creatureArg->identity->movementSpeed);
+	ImGui::Text("Leg Options:");
+	ImGui::SliderFloat("Snap Distance", &creatureArg->distanceToSnap, -150.f, 200.f);
+	ImGui::SliderFloat("Forward Step", &creatureArg->forwardOffset, -150.f, 200.f);
+	ImGui::SliderFloat("Otward Step", &creatureArg->outwardBias, 0.f, 1.f);
 
-	// Creature Lenght
-	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Lenght");
-	ImGui::SameLine(); ImGui::Text("%i", creatureArg->identity->creatureLenght);
+	ImGui::Text("Leg Count ", &creatureArg->legCounter); 
+	ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->AddLeg();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->RemoveLeg();
 
-	// Weapon Slots
-	ImGui::TextColored(ImVec4(0, 255, 255, 255), "Weapon Slots");
-	ImGui::SameLine(); ImGui::Text("%i", creatureArg->identity->weaponSlots);
+	for (size_t i = 0; i < creatureArg->legs.size(); ++i) {
+		ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
+		std::string legLabel = "Leg " + std::to_string(i);
+		if (ImGui::TreeNode(legLabel.c_str())) {
+			for (size_t j = 0; j < creatureArg->legs[i]->segments.size(); j++) {
+				std::string segmentLabel = "Segment " + std::to_string(j);
+				if (ImGui::TreeNode(segmentLabel.c_str())) {
+					ImGui::SliderFloat("Leg Length", &creatureArg->legs[i]->segments[j]->lenght, 1.0f, 30.0f);
+					ImGui::TreePop();
+				}
+			}
+
+			ImGui::Text("Chain Segments Count ", &creatureArg->legs[i]->chainLenght);
+			ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->legs[i]->AddSegment();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->legs[i]->RemoveSegment();
+			
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
+	}
+
+
+	ImGui::Spacing();
+
+	ImGui::Text("Body Options:");
+	ImGui::SliderInt("Creature Lenght", &creatureArg->desiredLenght, 2, 30);
+	ImGui::SliderInt("Segment Spacing", &creatureArg->desiredSegmentSpacing, 5, 50);
+
+	while (creatureArg->segmentSpacing < creatureArg->desiredSegmentSpacing)
+	{
+		creatureArg->AddSpacing();
+	}
+
+	while (creatureArg->segmentSpacing > creatureArg->desiredSegmentSpacing)
+	{
+		creatureArg->RemoveSpacing();
+	}
+
+	for (size_t i = 0; i < creatureArg->segments.size(); ++i)
+	{
+		ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
+
+		std::string label = "Segment " + std::to_string(i);
+		if (ImGui::TreeNode(label.c_str()))
+		{
+			ImGui::SliderInt("Thickness", &creatureArg->segments[i]->segmentRadius, 0.0f, 20.0f);
+			ImGui::TreePop();
+		}
+
+		ImGui::PopID();
+	}
+
+	// Required Logic for Sliders to work
+	while (creatureArg->creatureLenght < creatureArg->desiredLenght)
+		creatureArg->IncreaseBodyLenght();
+
+	while (creatureArg->creatureLenght > creatureArg->desiredLenght)
+		creatureArg->DecreaseBodyLenght();
+
+	ImGui::End();
+	
+}
+
+void UserInterface::CameraMenu(Player* creatureArg, Camera* maincam)
+{
+	ImGui::Begin("Camera", &open);
+
+	if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
+	{
+		glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
+		maincam->updateProjection(focus);
+	}
+	ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
+	ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
 
 	ImGui::End();
 }
 
-void UserInterface::UpgradeMenu(Creature* creatureArg)
+void UserInterface::Logger()
 {
-	ImGui::SetNextWindowPos(ImVec2(100, SCREEN_HEIGHT - 200));
-	ImGui::SetNextWindowSize(ImVec2(400, 300), open);
+	ImGui::Begin("Logs");
 
-	ImGui::Begin("UpgradeWindow", &open, windowflags);
+	const auto& logs = Logger::GetMessages(); // Or use Logger::messages if it's public
 
-	// Current DNA Points
-	ImGui::Text("DNA Available: %d", creatureArg->DNA);
-
-	// Hitpoints
-	if (ImGui::SmallButton("+##1"))
+	for (const auto& entry : logs)
 	{
-		creatureArg->IncreaseHealth();
-	}
-	ImGui::SameLine(); ImGui::Text("Hitpoints");
+		ImVec4 color;
+		switch (entry.type)
+		{
+		case LogType::LOG_INFO:
+			color = ImVec4(0.6f, 1.0f, 0.6f, 1.0f); // Light green
+			break;
+		case LogType::LOG_ERROR:
+			color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); // Light red
+			break;
+		default:
+			color = ImVec4(1, 1, 1, 1); // White
+			break;
+		}
 
-	// Movement Speed
-	if (ImGui::SmallButton("+##2"))
-	{
-		creatureArg->IncreaseSpeed();
+		ImGui::PushStyleColor(ImGuiCol_Text, color);
+		ImGui::TextUnformatted(entry.message.c_str());
+		ImGui::PopStyleColor();
 	}
-	ImGui::SameLine(); ImGui::Text("Speed");
-
-	// Creature Lenght
-	if (ImGui::SmallButton("+##3"))
-	{
-		creatureArg->IncreaseLenght();
-	}
-	ImGui::SameLine(); ImGui::Text("Lenght");
-
-	// Weapon Slots
-	if (ImGui::SmallButton("+##4"))
-	{
-		creatureArg->IncreaseSlots();
-	}
-	ImGui::SameLine(); ImGui::Text("Weapon Slots");
 
 	ImGui::End();
 }
 
-void UserInterface::ClassPopUp()
+void UserInterface::HeaderBar()
 {
-	ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20));
-	ImGui::SetNextWindowSize(ImVec2(300, 60), open);
+	if (ImGui::BeginMenuBar())
+	{
+		/*
+		ImGui::Text("FPS");
+		*/
 
-	ImGui::Begin("ClassWindow", &open, windowflags);
+		if (ImGui::BeginMenu("Options"))
+		{
+			
+			if (ImGui::MenuItem("Randomize Creature"))
+			{
+				// Close app or set a flag
+			}
+			if (ImGui::MenuItem("Save Preset"))
+			{
+				// Close app or set a flag
+			}
+			if (ImGui::MenuItem("Load Preset"))
+			{
+				// Close app or set a flag
+			}
+			
+			ImGui::EndMenu();
+		}
 
-	if (ImGui::Button("Tank"))
-		std::cout << "I choose Tank";
-
-	ImGui::SameLine();
-	if (ImGui::Button("Spawner"))
-		std::cout << "I choose Spawner";
-
-	ImGui::SameLine();
-	if (ImGui::Button("Devourer"))
-		std::cout << "I choose Devourer";
-
-	ImGui::End();
+		ImGui::EndMenuBar();
+	}
 }
 
-void UserInterface::LevelBar(Creature* creatureArg)
+void UserInterface::Game()
 {
-	ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH / 2 - 210, SCREEN_HEIGHT - 100));
-	ImGui::SetNextWindowSize(ImVec2(800, 300), open);
-
-	ImGui::Begin("LevelWindow", &open, windowflags);
-	ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	// Current Level
-	ImGui::Text("Creature Level: %i", creatureArg->level);
-	float percentage = static_cast<float>(creatureArg->points) / static_cast<float>(creatureArg->maxPoints);
-	ImGui::ProgressBar(percentage, ImVec2(400, 10), "");
-
-	ImGui::PopStyleColor();
-
-	ImGui::End();
+	
 }
