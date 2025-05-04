@@ -8,6 +8,12 @@ in vec4 gl_FragCoord;
 uniform sampler2D screenTexture;
 
 uniform bool isPostProcessed;
+uniform bool scanline;
+
+uniform float vignetteIntensity;
+uniform float curveLeft;
+uniform float curveRight;
+uniform float abberationIntensity;
 
 uniform float iTime;
 uniform vec2 iResolution;
@@ -29,7 +35,7 @@ float character(int n, vec2 p)
 vec2 CRTCurveUV( vec2 uv )
 {
     uv = uv * 2.0 - 1.0;
-    vec2 offset = abs( uv.yx ) / vec2( 6.0, 4.0 );
+    vec2 offset = abs( uv.yx ) / vec2( curveLeft, curveRight );
     uv = uv + uv * offset * offset;
     uv = uv * 0.5 + 0.5;
     return uv;
@@ -73,7 +79,7 @@ void main()
     if (isPostProcessed)
     {
         vec2 uv = gl_FragCoord.xy / iResolution.xy;
-        vec3 render = ChromaticAbberation(screenTexture, uv, 0.15f);
+        vec3 render = ChromaticAbberation(screenTexture, uv, abberationIntensity);
 
         vec2 crtUV = CRTCurveUV( uv );
         if ( crtUV.x < 0.0 || crtUV.x > 1.0 || crtUV.y < 0.0 || crtUV.y > 1.0 )
@@ -81,8 +87,10 @@ void main()
             render = vec3( 0.0, 0.0, 0.0 );
         }
 
-        DrawVignette( render, crtUV, 0.2f );
-        DrawScanline( render, uv );
+        DrawVignette( render, crtUV, vignetteIntensity );
+
+        if (scanline)
+            DrawScanline( render, uv );
 
 	    FragColor = vec4(render, 1.0f);
     }

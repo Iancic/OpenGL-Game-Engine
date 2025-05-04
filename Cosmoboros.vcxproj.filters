@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="libraries\imgui-master\imgui.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_demo.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_draw.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdlrenderer2.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_tables.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp" />
+    <ClCompile Include="libraries\stb\stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libraries\glad\glad.h" />
+    <ClInclude Include="libraries\imgui-master\imconfig.h" />
+    <ClInclude Include="libraries\imgui-master\imgui.h" />
+    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3.h" />
+    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="libraries\imgui-master\imgui_impl_sdlrenderer2.h" />
+    <ClInclude Include="libraries\imgui-master\imgui_internal.h" />
+    <ClInclude Include="libraries\imgui-master\imstb_rectpack.h" />
+    <ClInclude Include="libraries\imgui-master\imstb_textedit.h" />
+    <ClInclude Include="libraries\imgui-master\imstb_truetype.h" />
+    <ClInclude Include="libraries\stb\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\fFrameBuffer.glsl" />
+    <None Include="Assets\Shaders\fPerlin.glsl" />
+    <None Include="Assets\Shaders\fSpine.glsl" />
+    <None Include="Assets\Shaders\fSprite.glsl" />
+    <None Include="Assets\Shaders\fBasic.glsl" />
+    <None Include="Assets\Shaders\vFrameBuffer.glsl" />
+    <None Include="Assets\Shaders\vPerlin.glsl" />
+    <None Include="Assets\Shaders\vSpine.glsl" />
+    <None Include="Assets\Shaders\vSprite.glsl" />
+    <None Include="Assets\Shaders\vBasic.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{7ca575bb-64f4-4066-8b48-118d88ecf37a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{97cebae8-caaf-4a09-ac36-81ba6ea539b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{20368d7f-9e08-42ea-a324-71a3d52a2c57}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
