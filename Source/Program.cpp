@@ -2,6 +2,23 @@
 
 Program::Program(const char* title, int x, int y, int width, int height, bool fullscreen)
 {
+	FMOD::System* system = nullptr;
+	FMOD_RESULT result;
+
+	// Create FMOD system
+	result = FMOD::System_Create(&system);
+	if (result != FMOD_OK) {
+		std::cerr << "FMOD error! " << FMOD_ErrorString(result) << std::endl;
+	}
+
+	// Initialize FMOD system
+	result = system->init(512, FMOD_INIT_NORMAL, nullptr);
+	if (result != FMOD_OK) {
+		std::cerr << "FMOD init error! " << FMOD_ErrorString(result) << std::endl;
+	}
+
+	//std::cout << "FMOD initialized successfully." << std::endl;
+
 	int flags = SDL_WINDOW_OPENGL;
 
 	if (fullscreen) flags = SDL_WINDOW_FULLSCREEN;

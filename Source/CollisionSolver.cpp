@@ -2,6 +2,7 @@
 
 CollisionSolver* CollisionSolver::collision_solver_Instance = nullptr;
 
+/*
 void CollisionSolver::AddBroadPhaseCollider(BoxCollider* colliderArg, std::vector<BoxCollider*> narrowPhaseCollidersArg)
 {
 	broadPhaseColliders.push_back(colliderArg);
@@ -59,4 +60,28 @@ void CollisionSolver::SolveNarrowCollisions(std::vector<BoxCollider*> narrowA, s
 			}
 		}
 	}
+}
+*/
+
+void CollisionSolver::AddCollider(Collider* colliderArg)
+{
+}
+
+void CollisionSolver::SolveCollisions(std::vector<Collider*> colliderA, std::vector<Collider*> colliderB)
+{
+}
+
+bool CollisionSolver::CheckBoxBoxCollision(BoxCollider* colliderA, BoxCollider* colliderB)
+{
+	return false;
+}
+
+bool CollisionSolver::CheckCircleBoxCollision(CircleCollider* colliderA, BoxCollider* colliderB)
+{
+	return false;
+}
+
+bool CollisionSolver::CheckCircleCircleCollision(CircleCollider* colliderA, CircleCollider* colliderB)
+{
+	return false;
 }

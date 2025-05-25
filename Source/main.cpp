@@ -1,8 +1,3 @@
-// USAGE INSTRUCTIONS:
-// 1. Engine takes as argument a derived Program class (your game)
-// 2. Your game class can override HandleInput(), Update(), Render(), Init() and Shutdown()
-// 3. Implement your logic inside these 5 functions
-
 #pragma once
 #include "Engine.hpp"
 #include "Game.hpp"

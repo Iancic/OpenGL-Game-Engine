@@ -1,21 +1,16 @@
 #pragma once
-#include "Actor.hpp"
+#include "Entity.hpp"
 
 class Scene
 {
 public:
-	Scene(Actor* root);
+	Scene();
 	~Scene() = default;
 
-	bool requestChange = false;
+	// TODO: SEE COMMENT IN CONSTRUCTOR
+	Entity* player = nullptr;
 
-	std::vector<Actor*> actors;
+	entt::registry registry;
+private:
 
-	void Update();
-	void Render();
-
-	void AddActor();
-	void RemoveActor();
-
-	void AddSceneGraphRoot();
 };

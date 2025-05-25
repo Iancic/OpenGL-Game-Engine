@@ -1,5 +1,6 @@
 #pragma once
 #include "BoxCollider.hpp"
+#include "CircleCollider.hpp"
 #include "Logger.hpp"
 
 class CollisionSolver
@@ -26,17 +27,13 @@ public:
 		return collision_solver_Instance;
 	}
 
-	// Collision Solver provides you with:
-	// An interface to all broad phase colliders.
-	// When a broad phase collision has occured, each colldier contains pointer to Owner.
-	// Owner -> OnCollision() and Owner -> narrowPhaseColliders()
+	void AddCollider(Collider* colliderArg);
+	void SolveCollisions(std::vector<Collider*> colliderA, std::vector<Collider*> colliderB);
 
-	void AddBroadPhaseCollider(BoxCollider* colliderArg, std::vector<BoxCollider*> narrowPhaseCollidersArg);
-	void SolveBroadCollisions();
-	void SolveNarrowCollisions(std::vector<BoxCollider*> narrowA, std::vector<BoxCollider*> narrowB);
-	bool CheckCollision(BoxCollider* colliderA, BoxCollider* colliderB);
+	bool CheckBoxBoxCollision(BoxCollider* colliderA, BoxCollider* colliderB);
+	bool CheckCircleBoxCollision(CircleCollider* colliderA, BoxCollider* colliderB);
+	bool CheckCircleCircleCollision(CircleCollider* colliderA, CircleCollider* colliderB);
 
 private:
-
-	std::vector<BoxCollider*> broadPhaseColliders;
+	std::vector<Collider*> colliders;
 };

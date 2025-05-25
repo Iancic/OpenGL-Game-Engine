@@ -13,6 +13,8 @@
 #include "FrameBuffer.hpp"
 #include "Character.hpp"
 
+#include "Scene.hpp"
+
 class UserInterface
 {
 private:
@@ -44,10 +46,12 @@ public:
 		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground;
 	bool open = true;
 
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
+
 	bool showPostProccesed = false;
 	bool renderDebugInfo = true;
 
-	void EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam);
+	void EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef);
 	void Start();
 	void Init(SDL_Window* windowArg, void* glContextArg);
 	void Shutdown();
@@ -58,7 +62,15 @@ public:
 	void CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam);
 	void Gameplay();
 	void Logger();
+	void ContentBrowser();
+	void Hierarchy(Scene* sceneRef);
+	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
+
+	bool cameraMenu = false, gameMenu = false, creatureMenu = false;
+
+	entt::entity selectedHierarchyItem;
+
 
 	// -------- Game UI --------
 
@@ -69,7 +81,5 @@ public:
 	void RenderText(const std::string& text, float x, float y, float scale, const glm::vec3& color);
 
 	void Game();
-
-	//
 
 };

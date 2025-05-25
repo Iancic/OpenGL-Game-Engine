@@ -3,14 +3,15 @@
 
 class Collider
 {
-	Collider();
+public:
+	Collider() = default;
 	~Collider() = default;
 
-	Transform* transform = nullptr;
-
-	float width, height;
-
-	void DrawDebug();
-	void UpdateCollider(Transform* owner);
+	enum class ColliderType
+	{
+		CIRCLE,
+		BOX
+	};
+private:
 };
 

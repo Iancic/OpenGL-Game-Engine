@@ -16,7 +16,6 @@ public:
     unsigned int quadVAO;
 private:
     Shader* shader;
-    
 
     void initRenderData();
 

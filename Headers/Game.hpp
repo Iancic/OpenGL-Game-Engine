@@ -1,18 +1,7 @@
 #pragma once
 #include "Program.hpp"
-
-// Game Specific Header Files
-#include "common.hpp"
-#include "Creature.hpp"
-#include "Camera.hpp"
-#include "ResourceManager.hpp"
-#include "FrameBuffer.hpp"
-#include "UserInterface.hpp"
-#include "IKChain.hpp"
-#include "Logger.hpp"
-#include "BoxCollider.hpp"
-#include "CollisionSolver.hpp"
-#include "Emitter.hpp"
+#include "Utilities.hpp"
+#include "Scene.hpp"
 
 class Game : public Program
 {
@@ -33,6 +22,11 @@ public:
 
 private:
 
+	Scene scene = Scene(); // TODO: Find a way to read multiple scenes.
+
+	lua_State* L;
+	FMOD_RESULT result;
+
 	UserInterface* UI = UserInterface::getInstance();
 	ResourceManager* Resources = ResourceManager::getInstance();
 	FrameBuffer* RenderingBuffer = nullptr;
@@ -49,7 +43,7 @@ private:
 
 	Creature* player = nullptr;
 	std::vector<Creature*> creatures;
-	void SpawnCreature(); // TODO implement prototype pattern
+	void SpawnCreature() { creatures.push_back(new Creature(5, activeCamera)); }; // TODO implement prototype pattern
 	Transform* origin = new Transform();
 
 	ParticleProperties testProps;

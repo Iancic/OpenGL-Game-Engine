@@ -10,6 +10,43 @@
     <ClCompile Include="libraries\imgui-master\imgui_tables.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp" />
     <ClCompile Include="libraries\stb\stb_image.cpp" />
+    <ClCompile Include="Source\Actor.cpp" />
+    <ClCompile Include="Source\BaseWeapon.cpp" />
+    <ClCompile Include="Source\Boid.cpp" />
+    <ClCompile Include="Source\BoxCollider.cpp" />
+    <ClCompile Include="Source\Bullet.cpp" />
+    <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\Circle.cpp" />
+    <ClCompile Include="Source\Collider.cpp" />
+    <ClCompile Include="Source\CollisionSolver.cpp" />
+    <ClCompile Include="Source\Command.cpp" />
+    <ClCompile Include="Source\Creature.cpp" />
+    <ClCompile Include="Source\Emitter.cpp" />
+    <ClCompile Include="Source\Engine.cpp" />
+    <ClCompile Include="Source\FrameBuffer.cpp" />
+    <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\glad.c" />
+    <ClCompile Include="Source\IKChain.cpp" />
+    <ClCompile Include="Source\IKSegment.cpp" />
+    <ClCompile Include="Source\InputHandler.cpp" />
+    <ClCompile Include="Source\Line.cpp" />
+    <ClCompile Include="Source\Logger.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Perlin.cpp" />
+    <ClCompile Include="Source\Program.cpp" />
+    <ClCompile Include="Source\Random.cpp" />
+    <ClCompile Include="Source\ResourceManager.cpp" />
+    <ClCompile Include="Source\Scene.cpp" />
+    <ClCompile Include="Source\Segment.cpp" />
+    <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\SpriteRenderer.cpp" />
+    <ClCompile Include="Source\Star.cpp" />
+    <ClCompile Include="Source\Texture2D.cpp" />
+    <ClCompile Include="Source\Transform.cpp" />
+    <ClCompile Include="Source\UserInterface.cpp" />
+    <ClCompile Include="Source\CircleCollider.cpp" />
+    <ClCompile Include="Source\Entity.cpp" />
+    <ClCompile Include="Source\NameComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
@@ -23,18 +60,102 @@
     <ClInclude Include="libraries\imgui-master\imstb_textedit.h" />
     <ClInclude Include="libraries\imgui-master\imstb_truetype.h" />
     <ClInclude Include="libraries\stb\stb_image.h" />
+    <ClInclude Include="Headers\Actor.hpp" />
+    <ClInclude Include="Headers\BaseWeapon.hpp" />
+    <ClInclude Include="Headers\Boid.hpp" />
+    <ClInclude Include="Headers\BoxCollider.hpp" />
+    <ClInclude Include="Headers\Bullet.hpp" />
+    <ClInclude Include="Headers\Camera.hpp" />
+    <ClInclude Include="Headers\Character.hpp" />
+    <ClInclude Include="Headers\Circle.hpp" />
+    <ClInclude Include="Headers\Collider.hpp" />
+    <ClInclude Include="Headers\CollisionSolver.hpp" />
+    <ClInclude Include="Headers\Command.hpp" />
+    <ClInclude Include="Headers\Common.hpp" />
+    <ClInclude Include="Headers\Creature.hpp" />
+    <ClInclude Include="Headers\Emitter.hpp" />
+    <ClInclude Include="Headers\Engine.hpp" />
+    <ClInclude Include="Headers\FrameBuffer.hpp" />
+    <ClInclude Include="Headers\Game.hpp" />
+    <ClInclude Include="Headers\IKChain.hpp" />
+    <ClInclude Include="Headers\IKSegment.hpp" />
+    <ClInclude Include="Headers\InputHandler.hpp" />
+    <ClInclude Include="Headers\Line.hpp" />
+    <ClInclude Include="Headers\Logger.hpp" />
+    <ClInclude Include="Headers\Perlin.hpp" />
+    <ClInclude Include="Headers\Program.hpp" />
+    <ClInclude Include="Headers\Random.hpp" />
+    <ClInclude Include="Headers\ResourceManager.hpp" />
+    <ClInclude Include="Headers\Scene.hpp" />
+    <ClInclude Include="Headers\Segment.hpp" />
+    <ClInclude Include="Headers\Shader.hpp" />
+    <ClInclude Include="Headers\SpriteRenderer.hpp" />
+    <ClInclude Include="Headers\Star.hpp" />
+    <ClInclude Include="Headers\Texture2D.hpp" />
+    <ClInclude Include="Headers\Transform.hpp" />
+    <ClInclude Include="Headers\UserInterface.hpp" />
+    <ClInclude Include="Headers\Utilities.hpp" />
+    <ClInclude Include="Headers\Vertex.hpp" />
+    <ClInclude Include="Headers\CircleCollider.hpp" />
+    <ClInclude Include="Libraries\lua\include\lauxlib.h" />
+    <ClInclude Include="Libraries\lua\include\lua.h" />
+    <ClInclude Include="Libraries\lua\include\lua.hpp" />
+    <ClInclude Include="Libraries\lua\include\luaconf.h" />
+    <ClInclude Include="Libraries\lua\include\lualib.h" />
+    <ClInclude Include="Headers\LuaUtilities.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod_codec.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_common.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp_effects.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_errors.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_output.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio_common.h" />
+    <ClInclude Include="Libraries\entt\entt.hpp" />
+    <ClInclude Include="Headers\SpriteComponent.hpp" />
+    <ClInclude Include="Headers\TransformComponent.hpp" />
+    <ClInclude Include="Headers\Entity.hpp" />
+    <ClInclude Include="Headers\NameComponent.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\fFrameBuffer.glsl" />
-    <None Include="Assets\Shaders\fPerlin.glsl" />
-    <None Include="Assets\Shaders\fSpine.glsl" />
-    <None Include="Assets\Shaders\fSprite.glsl" />
-    <None Include="Assets\Shaders\fBasic.glsl" />
-    <None Include="Assets\Shaders\vFrameBuffer.glsl" />
-    <None Include="Assets\Shaders\vPerlin.glsl" />
-    <None Include="Assets\Shaders\vSpine.glsl" />
-    <None Include="Assets\Shaders\vSprite.glsl" />
-    <None Include="Assets\Shaders\vBasic.glsl" />
+    <None Include="Assets\Shaders\vSprite.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\vSpine.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\vPerlin.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\vFrameBuffer.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\vBasic.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\fSprite.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\fSpine.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\fPerlin.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\fFrameBuffer.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\fBasic.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Scripts\RandomNumber.lua" />
+    <None Include="Libraries\fmod\include\fmod.cs" />
+    <None Include="Libraries\fmod\include\fmod_dsp.cs" />
+    <None Include="Libraries\fmod\include\fmod_errors.cs" />
+    <None Include="Libraries\fmod\include\fmod_studio.cs" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Libraries">
@@ -45,6 +166,12 @@
     </Filter>
     <Filter Include="Game">
       <UniqueIdentifier>{20368d7f-9e08-42ea-a324-71a3d52a2c57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3f822e9e-1951-4270-86ea-69ce620e104f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{464b1586-6267-4c2b-be61-5b146db92375}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

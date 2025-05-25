@@ -122,12 +122,18 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\freeType\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)libraries\SDL\lib\SDL2.dll" "$(OutDir)"
-copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy /Y "$(SolutionDir)Libraries\freeType\lib\freetype.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\SDL\lib\SDL2.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\lua\lib\lua54.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmod.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodL.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudio.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,12 +152,18 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\freeType\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;;$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;fmodstudio_vc.lib;fmod_vc.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)libraries\SDL\lib\SDL2.dll" "$(OutDir)"
-copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy /Y "$(SolutionDir)Libraries\freeType\lib\freetype.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\SDL\lib\SDL2.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\lua\lib\lua54.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmod.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodL.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudio.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -171,12 +183,14 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClCompile Include="Source\Bullet.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Circle.cpp" />
+    <ClCompile Include="Source\CircleCollider.cpp" />
     <ClCompile Include="Source\Collider.cpp" />
     <ClCompile Include="Source\CollisionSolver.cpp" />
     <ClCompile Include="Source\Command.cpp" />
     <ClCompile Include="Source\Creature.cpp" />
     <ClCompile Include="Source\Emitter.cpp" />
     <ClCompile Include="Source\Engine.cpp" />
+    <ClCompile Include="Source\Entity.cpp" />
     <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\glad.c" />
@@ -186,12 +200,12 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\NameComponent.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
     <ClCompile Include="Source\Program.cpp" />
     <ClCompile Include="Source\Random.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
-    <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\Segment.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
@@ -209,6 +223,7 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClInclude Include="Headers\Camera.hpp" />
     <ClInclude Include="Headers\Character.hpp" />
     <ClInclude Include="Headers\Circle.hpp" />
+    <ClInclude Include="Headers\CircleCollider.hpp" />
     <ClInclude Include="Headers\Collider.hpp" />
     <ClInclude Include="Headers\CollisionSolver.hpp" />
     <ClInclude Include="Headers\Command.hpp" />
@@ -216,6 +231,7 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClInclude Include="Headers\Creature.hpp" />
     <ClInclude Include="Headers\Emitter.hpp" />
     <ClInclude Include="Headers\Engine.hpp" />
+    <ClInclude Include="Headers\Entity.hpp" />
     <ClInclude Include="Headers\FrameBuffer.hpp" />
     <ClInclude Include="Headers\Game.hpp" />
     <ClInclude Include="Headers\IKChain.hpp" />
@@ -223,21 +239,36 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClInclude Include="Headers\InputHandler.hpp" />
     <ClInclude Include="Headers\Line.hpp" />
     <ClInclude Include="Headers\Logger.hpp" />
+    <ClInclude Include="Headers\LuaUtilities.hpp" />
+    <ClInclude Include="Headers\NameComponent.hpp" />
     <ClInclude Include="Headers\Perlin.hpp" />
     <ClInclude Include="Headers\Program.hpp" />
     <ClInclude Include="Headers\Random.hpp" />
     <ClInclude Include="Headers\ResourceManager.hpp" />
     <ClInclude Include="Headers\Scene.hpp" />
-    <ClInclude Include="Headers\SceneManager.hpp" />
     <ClInclude Include="Headers\Segment.hpp" />
     <ClInclude Include="Headers\Shader.hpp" />
+    <ClInclude Include="Headers\SpriteComponent.hpp" />
     <ClInclude Include="Headers\SpriteRenderer.hpp" />
     <ClInclude Include="Headers\Star.hpp" />
     <ClInclude Include="Headers\Texture2D.hpp" />
     <ClInclude Include="Headers\Transform.hpp" />
+    <ClInclude Include="Headers\TransformComponent.hpp" />
     <ClInclude Include="Headers\UserInterface.hpp" />
     <ClInclude Include="Headers\Utilities.hpp" />
     <ClInclude Include="Headers\Vertex.hpp" />
+    <ClInclude Include="Libraries\entt\entt.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod_codec.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_common.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp_effects.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_errors.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_output.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.h" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.hpp" />
+    <ClInclude Include="Libraries\fmod\include\fmod_studio_common.h" />
     <ClInclude Include="libraries\glad\glad.h" />
     <ClInclude Include="libraries\imgui-master\imconfig.h" />
     <ClInclude Include="libraries\imgui-master\imgui.h" />
@@ -248,6 +279,11 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <ClInclude Include="libraries\imgui-master\imstb_rectpack.h" />
     <ClInclude Include="libraries\imgui-master\imstb_textedit.h" />
     <ClInclude Include="libraries\imgui-master\imstb_truetype.h" />
+    <ClInclude Include="Libraries\lua\include\lauxlib.h" />
+    <ClInclude Include="Libraries\lua\include\lua.h" />
+    <ClInclude Include="Libraries\lua\include\lua.hpp" />
+    <ClInclude Include="Libraries\lua\include\luaconf.h" />
+    <ClInclude Include="Libraries\lua\include\lualib.h" />
     <ClInclude Include="libraries\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +297,11 @@ copy /Y "$(SolutionDir)libraries\freeType\lib\freetype.dll" "$(OutDir)"</Command
     <None Include="Assets\Shaders\vSpine.glsl" />
     <None Include="Assets\Shaders\vSprite.glsl" />
     <None Include="Assets\Shaders\vBasic.glsl" />
+    <None Include="Libraries\fmod\include\fmod.cs" />
+    <None Include="Libraries\fmod\include\fmod_dsp.cs" />
+    <None Include="Libraries\fmod\include\fmod_errors.cs" />
+    <None Include="Libraries\fmod\include\fmod_studio.cs" />
+    <None Include="Scripts\RandomNumber.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

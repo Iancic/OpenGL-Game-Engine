@@ -1,5 +1,8 @@
 #include "Game.hpp"
-#include "Line.hpp"
+
+// ----------------------
+//     INITIALIZATION
+// ----------------------
 
 void Game::Init()
 {
@@ -16,17 +19,48 @@ void Game::Init()
 	Line::getInstance()->SetCamera(activeCamera); // Important To Setup For Debug Drawing
 
 	testEmmiter = new Emitter();
+
+	L = luaL_newstate();
+	luaL_openlibs(L);
+
+	// Register C++ function as callable from Lua
+	lua_register(L, "GetRandomNumber", lua_GetRandomNumber);
+
+	if (CheckLua(L, luaL_dofile(L, "Scripts/RandomNumber.lua")))
+	{
+		lua_getglobal(L, "ReturnRandomNumber"); // Push the function onto the stack
+
+		if (lua_isfunction(L, -1))
+		{
+			if (CheckLua(L, lua_pcall(L, 0, 1, 0))) // Call it with 0 arguments, expecting 1 return value
+			{
+				if (lua_isnumber(L, -1))
+				{
+					float result = (float)lua_tonumber(L, -1);
+					//std::cout << "[C++] Result from Lua: " << result << "\n";
+				}
+				lua_pop(L, 1); // Clean up result
+			}
+		}
+		else
+		{
+			std::cerr << "[C++] Error: ReturnRandomNumber is not defined or not a function.\n";
+			lua_pop(L, 1); // Clean the nil or wrong type from the stack
+		}
+	}
+
+	TestSound();
 }
 
-void Game::Shutdown()
-{
-
-}
+// ----------------------
+//       CORE LOOP
+// ----------------------
 
 void Game::Update()
 {
 	Time();
-	
+
+	/*
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouseX = mouseX - SCREEN_WIDTH / 2;
 	mouseY = mouseY - SCREEN_HEIGHT / 2;
@@ -72,13 +106,13 @@ void Game::Update()
 	glm::vec2 focus = glm::vec2(player->segments[0]->transform.position.x, player->segments[0]->transform.position.y);
 	activeCamera->updateProjection(focus);
 
-	CollisionSolver::getInstance()->SolveBroadCollisions();
+	//CollisionSolver::getInstance()->SolveCollisions();
+	*/
 }
 
-void Game::SpawnCreature()
-{
-	creatures.push_back(new Creature(5, activeCamera));
-}
+// ----------------------
+//        RENDERING
+// ----------------------
 
 void Game::Render()
 {
@@ -93,6 +127,7 @@ void Game::Render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
+	/*
 	// ----- Render Calls -----
 	player->Render();
 
@@ -109,18 +144,23 @@ void Game::Render()
 		for (auto& creature : creatures)
 			creature->RenderDebug();
 	}
+	*/
 
 	// Draw framebuffer to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	RenderingBuffer->DrawRenderBuffer(timeElapsed);
 
 	// UI
-	if (isEditorOn) UI->EngineEditor(player, RenderingBuffer, activeCamera);
+	if (isEditorOn) UI->EngineEditor(player, RenderingBuffer, activeCamera, &scene);
 	else UI->Game();
 
 	// Present
 	SDL_GL_SwapWindow(window);
 }
+
+// ----------------------
+//     EVENTS & INPUT
+// ----------------------
 
 void Game::HandleEvents()
 {
@@ -224,4 +264,13 @@ void Game::HandleInput()
 		player->segments[0]->transform.position.y -= player->movementSpeed * controllerAxisLeftY * deltaTime;
 		isPlayerMoving = true;
 	}
+}
+
+// ----------------------
+//       SHUTDOWN
+// ----------------------
+
+void Game::Shutdown()
+{
+	lua_close(L);
 }

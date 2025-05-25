@@ -116,7 +116,7 @@ void UserInterface::RenderText(const std::string& text, float x, float y, float 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam)
+void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef)
 {
 	Start();
 	Style();
@@ -124,11 +124,15 @@ void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera
 	Gameplay();
 	CreatureMenu(creatureArg);
 	CameraMenu(creatureArg, fbo, maincam);
+
 	if (showPostProccesed)
 		GameViewport(fbo->postprocessedTexture);
 	else
 		GameViewport(fbo->framebufferTexture);
 	Logger();
+	ContentBrowser();
+	Hierarchy(sceneRef);
+	PropertiesPanel(sceneRef);
 	Shutdown();
 }
 
@@ -187,7 +191,7 @@ void UserInterface::DockSpace()
 
 void UserInterface::GameViewport(GLuint fboID)
 {
-	ImGui::Begin("Game View");
+	ImGui::Begin("Viewport", nullptr, windowFlags);
 	ImTextureID imguiTexture = static_cast<ImTextureID>(static_cast<uintptr_t>(fboID));
 	ImGui::Image(imguiTexture, ImVec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT), ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::End();
@@ -274,124 +278,130 @@ void UserInterface::Style()
 
 void UserInterface::CreatureMenu(Creature* creatureArg)
 {
-	ImGui::Begin("Creature", &open);
+	if (creatureMenu) {
+		ImGui::Begin("Creature", &creatureMenu);
 
-	ImGui::Text("Leg Options:");
-	ImGui::Checkbox("Gait", &creatureArg->gait);
-	ImGui::SliderFloat("Leg Width", &creatureArg->legWidth, 1.f, 5.f);
-	ImGui::SliderFloat("Snap Distance", &creatureArg->distanceToSnap, -150.f, 200.f);
-	ImGui::SliderFloat("Forward Step", &creatureArg->forwardOffset, -150.f, 200.f);
-	ImGui::SliderFloat("Otward Step", &creatureArg->outwardBias, 0.f, 1.f);
+		ImGui::Text("Leg Options:");
+		ImGui::Checkbox("Gait", &creatureArg->gait);
+		ImGui::SliderFloat("Leg Width", &creatureArg->legWidth, 1.f, 5.f);
+		ImGui::SliderFloat("Snap Distance", &creatureArg->distanceToSnap, -150.f, 200.f);
+		ImGui::SliderFloat("Forward Step", &creatureArg->forwardOffset, -150.f, 200.f);
+		ImGui::SliderFloat("Otward Step", &creatureArg->outwardBias, 0.f, 1.f);
 
-	ImGui::Text("Leg Count ", &creatureArg->legCounter); 
-	ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->AddLeg();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->RemoveLeg();
+		ImGui::Text("Leg Count ", &creatureArg->legCounter);
+		ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->AddLeg();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->RemoveLeg();
 
-	for (size_t i = 0; i < creatureArg->legs.size(); ++i) {
-		ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
-		std::string legLabel = "Leg " + std::to_string(i);
-		if (ImGui::TreeNode(legLabel.c_str())) {
-			for (size_t j = 0; j < creatureArg->legs[i]->segments.size(); j++) {
-				std::string segmentLabel = "Segment " + std::to_string(j);
-				if (ImGui::TreeNode(segmentLabel.c_str())) {
-					ImGui::SliderFloat("Leg Length", &creatureArg->legs[i]->segments[j]->lenght, 1.0f, 30.0f);
-					ImGui::TreePop();
+		for (size_t i = 0; i < creatureArg->legs.size(); ++i) {
+			ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
+			std::string legLabel = "Leg " + std::to_string(i);
+			if (ImGui::TreeNode(legLabel.c_str())) {
+				for (size_t j = 0; j < creatureArg->legs[i]->segments.size(); j++) {
+					std::string segmentLabel = "Segment " + std::to_string(j);
+					if (ImGui::TreeNode(segmentLabel.c_str())) {
+						ImGui::SliderFloat("Leg Length", &creatureArg->legs[i]->segments[j]->lenght, 1.0f, 30.0f);
+						ImGui::TreePop();
+					}
 				}
+
+				ImGui::Text("Chain Segments Count ", &creatureArg->legs[i]->chainLenght);
+				ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->legs[i]->AddSegment();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->legs[i]->RemoveSegment();
+
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
+		}
+
+
+		ImGui::Spacing();
+
+		ImGui::Text("Body Options:");
+		ImGui::SliderInt("Creature Lenght", &creatureArg->desiredLenght, 2, 30);
+		ImGui::SliderInt("Segment Spacing", &creatureArg->desiredSegmentSpacing, 5, 50);
+
+		while (creatureArg->segmentSpacing < creatureArg->desiredSegmentSpacing)
+		{
+			creatureArg->AddSpacing();
+		}
+
+		while (creatureArg->segmentSpacing > creatureArg->desiredSegmentSpacing)
+		{
+			creatureArg->RemoveSpacing();
+		}
+
+		for (size_t i = 0; i < creatureArg->segments.size(); ++i)
+		{
+			ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
+
+			std::string label = "Segment " + std::to_string(i);
+			if (ImGui::TreeNode(label.c_str()))
+			{
+				ImGui::SliderInt("Thickness", &creatureArg->segments[i]->segmentRadius, 0.0f, 20.0f);
+				ImGui::TreePop();
 			}
 
-			ImGui::Text("Chain Segments Count ", &creatureArg->legs[i]->chainLenght);
-			ImGui::SameLine(); if (ImGui::Button("+")) creatureArg->legs[i]->AddSegment();  ImGui::SameLine(); if (ImGui::Button("-")) creatureArg->legs[i]->RemoveSegment();
-			
-			ImGui::TreePop();
-		}
-		ImGui::PopID();
-	}
-
-
-	ImGui::Spacing();
-
-	ImGui::Text("Body Options:");
-	ImGui::SliderInt("Creature Lenght", &creatureArg->desiredLenght, 2, 30);
-	ImGui::SliderInt("Segment Spacing", &creatureArg->desiredSegmentSpacing, 5, 50);
-
-	while (creatureArg->segmentSpacing < creatureArg->desiredSegmentSpacing)
-	{
-		creatureArg->AddSpacing();
-	}
-
-	while (creatureArg->segmentSpacing > creatureArg->desiredSegmentSpacing)
-	{
-		creatureArg->RemoveSpacing();
-	}
-
-	for (size_t i = 0; i < creatureArg->segments.size(); ++i)
-	{
-		ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
-
-		std::string label = "Segment " + std::to_string(i);
-		if (ImGui::TreeNode(label.c_str()))
-		{
-			ImGui::SliderInt("Thickness", &creatureArg->segments[i]->segmentRadius, 0.0f, 20.0f);
-			ImGui::TreePop();
+			ImGui::PopID();
 		}
 
-		ImGui::PopID();
+		// Required Logic for Sliders to work
+		while (creatureArg->creatureLenght < creatureArg->desiredLenght)
+			creatureArg->IncreaseBodyLenght();
+
+		while (creatureArg->creatureLenght > creatureArg->desiredLenght)
+			creatureArg->DecreaseBodyLenght();
+
+		ImGui::Spacing();
+		ImGui::SliderFloat("Rotation Speed", &creatureArg->rotationSpeed, 0.f, 5.f);
+		ImGui::SliderFloat("Dynamic Speed", &creatureArg->dynamicSpeed, 0.f, 200.f);
+		ImGui::SliderFloat("Texture Scale", &creatureArg->zoomFactor, 0.f, 50.f);
+
+		ImGui::SliderFloat2("Offset", &creatureArg->offset.x, 0.f, 50.f);
+
+		ImGui::SliderFloat3("Secondary Color", &creatureArg->secondaryColor.x, 0.f, 1.f);
+		ImGui::SliderFloat3("Primary Color", &creatureArg->primaryColor.x, 0.f, 1.f);
+
+		ImGui::SliderFloat("Spot Size", &creatureArg->spotSize, -1.f, 1.f);
+
+		ImGui::End();
 	}
-
-	// Required Logic for Sliders to work
-	while (creatureArg->creatureLenght < creatureArg->desiredLenght)
-		creatureArg->IncreaseBodyLenght();
-
-	while (creatureArg->creatureLenght > creatureArg->desiredLenght)
-		creatureArg->DecreaseBodyLenght();
-
-	ImGui::Spacing();
-	ImGui::SliderFloat("Rotation Speed", &creatureArg->rotationSpeed, 0.f, 5.f);
-	ImGui::SliderFloat("Dynamic Speed", &creatureArg->dynamicSpeed, 0.f, 200.f);
-	ImGui::SliderFloat("Texture Scale", &creatureArg->zoomFactor, 0.f, 50.f);
-
-	ImGui::SliderFloat2("Offset", &creatureArg->offset.x, 0.f, 50.f);
-
-	ImGui::SliderFloat3("Secondary Color", &creatureArg->secondaryColor.x, 0.f, 1.f);
-	ImGui::SliderFloat3("Primary Color", &creatureArg->primaryColor.x, 0.f, 1.f);
-
-	ImGui::SliderFloat("Spot Size", &creatureArg->spotSize, -1.f, 1.f);
-
-	ImGui::End();
 }
 
 void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam)
 {
-	ImGui::Begin("Camera", &open);
+	if (cameraMenu) {
+		ImGui::Begin("Camera", &cameraMenu);
 
-	if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
-	{
-		glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
-		maincam->updateProjection(focus);
+		if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
+		{
+			glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
+			maincam->updateProjection(focus);
+		}
+		ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
+		ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
+
+		ImGui::Checkbox("Post Processing:", &showPostProccesed);
+
+		if (showPostProccesed)
+		{
+			ImGui::Checkbox("Show Scanline", &fbo->scanline);
+			ImGui::SliderFloat("Chromatic Abberation", &fbo->abberationIntensity, 0.f, 5.f);
+			ImGui::SliderFloat("Curve Left", &fbo->curveLeft, 0.f, 5.f);
+			ImGui::SliderFloat("Curve Right", &fbo->curveRight, 0.f, 5.f);
+			ImGui::SliderFloat("Vignette", &fbo->vignetteIntensity, 0.f, 5.f);
+		}
+
+		ImGui::End();
 	}
-	ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
-	ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
-
-	ImGui::Checkbox("Post Processing:", &showPostProccesed);
-
-	if (showPostProccesed)
-	{
-		ImGui::Checkbox("Show Scanline", &fbo->scanline);
-		ImGui::SliderFloat("Chromatic Abberation", &fbo->abberationIntensity, 0.f, 5.f);
-		ImGui::SliderFloat("Curve Left", &fbo->curveLeft, 0.f, 5.f);
-		ImGui::SliderFloat("Curve Right", &fbo->curveRight, 0.f, 5.f);
-		ImGui::SliderFloat("Vignette", &fbo->vignetteIntensity, 0.f, 5.f);
-	}
-
-	ImGui::End();
 }
 
 void UserInterface::Gameplay()
 {
-	ImGui::Begin("Game");
+	if (gameMenu) {
+		ImGui::Begin("Game", &gameMenu);
 
-	ImGui::Checkbox("Show Colliders", &renderDebugInfo);
+		ImGui::Checkbox("Show Colliders", &renderDebugInfo);
 
-	ImGui::End();
+		ImGui::End();
+	}
 }
 
 void UserInterface::Logger()
@@ -424,6 +434,82 @@ void UserInterface::Logger()
 	ImGui::End();
 }
 
+void UserInterface::ContentBrowser()
+{
+	ImGui::Begin("Content Browser");
+
+	ImGui::End();
+}
+
+void UserInterface::Hierarchy(Scene* sceneRef)
+{
+	ImGui::Begin("Hierarchy");
+
+	for (auto entity : sceneRef->registry.view<entt::entity>())
+	{
+		// Out of the entt id make one for IMGUI
+		int id = static_cast<int>(entity);
+		ImGui::PushID(id);
+
+		// Get name of the Entity
+		std::string label = "Entity" + std::to_string(id);
+		if (sceneRef->registry.any_of<NameComponent>(entity)) 
+		{
+			auto& name = sceneRef->registry.get<NameComponent>(entity);
+			label = name.name;
+		}
+
+		// TODO: wrap this inside a Tree Node for scene graph functionality
+		bool clicked = ImGui::Selectable(label.c_str(), selectedHierarchyItem == entity);
+		if (clicked) selectedHierarchyItem = entity;
+
+		ImGui::PopID();
+	}
+
+	ImGui::End();
+}
+
+void UserInterface::PropertiesPanel(Scene* sceneRef)
+{
+	ImGui::Begin("Properties");
+
+	if (selectedHierarchyItem != entt::null && sceneRef->registry.valid(selectedHierarchyItem))
+	{
+		// ALL POSSIBLE COMPONENTS
+		if (ImGui::CollapsingHeader("Name")) {
+			char buffer[64];
+			auto& name = sceneRef->registry.get<NameComponent>(selectedHierarchyItem);
+			strncpy_s(buffer, name.name.c_str(), sizeof(buffer));
+			buffer[sizeof(buffer) - 1] = '\0';
+			if (ImGui::InputText("Name ##", buffer, sizeof(buffer))) {
+				name.name = buffer;
+			}
+		
+			char buffer2[64];
+			strncpy_s(buffer2, name.tag.c_str(), sizeof(buffer2));
+			buffer2[sizeof(buffer2) - 1] = '\0';
+			if (ImGui::InputText("Tag", buffer2, sizeof(buffer2))) {
+				name.tag = buffer2;
+			}
+		}
+
+		if (sceneRef->registry.any_of<TransformComponent>(selectedHierarchyItem)) 
+		{
+			auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Transform"))
+			{
+				ImGui::Text("Test 2");
+			}
+		}
+
+	}
+	else 
+		ImGui::Text("No entity selected.");
+
+	ImGui::End();
+}
+
 void UserInterface::HeaderBar()
 {
 	if (ImGui::BeginMenuBar())
@@ -432,22 +518,44 @@ void UserInterface::HeaderBar()
 		ImGui::Text("FPS");
 		*/
 
-		if (ImGui::BeginMenu("Options"))
+		if (ImGui::BeginMenu("File"))
 		{
-			
-			if (ImGui::MenuItem("Randomize Creature"))
+			if (ImGui::MenuItem("Save"))
 			{
-				// Close app or set a flag
+
 			}
-			if (ImGui::MenuItem("Save Preset"))
+			if (ImGui::MenuItem("Export Build"))
 			{
-				// Close app or set a flag
+
 			}
-			if (ImGui::MenuItem("Load Preset"))
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::MenuItem("Preferences"))
 			{
-				// Close app or set a flag
+				
 			}
-			
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("View"))
+		{
+
+			if (ImGui::MenuItem("Camera"))
+			{
+				cameraMenu = true;
+			}
+			if (ImGui::MenuItem("Game"))
+			{
+				gameMenu = true;
+			}
+			if (ImGui::MenuItem("Creature"))
+			{
+				creatureMenu = true;
+			}
+
 			ImGui::EndMenu();
 		}
 

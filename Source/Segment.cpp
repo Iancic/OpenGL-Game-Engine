@@ -2,7 +2,7 @@
 
 Segment::Segment(Segment* Target, int desiredShape, int desiredRadius, int desiredSpacing)
 {
-	collider = new BoxCollider(BoxCollider::ColliderType::Segment);
+	collider = new BoxCollider();
 
 	segmentSpacing = desiredSpacing;
 	segmentShape = desiredShape;

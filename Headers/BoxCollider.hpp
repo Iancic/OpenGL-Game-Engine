@@ -1,15 +1,13 @@
 #pragma once
 #include "Transform.hpp"
 #include "Line.hpp"
+#include "Collider.hpp"
 #include <functional> // Support for callbacks
 
-class BoxCollider
+class BoxCollider : Collider
 {
 public:
-	enum class ColliderType { Untagged, BroadPhase, Segment, Bullet, Dust, Planet, Head };
-	ColliderType type = ColliderType::Untagged;
-
-	BoxCollider(ColliderType tagType);
+	BoxCollider();
 	~BoxCollider();
 	
 	void Update(Transform* target, float widthArg, float heightArg); // Synchronise collider 
@@ -30,9 +28,8 @@ public:
 
 	glm::vec4 defaultColor{ 255.f, 0.f, 0.f, 255.f };
 
-	std::vector<BoxCollider*> narrowPhaseColliders;
+	ColliderType type = Collider::ColliderType::BOX;
 
 private:
-	
 	glm::vec4 color = defaultColor;
 };

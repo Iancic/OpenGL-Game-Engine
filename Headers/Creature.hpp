@@ -82,8 +82,7 @@ public:
 
 	SpriteRenderer* spriteRenderer = nullptr; // Used to draw all sprites
 	
-	BoxCollider* colliderBroadPhase;
-	std::vector<BoxCollider*> narrowPhaseColliders;
+	std::vector<BoxCollider*> colliders;
 
 	void Update(Transform& target, float deltaTime);
 	void AI();

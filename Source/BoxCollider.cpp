@@ -1,8 +1,7 @@
 #include "BoxCollider.hpp"
 
-BoxCollider::BoxCollider(ColliderType tagType)
+BoxCollider::BoxCollider()
 {
-	type = tagType;
 	transform = new Transform();
 }
 

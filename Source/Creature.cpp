@@ -129,10 +129,8 @@ Creature::Creature(int difficulty, Camera* camera)
 
 	spriteRenderer = new SpriteRenderer();
 
-	// Setup Broad and Narrow colliders
-	colliderBroadPhase = new BoxCollider(BoxCollider::ColliderType::BroadPhase);
-	for (auto& segment : segments) narrowPhaseColliders.push_back(segment->collider);
-	CollisionSolver::getInstance()->AddBroadPhaseCollider(colliderBroadPhase, narrowPhaseColliders);
+	// Setup Colliders
+	for (auto& segment : segments) colliders.push_back(segment->collider);
 }
 
 Creature::~Creature()
@@ -265,8 +263,6 @@ void Creature::Update(Transform& target, float deltaTime)
 
 	float broadPhaseSize{};
 	for (auto& segment : segments) { broadPhaseSize += segment->segmentRadius + segment->segmentSpacing; }
-
-	colliderBroadPhase->Update(&targetBroadPhase, broadPhaseSize, broadPhaseSize); // Does need to be very exact since it's just an optimization pattern.
 }
 
 void Creature::AI()
@@ -293,8 +289,6 @@ void Creature::Render()
 void Creature::RenderDebug()
 {
 	for (auto& element : segments) element->RenderDebug();
-
-	colliderBroadPhase->Render();
 }
 
 void Creature::RenderSprites()

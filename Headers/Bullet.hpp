@@ -2,6 +2,7 @@
 #include "Transform.hpp"
 #include "Camera.hpp"
 #include "Circle.hpp"
+#include "CircleCollider.hpp"
 
 class Bullet
 {
@@ -17,8 +18,11 @@ public:
 
 	Transform transform;
 
+	//CircleCollider* 
+
 	void Update(float deltaTime, float bulletSpeed);
 	void Render();
+	void RenderDebug();
 
 private:
 };

@@ -1,25 +1,12 @@
 #include "Scene.hpp"
 
-Scene::Scene(Actor* root)
+Scene::Scene()
 {
-}
+	// TODO: Add entities during runtime.
+	// TODO: Read entities from file.
 
-void Scene::Update()
-{
-}
-
-void Scene::Render()
-{
-}
-
-void Scene::AddActor()
-{
-}
-
-void Scene::RemoveActor()
-{
-}
-
-void Scene::AddSceneGraphRoot()
-{
+	player = new Entity(registry.create(), registry);
+	player->AddComponent<TransformComponent>(glm::vec3{ 0.f }, glm::vec3{ 0.f }, glm::vec3{ 0.f });
+	player->AddComponent<NameComponent>("Player", "Default");
+	player->AddComponent<SpriteComponent>();
 }
