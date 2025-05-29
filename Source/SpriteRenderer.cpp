@@ -14,6 +14,7 @@ SpriteRenderer::~SpriteRenderer()
 void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color)
 {
     // prepare transformations
+    // TODO: move this in component?
     this->shader->use();
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position, 0.0f));

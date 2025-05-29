@@ -122,7 +122,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -153,7 +153,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;;$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;fmodstudio_vc.lib;fmod_vc.lib</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudio_vc.lib;fmod_vc.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Libraries\freeType\lib\freetype.dll" "$(OutDir)"
@@ -168,6 +168,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\imgui-master\imgui.cpp" />
+    <ClCompile Include="Libraries\imgui-master\ImGuizmo.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui_demo.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui_draw.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp" />
@@ -200,7 +201,6 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\NameComponent.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
     <ClCompile Include="Source\Program.cpp" />
     <ClCompile Include="Source\Random.cpp" />
@@ -216,6 +216,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Actor.hpp" />
+    <ClInclude Include="Headers\AudioComponent.hpp" />
     <ClInclude Include="Headers\BaseWeapon.hpp" />
     <ClInclude Include="Headers\Boid.hpp" />
     <ClInclude Include="Headers\BoxCollider.hpp" />
@@ -230,6 +231,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="Headers\Common.hpp" />
     <ClInclude Include="Headers\Creature.hpp" />
     <ClInclude Include="Headers\Emitter.hpp" />
+    <ClInclude Include="Headers\EmitterComponent.hpp" />
     <ClInclude Include="Headers\Engine.hpp" />
     <ClInclude Include="Headers\Entity.hpp" />
     <ClInclude Include="Headers\FrameBuffer.hpp" />
@@ -242,15 +244,18 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="Headers\LuaUtilities.hpp" />
     <ClInclude Include="Headers\NameComponent.hpp" />
     <ClInclude Include="Headers\Perlin.hpp" />
+    <ClInclude Include="Headers\PhysicsComponent.hpp" />
     <ClInclude Include="Headers\Program.hpp" />
     <ClInclude Include="Headers\Random.hpp" />
     <ClInclude Include="Headers\ResourceManager.hpp" />
     <ClInclude Include="Headers\Scene.hpp" />
+    <ClInclude Include="Headers\ScriptComponent.hpp" />
     <ClInclude Include="Headers\Segment.hpp" />
     <ClInclude Include="Headers\Shader.hpp" />
     <ClInclude Include="Headers\SpriteComponent.hpp" />
     <ClInclude Include="Headers\SpriteRenderer.hpp" />
     <ClInclude Include="Headers\Star.hpp" />
+    <ClInclude Include="Headers\TextComponent.hpp" />
     <ClInclude Include="Headers\Texture2D.hpp" />
     <ClInclude Include="Headers\Transform.hpp" />
     <ClInclude Include="Headers\TransformComponent.hpp" />
@@ -272,8 +277,10 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="libraries\glad\glad.h" />
     <ClInclude Include="libraries\imgui-master\imconfig.h" />
     <ClInclude Include="libraries\imgui-master\imgui.h" />
+    <ClInclude Include="Libraries\imgui-master\ImGuizmo.h" />
     <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3.h" />
     <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Libraries\imgui-master\imgui_impl_sdl2.h" />
     <ClInclude Include="libraries\imgui-master\imgui_impl_sdlrenderer2.h" />
     <ClInclude Include="libraries\imgui-master\imgui_internal.h" />
     <ClInclude Include="libraries\imgui-master\imstb_rectpack.h" />

@@ -22,7 +22,7 @@ public:
 
 private:
 
-	Scene scene = Scene(); // TODO: Find a way to read multiple scenes.
+	Scene* scene = nullptr; // TODO: Find a way to read multiple scenes.
 
 	lua_State* L;
 	FMOD_RESULT result;

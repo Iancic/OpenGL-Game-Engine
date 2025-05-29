@@ -83,3 +83,13 @@ void Program::Time()
 
 	milisecondsPreviousFrame = SDL_GetTicks();
 }
+
+int Program::GetFPS()
+{
+	return (deltaTime > 0.0) ? static_cast<int>(1.0 / deltaTime) : 0;
+}
+
+int Program::GetMS()
+{
+	return static_cast<int>(deltaTime * 1000.0);;
+}

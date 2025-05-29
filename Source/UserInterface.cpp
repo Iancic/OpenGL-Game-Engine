@@ -116,30 +116,30 @@ void UserInterface::RenderText(const std::string& text, float x, float y, float 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef)
+void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef, const int& MS, const int& FPS)
 {
 	Start();
 	Style();
 	DockSpace();
-	Gameplay();
+	Gameplay(MS, FPS);
 	CreatureMenu(creatureArg);
 	CameraMenu(creatureArg, fbo, maincam);
 
 	if (showPostProccesed)
-		GameViewport(fbo->postprocessedTexture);
+		GameViewport(fbo->postprocessedTexture, maincam, sceneRef);
 	else
-		GameViewport(fbo->framebufferTexture);
+		GameViewport(fbo->framebufferTexture, maincam, sceneRef);
 	Logger();
-	ContentBrowser();
 	Hierarchy(sceneRef);
 	PropertiesPanel(sceneRef);
-	Shutdown();
+	Shutdown(sceneRef);
 }
 
 void UserInterface::Start()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 }
 
 void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
@@ -158,8 +158,14 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-void UserInterface::Shutdown()
+void UserInterface::Shutdown(Scene* sceneRef)
 {
+	for (auto entity : entitiesToDestroy)
+	{
+		sceneRef->DestroyEntity(entity);
+	}
+	entitiesToDestroy.clear();
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -189,12 +195,116 @@ void UserInterface::DockSpace()
 	ImGui::End();
 }
 
-void UserInterface::GameViewport(GLuint fboID)
+void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 {
 	ImGui::Begin("Viewport", nullptr, windowFlags);
-	ImTextureID imguiTexture = static_cast<ImTextureID>(static_cast<uintptr_t>(fboID));
-	ImGui::Image(imguiTexture, ImVec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT), ImVec2(0, 1), ImVec2(1, 0));
+
+	// Because I have docking this is required to know to draw imguizmo rect on top
+	ImVec2 windowPos = ImGui::GetWindowPos();
+	ImVec2 cursorPos = ImGui::GetCursorPos();
+	ImVec2 imagePos = ImVec2(windowPos.x + cursorPos.x, windowPos.y + cursorPos.y);
+	ImVec2 imageSize = ImVec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+
+	ImVec2 buttonSize = ImVec2(32, 32);
+
+	if (ImGui::Button("Play", buttonSize))
+	{
+		// Play logic
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Pause", buttonSize))
+	{
+		// Pause logic
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Stop", buttonSize))
+	{
+		// Stop logic
+	}
+
+	// Render the framebuffer in imgui image
+	ImGui::Image((ImTextureID)(uintptr_t)fboID, imageSize, ImVec2(0, 1), ImVec2(1, 0));
+
+	// Set imguzimor rect
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(imagePos.x, imagePos.y + buttonSize.y, imageSize.x, imageSize.y);
+
+	//ImGui::SetCursorScreenPos(ImVec2(imagePos.x + 10, imagePos.y + 10));
+	
+
+	// TODO: view and projection do not seem to work from main camera
+	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 projMatrix = maincam->GetProjectionMatrix();//glm::perspective(glm::radians(45.0f), imageSize.x / imageSize.y, 0.1f, 100.0f);
+
+	if (selectedHierarchyItem != entt::null && sceneRef->registry.any_of<TransformComponent>(selectedHierarchyItem))
+	{
+		auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), transform.Translation);
+
+		// From glm mat4 to C array for ImGui
+		float view[16], proj[16], model[16];
+		memcpy(view, glm::value_ptr(viewMatrix), sizeof(view));
+		memcpy(proj, glm::value_ptr(projMatrix), sizeof(proj));
+		memcpy(model, glm::value_ptr(modelMatrix), sizeof(model));
+
+		// Actual Gizmo
+		ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y, ImGuizmo::LOCAL, model); // ROTATE - SCALE
+		if (ImGuizmo::IsUsing())
+		{
+			glm::mat4 updatedModel = glm::make_mat4(model);
+
+			// Decompose the matrix to update Translation / Rotation / Scale
+			glm::vec3 translation, rotation, scale;
+			ImGuizmo::DecomposeMatrixToComponents(model, glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+
+			auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
+			transform.Translation = translation;
+		}
+	}
+
 	ImGui::End();
+}
+
+void UserInterface::DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
+{
+	ImGui::PushID(label.c_str());
+	ImGui::BeginTable("Vec3Control", 4, ImGuiTableFlags_SizingFixedFit);
+	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
+	ImGui::TableSetupColumn("X");
+	ImGui::TableSetupColumn("Y");
+	ImGui::TableSetupColumn("Z");
+
+	ImGui::TableNextRow();
+
+	// Label
+	ImGui::TableSetColumnIndex(0);
+	if (ImGui::Button(label.c_str())) values = glm::vec3(resetValue);
+
+	// Common settings
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::TableSetColumnIndex(1);
+	ImGui::SetNextItemWidth(70); // Fill remaining column space
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.8f, 0.1f, 0.15f, 0.3f });
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopStyleColor();
+
+	ImGui::TableSetColumnIndex(2);
+	ImGui::SetNextItemWidth(70);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.2f, 0.7f, 0.2f, 0.3f });
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopStyleColor();
+
+	ImGui::TableSetColumnIndex(3);
+	ImGui::SetNextItemWidth(70);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.1f, 0.25f, 0.8f, 0.3f });
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopStyleColor();
+
+	ImGui::SameLine();
+	ImGui::EndTable();
+	ImGui::PopID();
 }
 
 void UserInterface::Style()
@@ -367,41 +477,53 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 
 void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam)
 {
-	if (cameraMenu) {
-		ImGui::Begin("Camera", &cameraMenu);
+	
+	ImGui::Begin("Camera");
 
-		if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
-		{
-			glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
-			maincam->updateProjection(focus);
-		}
-		ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
-		ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
-
-		ImGui::Checkbox("Post Processing:", &showPostProccesed);
-
-		if (showPostProccesed)
-		{
-			ImGui::Checkbox("Show Scanline", &fbo->scanline);
-			ImGui::SliderFloat("Chromatic Abberation", &fbo->abberationIntensity, 0.f, 5.f);
-			ImGui::SliderFloat("Curve Left", &fbo->curveLeft, 0.f, 5.f);
-			ImGui::SliderFloat("Curve Right", &fbo->curveRight, 0.f, 5.f);
-			ImGui::SliderFloat("Vignette", &fbo->vignetteIntensity, 0.f, 5.f);
-		}
-
-		ImGui::End();
+	if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
+	{
+		glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
+		maincam->updateProjection(focus);
 	}
+	ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
+	ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
+
+	ImGui::Checkbox("Post Processing:", &showPostProccesed);
+
+	if (showPostProccesed)
+	{
+		ImGui::Checkbox("Show Scanline", &fbo->scanline);
+		ImGui::SliderFloat("Chromatic Abberation", &fbo->abberationIntensity, 0.f, 5.f);
+		ImGui::SliderFloat("Curve Left", &fbo->curveLeft, 0.f, 5.f);
+		ImGui::SliderFloat("Curve Right", &fbo->curveRight, 0.f, 5.f);
+		ImGui::SliderFloat("Vignette", &fbo->vignetteIntensity, 0.f, 5.f);
+	}
+
+	ImGui::End();
 }
 
-void UserInterface::Gameplay()
+void UserInterface::Gameplay(const int& MS, const int& FPS)
 {
-	if (gameMenu) {
-		ImGui::Begin("Game", &gameMenu);
+	ImGui::Begin("Game");
 
-		ImGui::Checkbox("Show Colliders", &renderDebugInfo);
+	ImVec4 color{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA in 0–1 range for ImGui color
 
-		ImGui::End();
-	}
+	// FPS
+	ImGui::Text("FPS: ");
+	//ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	//ImGui::Text("%d", FPS);
+	ImGui::PopStyleColor();
+
+	// Milliseconds per frame
+	ImGui::Text("MS: ");
+	ImGui::SameLine();
+	ImGui::PushStyleColor(ImGuiCol_Text, color);
+	//ImGui::Text("%d", MS);
+	ImGui::PopStyleColor();
+
+	ImGui::End();
+	
 }
 
 void UserInterface::Logger()
@@ -434,13 +556,6 @@ void UserInterface::Logger()
 	ImGui::End();
 }
 
-void UserInterface::ContentBrowser()
-{
-	ImGui::Begin("Content Browser");
-
-	ImGui::End();
-}
-
 void UserInterface::Hierarchy(Scene* sceneRef)
 {
 	ImGui::Begin("Hierarchy");
@@ -459,20 +574,63 @@ void UserInterface::Hierarchy(Scene* sceneRef)
 			label = name.name;
 		}
 
+		// Draw the selectable
+		float availableWidth = ImGui::GetContentRegionAvail().x;
+		float buttonWidth = 20.0f;
+		float spacing = 5.0f; // Spacing between selectable and button
+
 		// TODO: wrap this inside a Tree Node for scene graph functionality
-		bool clicked = ImGui::Selectable(label.c_str(), selectedHierarchyItem == entity);
+		bool clicked = ImGui::Selectable(label.c_str(), selectedHierarchyItem == entity, 0, ImVec2(availableWidth - buttonWidth - spacing, 0));
 		if (clicked) selectedHierarchyItem = entity;
 
 		ImGui::PopID();
+
+		// Delete BUTTON
+		if (selectedHierarchyItem == entity)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+			ImGui::SameLine();
+			// align the button at the right
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + spacing);
+			if (ImGui::SmallButton("X"))
+			{
+				entitiesToDestroy.push_back(entity);
+				if (selectedHierarchyItem == entity) selectedHierarchyItem = entt::null;
+			}
+			ImGui::PopStyleColor();
+		}
 	}
 
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+	float panelWidth = ImGui::GetContentRegionAvail().x;
+	float buttonWidth = 100.0f, buttonHeight = 25.f;
+	ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+
+	if (ImGui::Button("New Entity", ImVec2(buttonWidth, buttonHeight)))
+		sceneRef->AddEntity("Test", "Test");
+
 	ImGui::End();
+}
+
+void UserInterface::DrawEntity()
+{
+
 }
 
 void UserInterface::PropertiesPanel(Scene* sceneRef)
 {
 	ImGui::Begin("Properties");
 
+	if (selectedHierarchyItem != entt::null && !sceneRef->registry.valid(selectedHierarchyItem)) {
+		selectedHierarchyItem = entt::null;
+		ImGui::Text("No entity selected.");
+		ImGui::End();
+		return;
+	}
+
+	float buttonWidth = 100.0f, buttonHeight = 22.f;
 	if (selectedHierarchyItem != entt::null && sceneRef->registry.valid(selectedHierarchyItem))
 	{
 		// ALL POSSIBLE COMPONENTS
@@ -499,10 +657,111 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 			if (ImGui::CollapsingHeader("Transform"))
 			{
-				ImGui::Text("Test 2");
+				ImGui::PushID(1);
+					DrawVec3Control("Position", transform.Translation);
+				ImGui::PopID();
+				ImGui::PushID(2);
+					DrawVec3Control("Rotation", transform.Rotation);
+				ImGui::PopID();
+				ImGui::PushID(3);
+					DrawVec3Control(" Scale  ", transform.Scale);
+				ImGui::PopID();
+
+				ImGui::Spacing();
+				float popUpWidth = 200, popUpHeight = 100;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				
+
+				ImGui::PushID(4);
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<TransformComponent>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
+				ImGui::PopID();
 			}
 		}
 
+		if (sceneRef->registry.any_of<SpriteComponent>(selectedHierarchyItem))
+		{
+			auto& sprite = sceneRef->registry.get<SpriteComponent>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Sprite"))
+			{
+				
+				if (ImGui::Button("Browse"))
+				{
+					std::string path = OpenFileDialog();
+					if (!path.empty())
+					{
+						fileName = std::filesystem::path(path).filename().string();
+						sprite.texturePath = path;
+						sprite.texture = Texture2D();
+						int width, height, nrChannels;
+						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+						sprite.texture.Generate(width, height, data);
+						stbi_image_free(data);
+					}
+				}
+				ImGui::SameLine(); ImGui::Text(fileName.c_str());
+
+				ImGui::Spacing();
+				float popUpWidth = 200, popUpHeight = 100;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+
+				ImGui::PushID(5);
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<SpriteComponent>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
+				ImGui::PopID();
+			}
+		}
+
+		// ADD COMPONENT
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+		float popUpWidth = 200, popUpHeight = 100;
+		float panelWidth = ImGui::GetContentRegionAvail().x;
+		float buttonWidth = 140.0f, buttonHeight = 25.f;
+		ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+		if(ImGui::Button("New Component", ImVec2(buttonWidth, buttonHeight)))
+		{
+			ImVec2 pos = ImGui::GetCursorScreenPos();
+			ImGui::SetNextWindowPos(ImVec2(pos.x + (panelWidth - popUpWidth) * 0.5f, pos.y));
+			ImGui::OpenPopup("AddComponentPopup");
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(popUpWidth, popUpHeight));
+		ImGui::Spacing();
+		if (ImGui::BeginPopup("AddComponentPopup")) 
+		{
+			Entity entityWrapper(selectedHierarchyItem, sceneRef->registry);
+
+			if (!sceneRef->registry.any_of<TransformComponent>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Transform Component"))
+				{
+					entityWrapper.AddComponent<TransformComponent>(glm::vec3{ 0.f }, glm::vec3{ 0.f }, glm::vec3{ 0.f });
+				}
+			}
+			if (!sceneRef->registry.any_of<SpriteComponent>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Sprite Component"))
+				{
+					entityWrapper.AddComponent<SpriteComponent>();
+				}
+			}
+			ImGui::EndPopup();
+		}
 	}
 	else 
 		ImGui::Text("No entity selected.");
@@ -514,10 +773,6 @@ void UserInterface::HeaderBar()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		/*
-		ImGui::Text("FPS");
-		*/
-
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("Save"))
@@ -542,15 +797,6 @@ void UserInterface::HeaderBar()
 
 		if (ImGui::BeginMenu("View"))
 		{
-
-			if (ImGui::MenuItem("Camera"))
-			{
-				cameraMenu = true;
-			}
-			if (ImGui::MenuItem("Game"))
-			{
-				gameMenu = true;
-			}
 			if (ImGui::MenuItem("Creature"))
 			{
 				creatureMenu = true;
@@ -561,6 +807,24 @@ void UserInterface::HeaderBar()
 
 		ImGui::EndMenuBar();
 	}
+}
+
+std::string UserInterface::OpenFileDialog()
+{
+	char filename[MAX_PATH] = "";
+
+	OPENFILENAMEA ofn = { 0 };
+	ofn.lStructSize = sizeof(OPENFILENAMEA);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = sizeof(filename);
+	ofn.lpstrFilter = "Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+		return std::string(filename);
+	return ""; // Cancelled or failed
 }
 
 void UserInterface::Game()

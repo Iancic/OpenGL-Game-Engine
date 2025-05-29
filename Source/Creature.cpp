@@ -281,7 +281,7 @@ void Creature::Render()
 	for (int i = 0; i < legs.size(); i++) legs[i]->Render(activeCamera, legWidth);  // Render Legs
 
 	RenderInside();
-	//RenderSprites();
+	RenderSprites();
 
 	if (hasWeapons) for (auto& element : weapons) element->Render(activeCamera); // Render Weapons
 }

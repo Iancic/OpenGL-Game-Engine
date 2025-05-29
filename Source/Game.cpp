@@ -9,6 +9,8 @@ void Game::Init()
 	controller = SDL_GameControllerOpen(0);
 	Resources->loadResources();
 
+	scene = new Scene();
+
 	UI->Init(window, glContext);
 
 	RenderingBuffer = new FrameBuffer();
@@ -39,6 +41,7 @@ void Game::Init()
 					float result = (float)lua_tonumber(L, -1);
 					//std::cout << "[C++] Result from Lua: " << result << "\n";
 				}
+
 				lua_pop(L, 1); // Clean up result
 			}
 		}
@@ -59,6 +62,7 @@ void Game::Init()
 void Game::Update()
 {
 	Time();
+
 
 	/*
 	SDL_GetMouseState(&mouseX, &mouseY);
@@ -127,10 +131,13 @@ void Game::Render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
-	/*
-	// ----- Render Calls -----
-	player->Render();
 
+	scene->RenderingSystem(activeCamera);
+
+
+	// ----- Render Calls -----
+	//player->Render();
+	/*
 	for (auto& creature : creatures)
 		creature->Render();
 
@@ -151,7 +158,7 @@ void Game::Render()
 	RenderingBuffer->DrawRenderBuffer(timeElapsed);
 
 	// UI
-	if (isEditorOn) UI->EngineEditor(player, RenderingBuffer, activeCamera, &scene);
+	if (isEditorOn) UI->EngineEditor(player, RenderingBuffer, activeCamera, scene, GetMS(), GetFPS());
 	else UI->Game();
 
 	// Present

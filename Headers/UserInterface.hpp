@@ -1,8 +1,10 @@
 #pragma once
+
 #include <imgui-master/imgui.h>
 #include <imgui-master/imgui_impl_sdl2.h>
 #include <imgui-master/imgui_impl_sdlrenderer2.h>
 #include <imgui-master/imgui_impl_opengl3.h>
+#include <imgui-master/imgui_internal.h>
 #include <string>
 #include <map>
 #include <ft2build.h>
@@ -14,6 +16,13 @@
 #include "Character.hpp"
 
 #include "Scene.hpp"
+
+#include "imgui-master/ImGuizmo.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <commdlg.h>
 
 class UserInterface
 {
@@ -51,26 +60,31 @@ public:
 	bool showPostProccesed = false;
 	bool renderDebugInfo = true;
 
-	void EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef);
+	void EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef, const int& MS, const int& FPS);
 	void Start();
 	void Init(SDL_Window* windowArg, void* glContextArg);
-	void Shutdown();
+	void Shutdown(Scene* sceneRef);
 	void DockSpace();
-	void GameViewport(GLuint fboID);
+	void GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef);
+	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.f, float columnWidth = 80.f);
 	void Style();
 	void CreatureMenu(Creature* creatureArg);
 	void CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam);
-	void Gameplay();
+	void Gameplay(const int& MS, const int& FPS);
 	void Logger();
-	void ContentBrowser();
 	void Hierarchy(Scene* sceneRef);
+	void DrawEntity();
 	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
 
-	bool cameraMenu = false, gameMenu = false, creatureMenu = false;
+	// For Sprite Component
+	std::string OpenFileDialog();
+	std::string fileName = "Empty";
+
+	bool creatureMenu = false;
 
 	entt::entity selectedHierarchyItem;
-
+	std::vector<entt::entity> entitiesToDestroy;
 
 	// -------- Game UI --------
 

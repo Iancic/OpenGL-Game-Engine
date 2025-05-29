@@ -18,6 +18,9 @@ public:
 
 	virtual bool Running() { return isRunning; };
 
+	int GetFPS();
+	int GetMS();
+
 protected:
 
 	SDL_GLContext glContext;

@@ -1,15 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="libraries\imgui-master\imgui.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_demo.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_draw.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_sdl2.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_sdlrenderer2.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_tables.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp" />
-    <ClCompile Include="libraries\stb\stb_image.cpp" />
     <ClCompile Include="Source\Actor.cpp" />
     <ClCompile Include="Source\BaseWeapon.cpp" />
     <ClCompile Include="Source\Boid.cpp" />
@@ -46,20 +37,39 @@
     <ClCompile Include="Source\UserInterface.cpp" />
     <ClCompile Include="Source\CircleCollider.cpp" />
     <ClCompile Include="Source\Entity.cpp" />
-    <ClCompile Include="Source\NameComponent.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_demo.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_draw.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdl2.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdlrenderer2.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_tables.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\imgui-master\ImGuizmo.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\stb\stb_image.cpp">
+      <Filter>Libraries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
-    <ClInclude Include="libraries\imgui-master\imconfig.h" />
-    <ClInclude Include="libraries\imgui-master\imgui.h" />
-    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3.h" />
-    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="libraries\imgui-master\imgui_impl_sdlrenderer2.h" />
-    <ClInclude Include="libraries\imgui-master\imgui_internal.h" />
-    <ClInclude Include="libraries\imgui-master\imstb_rectpack.h" />
-    <ClInclude Include="libraries\imgui-master\imstb_textedit.h" />
-    <ClInclude Include="libraries\imgui-master\imstb_truetype.h" />
-    <ClInclude Include="libraries\stb\stb_image.h" />
     <ClInclude Include="Headers\Actor.hpp" />
     <ClInclude Include="Headers\BaseWeapon.hpp" />
     <ClInclude Include="Headers\Boid.hpp" />
@@ -98,27 +108,106 @@
     <ClInclude Include="Headers\Vertex.hpp" />
     <ClInclude Include="Headers\CircleCollider.hpp" />
     <ClInclude Include="Libraries\lua\include\lauxlib.h" />
-    <ClInclude Include="Libraries\lua\include\lua.h" />
-    <ClInclude Include="Libraries\lua\include\lua.hpp" />
-    <ClInclude Include="Libraries\lua\include\luaconf.h" />
-    <ClInclude Include="Libraries\lua\include\lualib.h" />
     <ClInclude Include="Headers\LuaUtilities.hpp" />
-    <ClInclude Include="Libraries\fmod\include\fmod.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod.hpp" />
-    <ClInclude Include="Libraries\fmod\include\fmod_codec.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_common.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_dsp.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_dsp_effects.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_errors.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_output.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_studio.h" />
-    <ClInclude Include="Libraries\fmod\include\fmod_studio.hpp" />
-    <ClInclude Include="Libraries\fmod\include\fmod_studio_common.h" />
-    <ClInclude Include="Libraries\entt\entt.hpp" />
-    <ClInclude Include="Headers\SpriteComponent.hpp" />
-    <ClInclude Include="Headers\TransformComponent.hpp" />
     <ClInclude Include="Headers\Entity.hpp" />
-    <ClInclude Include="Headers\NameComponent.hpp" />
+    <ClInclude Include="Headers\NameComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\TransformComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\SpriteComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_studio_common.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.hpp">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_studio.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_output.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_errors.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp_effects.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_dsp.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_common.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod_codec.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod.hpp">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\fmod\include\fmod.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\entt\entt.hpp">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imconfig.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imgui.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imgui_impl_opengl3_loader.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\imgui-master\imgui_impl_sdl2.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imgui_impl_sdlrenderer2.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imgui_internal.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\imgui-master\ImGuizmo.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imstb_rectpack.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imstb_textedit.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui-master\imstb_truetype.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\stb\stb_image.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\lua\include\lualib.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\lua\include\luaconf.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\lua\include\lua.hpp">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\lua\include\lua.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\TextComponent.hpp" />
+    <ClInclude Include="Headers\ScriptComponent.hpp" />
+    <ClInclude Include="Headers\PhysicsComponent.hpp" />
+    <ClInclude Include="Headers\EmitterComponent.hpp" />
+    <ClInclude Include="Headers\AudioComponent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vSprite.glsl">
@@ -152,10 +241,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Scripts\RandomNumber.lua" />
-    <None Include="Libraries\fmod\include\fmod.cs" />
-    <None Include="Libraries\fmod\include\fmod_dsp.cs" />
-    <None Include="Libraries\fmod\include\fmod_errors.cs" />
-    <None Include="Libraries\fmod\include\fmod_studio.cs" />
+    <None Include="Libraries\fmod\include\fmod_studio.cs">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="Libraries\fmod\include\fmod_errors.cs">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="Libraries\fmod\include\fmod_dsp.cs">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="Libraries\fmod\include\fmod.cs">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Libraries">
