@@ -41,4 +41,6 @@ public:
 	// Textures:
 	std::vector<Texture2D*> textures; // Used to count them
 	static inline Texture2D* smileyFace = nullptr;
+	static inline Texture2D* playButton = nullptr;
+	static inline Texture2D* stopButton = nullptr;
 };

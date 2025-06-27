@@ -1,6 +1,6 @@
 #include "Program.hpp"
 
-Program::Program(const char* title, int x, int y, int width, int height, bool fullscreen)
+Program::Program(const char* title)
 {
 	FMOD::System* system = nullptr;
 	FMOD_RESULT result;
@@ -17,11 +17,9 @@ Program::Program(const char* title, int x, int y, int width, int height, bool fu
 		std::cerr << "FMOD init error! " << FMOD_ErrorString(result) << std::endl;
 	}
 
-	//std::cout << "FMOD initialized successfully." << std::endl;
-
 	int flags = SDL_WINDOW_OPENGL;
 
-	if (fullscreen) flags = SDL_WINDOW_FULLSCREEN;
+	//flags = SDL_WINDOW_FULLSCREEN;
 
 	SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
@@ -44,19 +42,42 @@ Program::Program(const char* title, int x, int y, int width, int height, bool fu
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	window = SDL_CreateWindow(title, x, y, width, height, flags);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
 	glContext = SDL_GL_CreateContext(window);
 
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 
 	if (window) isRunning = true;
 
+	Resources->loadResources();
+	UI = UserInterface::getInstance();
+	RenderingBuffer = new FrameBuffer();
+	UI->Init(window, glContext);
 	Init();
 }
 
 Program::~Program()
 {
 	Shutdown();
+}
+
+void Program::PreRender()
+{
+	// Bind framebuffer, viewport & clear buffers
+	glBindFramebuffer(GL_FRAMEBUFFER, RenderingBuffer->FBO);
+	RenderingBuffer->shader->use();
+	glUniform1i(glGetUniformLocation(RenderingBuffer->shader->ID, "screenTexture"), 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glClearColor(0.0f, 0.1f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+}
+
+void Program::PostRender()
+{
+	SDL_GL_SwapWindow(window);
 }
 
 void Program::Quit()

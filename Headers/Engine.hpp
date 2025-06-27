@@ -1,6 +1,4 @@
 #pragma once
-
-// Engine executes on programs
 #include "Program.hpp"
 
 class Engine

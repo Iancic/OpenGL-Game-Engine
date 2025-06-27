@@ -1,5 +1,6 @@
 #pragma once
 #include "entt/entt.hpp"
+
 #include "NameComponent.hpp"
 #include "TransformComponent.hpp"
 #include "SpriteComponent.hpp"

@@ -5,55 +5,6 @@ UserInterface* UserInterface::ui_Instance = nullptr;
 
 UserInterface::UserInterface()
 {
-	FT_Library ft;
-	if (FT_Init_FreeType(&ft))
-	{
-		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-	}
-
-	FT_Face face;
-	if (FT_New_Face(ft, "Assets/Fonts/MonaspaceNeonFrozen-Regular.ttf", 0, &face))
-	{
-		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-	}
-
-	FT_Set_Pixel_Sizes(face, 0, 48); // Setting the width to 0 lets the face dynamically calculate the width based on the given height.
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-
-	// first 128 ASCII characters
-	for (unsigned char c = 0; c < 128; c++)
-	{
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) // Load Glyph 
-		{
-			std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-			continue;
-		}
-
-		// Generate Texture
-		unsigned int texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		// Store Character for later use
-		Character character = { texture,
-			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-			face->glyph->advance.x
-		};
-		Characters.insert(std::pair<char, Character>(c, character));
-	}
-
-	// When we are done with True Type clear data
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
-
 	glGenVertexArrays(1, &textVAO);
 	glGenBuffers(1, &textVBO);
 	glBindVertexArray(textVAO);
@@ -65,65 +16,13 @@ UserInterface::UserInterface()
 	glBindVertexArray(0);
 }
 
-void UserInterface::RenderText(const std::string& text, float x, float y, float scale, const glm::vec3& color)
-{
-	// Get and check shader
-	auto shader = ResourceManager::getInstance()->textShader;
-	if (!shader) return;
-
-	shader->use();
-	shader->setVec3("textColor", color);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(textVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
-
-	for (const char& c : text)
-	{
-		// Ensure character exists in the map
-		auto it = Characters.find(c);
-		if (it == Characters.end()) continue;
-
-		const Character& ch = it->second;
-
-		float xpos = x + ch.Bearing.x * scale;
-		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-		float w = ch.Size.x * scale;
-		float h = ch.Size.y * scale;
-
-		// Define quad vertices
-		float vertices[6][4] = {
-			{ xpos,     ypos + h,   0.0f, 0.0f },
-			{ xpos,     ypos,       0.0f, 1.0f },
-			{ xpos + w, ypos,       1.0f, 1.0f },
-
-			{ xpos,     ypos + h,   0.0f, 0.0f },
-			{ xpos + w, ypos,       1.0f, 1.0f },
-			{ xpos + w, ypos + h,   1.0f, 0.0f }
-		};
-
-		// Bind texture and render glyph quad
-		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		// Advance cursor (convert from 1/64th pixels to pixels)
-		x += (ch.Advance >> 6) * scale;
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void UserInterface::EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef, const int& MS, const int& FPS)
+void UserInterface::EngineEditor(FrameBuffer* fbo, Camera* maincam, Scene* sceneRef)
 {
 	Start();
 	Style();
 	DockSpace();
-	Gameplay(MS, FPS);
-	CreatureMenu(creatureArg);
-	CameraMenu(creatureArg, fbo, maincam);
+	//CreatureMenu(creatureArg);
+	//CameraMenu(creatureArg, fbo, maincam);
 
 	if (showPostProccesed)
 		GameViewport(fbo->postprocessedTexture, maincam, sceneRef);
@@ -151,7 +50,7 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;;
-	io.FontGlobalScale = 1.f;
+	io.FontGlobalScale = 0.95f;
 	io.Fonts->AddFontFromFileTTF("Assets/fonts/MonaspaceNeonFrozen-Regular.ttf", 16.0f);
 	io.Fonts->Build();
 	ImGui_ImplSDL2_InitForOpenGL(windowArg, glContextArg);
@@ -205,19 +104,21 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	ImVec2 imagePos = ImVec2(windowPos.x + cursorPos.x, windowPos.y + cursorPos.y);
 	ImVec2 imageSize = ImVec2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
-	ImVec2 buttonSize = ImVec2(32, 32);
+	float buttonWidth = 40.0f;
+	float buttonHeight = 25.0f;
+	float spacing = ImGui::GetStyle().ItemSpacing.x;
 
-	if (ImGui::Button("Play", buttonSize))
+	float totalWidth = 2 * buttonWidth + spacing;
+	float panelWidth = ImGui::GetContentRegionAvail().x;
+	float startX = (panelWidth - totalWidth) * 0.5f;
+
+	ImGui::SetCursorPosX(startX);
+	if (ImGui::ImageButton("##Play", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(16, 16)))
 	{
 		// Play logic
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Pause", buttonSize))
-	{
-		// Pause logic
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Stop", buttonSize))
+	if (ImGui::ImageButton("##Stop", (ImTextureID)(uintptr_t)ResourceManager::stopButton->ID, ImVec2(16, 16)))
 	{
 		// Stop logic
 	}
@@ -227,7 +128,7 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 
 	// Set imguzimor rect
 	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetRect(imagePos.x, imagePos.y + buttonSize.y, imageSize.x, imageSize.y);
+	ImGuizmo::SetRect(imagePos.x, imagePos.y + buttonHeight, imageSize.x, imageSize.y);
 
 	//ImGui::SetCursorScreenPos(ImVec2(imagePos.x + 10, imagePos.y + 10));
 	
@@ -320,7 +221,7 @@ void UserInterface::Style()
 	ImVec4 activeGray = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);       // brighter when active
 
 	// Text
-	colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f); // brighter text for readability
+	colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.0f); // brighter text for readability
 
 	// Backgrounds
 	colors[ImGuiCol_WindowBg] = windowBgGray;
@@ -379,11 +280,11 @@ void UserInterface::Style()
 	colors[ImGuiCol_SliderGrabActive] = activeGray;
 
 	// Roundness
-	style.WindowRounding = 3.0f;
-	style.FrameRounding = 3.0f;
-	style.ScrollbarRounding = 3.0f;
-	style.GrabRounding = 3.0f;
-	style.TabRounding = 3.0f;
+	style.WindowRounding = 1.0f;
+	style.FrameRounding = 1.0f;
+	style.ScrollbarRounding = 1.0f;
+	style.GrabRounding = 1.0f;
+	style.TabRounding = 1.0f;
 }
 
 void UserInterface::CreatureMenu(Creature* creatureArg)
@@ -500,30 +401,6 @@ void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* 
 	}
 
 	ImGui::End();
-}
-
-void UserInterface::Gameplay(const int& MS, const int& FPS)
-{
-	ImGui::Begin("Game");
-
-	ImVec4 color{ 0.0f, 1.0f, 0.0f, 1.0f }; // RGBA in 0–1 range for ImGui color
-
-	// FPS
-	ImGui::Text("FPS: ");
-	//ImGui::SameLine();
-	ImGui::PushStyleColor(ImGuiCol_Text, color);
-	//ImGui::Text("%d", FPS);
-	ImGui::PopStyleColor();
-
-	// Milliseconds per frame
-	ImGui::Text("MS: ");
-	ImGui::SameLine();
-	ImGui::PushStyleColor(ImGuiCol_Text, color);
-	//ImGui::Text("%d", MS);
-	ImGui::PopStyleColor();
-
-	ImGui::End();
-	
 }
 
 void UserInterface::Logger()
@@ -725,6 +602,39 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			}
 		}
 
+		if (sceneRef->registry.any_of<ScriptComponent>(selectedHierarchyItem))
+		{
+			auto& sprite = sceneRef->registry.get<ScriptComponent>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Script"))
+			{
+				if (ImGui::Button("Browse"))
+				{
+					std::string path = OpenFileDialog();
+					if (!path.empty())
+					{
+						fileName = std::filesystem::path(path).filename().string();
+					}
+				}
+				ImGui::SameLine(); ImGui::Text(fileName.c_str());
+
+				ImGui::Spacing();
+				float popUpWidth = 200, popUpHeight = 100;
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+
+				ImGui::PushID(5);
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<ScriptComponent>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
+				ImGui::PopID();
+			}
+		}
+
 		// ADD COMPONENT
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -760,6 +670,13 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 					entityWrapper.AddComponent<SpriteComponent>();
 				}
 			}
+			if (!sceneRef->registry.any_of<ScriptComponent>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Script Component"))
+				{
+					entityWrapper.AddComponent<ScriptComponent>();
+				}
+			}
 			ImGui::EndPopup();
 		}
 	}
@@ -773,38 +690,11 @@ void UserInterface::HeaderBar()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Save"))
-			{
-
-			}
-			if (ImGui::MenuItem("Export Build"))
-			{
-
-			}
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Edit"))
-		{
-			if (ImGui::MenuItem("Preferences"))
-			{
-				
-			}
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("View"))
-		{
-			if (ImGui::MenuItem("Creature"))
-			{
-				creatureMenu = true;
-			}
-
-			ImGui::EndMenu();
-		}
-
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+		ImGui::Button("Save");
+		ImGui::Button("Load");
+		ImGui::Button("Build");
+		ImGui::PopStyleColor();
 		ImGui::EndMenuBar();
 	}
 }
@@ -825,9 +715,4 @@ std::string UserInterface::OpenFileDialog()
 	if (GetOpenFileNameA(&ofn))
 		return std::string(filename);
 	return ""; // Cancelled or failed
-}
-
-void UserInterface::Game()
-{
-	RenderText("This is sample text", 100.0f, 100.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 }

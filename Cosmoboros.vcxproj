@@ -145,7 +145,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;;$(SolutionDir)Headers</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;$(SolutionDir)Headers;$(SolutionDir)Libraries/sol</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -201,6 +201,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\MetaUtilities.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
     <ClCompile Include="Source\Program.cpp" />
     <ClCompile Include="Source\Random.cpp" />
@@ -239,9 +240,15 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="Headers\IKChain.hpp" />
     <ClInclude Include="Headers\IKSegment.hpp" />
     <ClInclude Include="Headers\InputHandler.hpp" />
+    <ClInclude Include="Headers\lauxlib.h" />
     <ClInclude Include="Headers\Line.hpp" />
     <ClInclude Include="Headers\Logger.hpp" />
+    <ClInclude Include="Headers\lua.h" />
+    <ClInclude Include="Headers\lua.hpp" />
+    <ClInclude Include="Headers\luaconf.h" />
+    <ClInclude Include="Headers\lualib.h" />
     <ClInclude Include="Headers\LuaUtilities.hpp" />
+    <ClInclude Include="Headers\MetaUtilities.hpp" />
     <ClInclude Include="Headers\NameComponent.hpp" />
     <ClInclude Include="Headers\Perlin.hpp" />
     <ClInclude Include="Headers\PhysicsComponent.hpp" />
@@ -291,9 +298,11 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="Libraries\lua\include\lua.hpp" />
     <ClInclude Include="Libraries\lua\include\luaconf.h" />
     <ClInclude Include="Libraries\lua\include\lualib.h" />
+    <ClInclude Include="Libraries\sol\sol.hpp" />
     <ClInclude Include="libraries\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="Assets\Shaders\fFrameBuffer.glsl" />
     <None Include="Assets\Shaders\fPerlin.glsl" />
     <None Include="Assets\Shaders\fSpine.glsl" />
@@ -304,10 +313,13 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <None Include="Assets\Shaders\vSpine.glsl" />
     <None Include="Assets\Shaders\vSprite.glsl" />
     <None Include="Assets\Shaders\vBasic.glsl" />
+    <None Include="imgui.ini" />
     <None Include="Libraries\fmod\include\fmod.cs" />
     <None Include="Libraries\fmod\include\fmod_dsp.cs" />
     <None Include="Libraries\fmod\include\fmod_errors.cs" />
     <None Include="Libraries\fmod\include\fmod_studio.cs" />
+    <None Include="LICENSE" />
+    <None Include="Scripts\Default.lua" />
     <None Include="Scripts\RandomNumber.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

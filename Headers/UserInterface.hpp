@@ -7,8 +7,6 @@
 #include <imgui-master/imgui_internal.h>
 #include <string>
 #include <map>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 #include "Common.hpp"
 #include "Creature.hpp"
@@ -49,8 +47,6 @@ public:
 
 	unsigned int textVAO, textVBO;
 
-	// -------- IMGUI --------
-
 	ImGuiWindowFlags placeholderWindowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground;
 	bool open = true;
@@ -60,7 +56,7 @@ public:
 	bool showPostProccesed = false;
 	bool renderDebugInfo = true;
 
-	void EngineEditor(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam, Scene* sceneRef, const int& MS, const int& FPS);
+	void EngineEditor(FrameBuffer* fbo, Camera* maincam, Scene* sceneRef);
 	void Start();
 	void Init(SDL_Window* windowArg, void* glContextArg);
 	void Shutdown(Scene* sceneRef);
@@ -70,7 +66,6 @@ public:
 	void Style();
 	void CreatureMenu(Creature* creatureArg);
 	void CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam);
-	void Gameplay(const int& MS, const int& FPS);
 	void Logger();
 	void Hierarchy(Scene* sceneRef);
 	void DrawEntity();
@@ -85,15 +80,5 @@ public:
 
 	entt::entity selectedHierarchyItem;
 	std::vector<entt::entity> entitiesToDestroy;
-
-	// -------- Game UI --------
-
-	ImGuiWindowFlags editorWindowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
-
-	std::map<char, Character> Characters;
-
-	void RenderText(const std::string& text, float x, float y, float scale, const glm::vec3& color);
-
-	void Game();
 
 };

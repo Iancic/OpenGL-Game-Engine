@@ -22,4 +22,16 @@ void ResourceManager::loadResources()
 	unsigned char* data = stbi_load("Assets/Textures/awesomeface.png", &width, &height, &nrChannels, 0);
 	smileyFace->Generate(width, height, data);
 	stbi_image_free(data);
+
+	playButton = new Texture2D();
+	textures.push_back(playButton);
+	data = stbi_load("Assets/Icons/Play.png", &width, &height, &nrChannels, 0);
+	playButton->Generate(width, height, data);
+	stbi_image_free(data);
+
+	stopButton = new Texture2D();
+	textures.push_back(stopButton);
+	data = stbi_load("Assets/Icons/Stop.png", &width, &height, &nrChannels, 0);
+	stopButton->Generate(width, height, data);
+	stbi_image_free(data);
 }

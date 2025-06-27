@@ -67,6 +67,7 @@
     <ClCompile Include="libraries\stb\stb_image.cpp">
       <Filter>Libraries</Filter>
     </ClCompile>
+    <ClCompile Include="Source\MetaUtilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
@@ -208,6 +209,13 @@
     <ClInclude Include="Headers\PhysicsComponent.hpp" />
     <ClInclude Include="Headers\EmitterComponent.hpp" />
     <ClInclude Include="Headers\AudioComponent.hpp" />
+    <ClInclude Include="Libraries\sol\sol.hpp" />
+    <ClInclude Include="Headers\lualib.h" />
+    <ClInclude Include="Headers\luaconf.h" />
+    <ClInclude Include="Headers\lua.hpp" />
+    <ClInclude Include="Headers\lua.h" />
+    <ClInclude Include="Headers\lauxlib.h" />
+    <ClInclude Include="Headers\MetaUtilities.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vSprite.glsl">
@@ -253,6 +261,10 @@
     <None Include="Libraries\fmod\include\fmod.cs">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="LICENSE" />
+    <None Include="imgui.ini" />
+    <None Include=".gitignore" />
+    <None Include="Scripts\Default.lua" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Libraries">

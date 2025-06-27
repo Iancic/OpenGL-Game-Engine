@@ -12,6 +12,7 @@
 #include <map>
 #include <unordered_map>
 #include <thread>
+#include <cassert>
 
 // Engine Utilities Re-usable Across Different Programs
 #include "Line.hpp"

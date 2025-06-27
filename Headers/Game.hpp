@@ -6,7 +6,7 @@
 class Game : public Program
 {
 public:
-	Game(const char* title, int x, int y, int width, int height, bool fullscreen) : Program(title, x, y, width, height, fullscreen) {}
+	Game(const char* title) : Program(title) {}
 	~Game() {}
 
 	void Init() override;
@@ -18,42 +18,26 @@ public:
 
 	static inline Camera* activeCamera = nullptr;
 
-	bool isEditorOn = true;
-
-private:
-
-	Scene* scene = nullptr; // TODO: Find a way to read multiple scenes.
-
-	lua_State* L;
-	FMOD_RESULT result;
-
-	UserInterface* UI = UserInterface::getInstance();
-	ResourceManager* Resources = ResourceManager::getInstance();
-	FrameBuffer* RenderingBuffer = nullptr;
+	void LoadScene();
 
 	enum class GameState
 	{
-		GAME_ACTIVE,
-		GAME_PAUSED,
+		PAUSED,
+		PLAYING,
+		STOPPED
 	};
+	GameState gameState = GameState::PAUSED;
 
-	int mouseX, mouseY;
-	bool isPlayerMoving = false;
-	int armLenght = 5;
+private:
 
-	Creature* player = nullptr;
-	std::vector<Creature*> creatures;
-	void SpawnCreature() { creatures.push_back(new Creature(5, activeCamera)); }; // TODO implement prototype pattern
-	Transform* origin = new Transform();
-
-	ParticleProperties testProps;
-	Emitter* testEmmiter = nullptr;
-
-	// Events:
+	std::vector<Scene*> scenes;
+	Scene* activeScene = nullptr;
+	
+	// Events and Input:
 	SDL_GameController* controller;
-
+	int mouseX, mouseY;
 	const Uint8* keyState = SDL_GetKeyboardState(NULL);
+	float controllerAxisRightX, controllerAxisRightY;
 	bool keyPressedOnce[SDL_NUM_SCANCODES] = { false };
 	bool controllerButtonPressed[SDL_CONTROLLER_BUTTON_MAX] = { false };
-	float controllerAxisRightX, controllerAxisRightY;
 };

@@ -7,19 +7,23 @@ class Scene
 public:
 	Scene();
 	~Scene() = default;
-	
-	std::vector<Entity> entities;
-	// TODO: SEE COMMENT IN CONSTRUCTOR
-	Entity* player = nullptr;
 
-	entt::registry registry;
+	void Start();
+	void Render();
+	void Update();
 
-	SpriteRenderer* testerMata;
+	void BindTypes(sol::state& lua);
+	void BindEntity(sol::state& lua);
 
+	void Serialize();
 	void AddEntity(const std::string& name, const std::string& tag);
 	void DestroyEntity(entt::entity handle);
-
+	
 	void RenderingSystem(Camera* activeCamera);
-private:
 
+	Transform* origin = new Transform();
+	entt::registry registry;
+	std::vector<Entity> entities;
+private:
+	
 };

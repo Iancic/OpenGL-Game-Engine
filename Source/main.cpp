@@ -4,9 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-    Program* game = new Game("Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, false);
-    game->Init();
-
+    Program* game = new Game("Engine");
     Engine* engine = new Engine(game);
     engine->Run();
 

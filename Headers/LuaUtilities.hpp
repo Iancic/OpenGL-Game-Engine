@@ -1,11 +1,9 @@
-extern "C"
-{
-#include "lua/include/lua.h"
-#include "lua/include/lauxlib.h"
-#include "lua/include/lualib.h"
-}
+#pragma once
+#include <cassert>
+#include <sol/sol.hpp>
 #include "Logger.hpp"
 
+/*
 static inline bool CheckLua(lua_State* L, int r)
 {
 	if (r != LUA_OK)
@@ -25,3 +23,4 @@ static inline int lua_GetRandomNumber(lua_State* L)
 
 	return 1;
 }
+*/
