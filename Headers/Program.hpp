@@ -13,7 +13,6 @@ public:
 	virtual void PreRender();
 	virtual void Render() = 0;
 	virtual void PostRender();
-	virtual void HandleEvents() = 0;
 	virtual void HandleInput() = 0;
 	virtual void Quit();
 	virtual void Time();
@@ -23,11 +22,11 @@ public:
 	int GetFPS();
 	int GetMS();
 
-protected:
+	Input* InputSystem = nullptr;
 
+protected:
 	bool isRunning;
 	bool isEditorOn = true;
-
 	
 	ResourceManager* Resources = ResourceManager::getInstance();
 	UserInterface* UI = nullptr;

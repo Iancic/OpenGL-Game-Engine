@@ -8,6 +8,7 @@
 #include "AudioComponent.hpp"
 #include "EmitterComponent.hpp"
 #include "TextComponent.hpp"
+#include "Creature.hpp"
 
 class Entity
 {

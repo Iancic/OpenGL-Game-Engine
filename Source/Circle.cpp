@@ -23,12 +23,12 @@ Circle::Circle()
 	glBindVertexArray(0);
 }
 
-void Circle::DrawCircle(int centerX, int centerY, int radius, int segmentShape, glm::vec4 color, float dynamicAngle, int rotationDirection)
+void Circle::DrawCircle(int centerX, int centerY, float radius, int segmentShape, glm::vec4 color, float dynamicAngleArg, int rotationDirection)
 {
 	if (segmentShape == 4)
-		offsetAngle = M_PI / 4 + dynamicAngle;  // Square
+		offsetAngle = M_PI / 4 + dynamicAngleArg;  // Square
 	else
-		offsetAngle = dynamicAngle;  // Spin Effect
+		offsetAngle = dynamicAngleArg;  // Spin Effect
 
 	for (int i = 0; i < segmentShape; i++)
 	{

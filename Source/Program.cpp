@@ -17,10 +17,6 @@ Program::Program(const char* title)
 		std::cerr << "FMOD init error! " << FMOD_ErrorString(result) << std::endl;
 	}
 
-	int flags = SDL_WINDOW_OPENGL;
-
-	//flags = SDL_WINDOW_FULLSCREEN;
-
 	SDL_Init(SDL_INIT_EVERYTHING | SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
 	for (int i = 0; i < SDL_NumJoysticks(); ++i)
@@ -42,6 +38,7 @@ Program::Program(const char* title)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
+	int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
 	glContext = SDL_GL_CreateContext(window);
 
@@ -49,6 +46,7 @@ Program::Program(const char* title)
 
 	if (window) isRunning = true;
 
+	InputSystem = new Input();
 	Resources->loadResources();
 	UI = UserInterface::getInstance();
 	RenderingBuffer = new FrameBuffer();
@@ -77,6 +75,13 @@ void Program::PreRender()
 
 void Program::PostRender()
 {
+	// Draw framebuffer to screen
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	RenderingBuffer->DrawRenderBuffer(timeElapsed);
+
+	// Engine Editor UI
+	if (isEditorOn) UI->EngineEditor(RenderingBuffer);
+
 	SDL_GL_SwapWindow(window);
 }
 

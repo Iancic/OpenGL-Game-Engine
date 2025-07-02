@@ -5,11 +5,9 @@ Boid::Boid()
 	transform->setPosition(800, 800);
 }
 
-void Boid::Render(Camera* activeCamera)
+void Boid::Render()
 {
-	Circle::getInstance()->DrawCircle(transform->position.x - activeCamera->transform->position.x, 
-										transform->position.y - activeCamera->transform->position.y,
-										10, 3, glm::vec4(255, 255, 255, 255));
+	Circle::getInstance()->DrawCircle(transform->position.x, transform->position.y, 10, 3, glm::vec4(255, 255, 255, 255));
 }
 
 void Boid::Update(std::vector<Boid*> boidPool)
@@ -24,11 +22,12 @@ void Boid::Update(std::vector<Boid*> boidPool)
 glm::vec2 Boid::Behaviour(std::vector<Boid*> boidPool)
 {
 	glm::vec2 finalDirection = { 0, 0 };
-
+	/*
 	for (auto boid : boidPool)
 	{
 
 	}
+	*/
 
 	return finalDirection;
 }

@@ -13,6 +13,7 @@
 class Creature
 {
 public:
+	Creature() = default;
 	Creature(int difficulty, Camera* camera);
 	~Creature();
 

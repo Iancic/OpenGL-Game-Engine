@@ -4,7 +4,7 @@ Creature::Creature(int difficulty, Camera* camera)
 {
 	desiredSegmentSpacing = segmentSpacing;
 
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 
 	glGenVertexArrays(1, &spineVAO);
 	glGenBuffers(1, &spineVBO);
@@ -121,7 +121,7 @@ Creature::Creature(int difficulty, Camera* camera)
 		footTargets.push_back(glm::vec2(0, 0)); // Init empty target
 	}
 
-	int legCount = segments.size();
+	int legCount = static_cast<int>(segments.size());
 	isStepping.resize(legCount, false);
 	stepTimers.resize(legCount, 0.0f);
 	stepStartPositions.resize(legCount);
@@ -283,7 +283,7 @@ void Creature::Render()
 	RenderInside();
 	RenderSprites();
 
-	if (hasWeapons) for (auto& element : weapons) element->Render(activeCamera); // Render Weapons
+	if (hasWeapons) for (auto& element : weapons) element->Render(); // Render Weapons
 }
 
 void Creature::RenderDebug()

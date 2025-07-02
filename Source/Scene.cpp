@@ -3,10 +3,7 @@
 
 Scene::Scene()
 {
-	entt::entity handle = registry.create();
-	registry.emplace<NameComponent>(handle, "name", "tag");
-	registry.emplace<TransformComponent>(handle);
-	registry.emplace<ScriptComponent>(handle);
+
 }
 
 void Scene::Start()
@@ -24,25 +21,7 @@ void Scene::Start()
 
 		Lua.set_function("print", [](sol::variadic_args args)
 		{
-			std::cout << "[Lua] ";
-			for (auto arg : args)
-			{
-				sol::object obj = arg;
-
-				if (obj.is<std::string>())
-					std::cout << obj.as<std::string>();
-				else if (obj.is<double>())
-					std::cout << obj.as<double>();
-				else if (obj.is<float>())
-					std::cout << obj.as<float>();
-				else if (obj.is<int>())
-					std::cout << obj.as<int>();
-				else if (obj.is<bool>())
-					std::cout << (obj.as<bool>() ? "true" : "false");
-				else
-					std::cout << "<unknown>";
-				std::cout << " ";
-			}
+			
 		});
 
 		BindTypes(Lua);
@@ -62,6 +41,8 @@ void Scene::Start()
 		if (script.onStart.valid())
 			script.onStart();
 	}
+
+	initialized = true;
 }
 
 void Scene::Render()
@@ -78,6 +59,10 @@ void Scene::Update()
 		if (script.onUpdate.valid())
 			script.onUpdate(100);
 	}
+}
+
+void Scene::Shutdown()
+{
 }
 
 void Scene::BindTypes(sol::state& lua)

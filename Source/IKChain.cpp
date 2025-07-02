@@ -51,7 +51,7 @@ void IKChain::Render(Camera* camera, float legWidth)
 {
 	for (int i = 0; i < chainLenght; i++)
 	{
-		segments[i]->Render(camera, legWidth);
+		segments[i]->Render(legWidth);
 	}
 }
 

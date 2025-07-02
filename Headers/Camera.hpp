@@ -14,7 +14,8 @@ public:
 	float followSpeed = 1.f;
 	float distanceFromPlayer = 1.f;
 
-	float FieldOfView, AspectRatio, NearClipping, FarClipping;
+	float FieldOfView, NearClipping, FarClipping;
+	int AspectRatio;
 
 	int counterLeft = 0, counterRight = 0, counterTop = 0, counterBot = 0;
 
@@ -31,8 +32,7 @@ public:
 
 	void zoomOut(float factor, const glm::vec2& target);
 
-
-	void updateProjection(const glm::vec2& target);
+	void updateProjection();
 
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetViewMatrix();

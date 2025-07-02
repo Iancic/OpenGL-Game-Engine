@@ -47,7 +47,7 @@ void BaseWeapon::Update(Transform& Target, float deltaTime)
 	}
 }
 
-void BaseWeapon::Render(Camera* activeCamera)
+void BaseWeapon::Render()
 {
 	magnitude.x = target.position.x - transform.position.x;
 	magnitude.y = target.position.y - transform.position.y;

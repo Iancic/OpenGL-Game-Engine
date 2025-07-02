@@ -11,9 +11,11 @@ void Engine::Run()
 
     while (activeProgram->Running())
     {
-        activeProgram->HandleEvents();
+        activeProgram->InputSystem->PollEvents();
         activeProgram->HandleInput();
+        activeProgram->Time();
         activeProgram->Update();
+        activeProgram->InputSystem->EndFrame();
         activeProgram->PreRender();
         activeProgram->Render();
         activeProgram->PostRender();

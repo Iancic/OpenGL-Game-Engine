@@ -13,7 +13,7 @@ public:
     Transform* endEffector = new Transform();
     Transform* base = new Transform();
 
-    void Render(Camera* activeCamera, float legWidth);
+    void Render(float legWidth);
     
     void ForwardPass(float target_x, float target_y);  // From end effector to the base
     void BackwardPass(); // From base to end effector

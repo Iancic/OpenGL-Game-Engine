@@ -1,5 +1,6 @@
 ﻿#include "UserInterface.hpp"
 #include "Logger.hpp"
+#include <Game.hpp>
 
 UserInterface* UserInterface::ui_Instance = nullptr;
 
@@ -16,22 +17,22 @@ UserInterface::UserInterface()
 	glBindVertexArray(0);
 }
 
-void UserInterface::EngineEditor(FrameBuffer* fbo, Camera* maincam, Scene* sceneRef)
+void UserInterface::EngineEditor(FrameBuffer* fbo)
 {
+	cameraRef = Game::getInstance()->activeCamera;
+
 	Start();
 	Style();
-	DockSpace();
-	//CreatureMenu(creatureArg);
-	//CameraMenu(creatureArg, fbo, maincam);
+	DockSpace();	
 
 	if (showPostProccesed)
-		GameViewport(fbo->postprocessedTexture, maincam, sceneRef);
+		GameViewport(fbo->postprocessedTexture, cameraRef, Game::getInstance()->activeScene);
 	else
-		GameViewport(fbo->framebufferTexture, maincam, sceneRef);
+		GameViewport(fbo->framebufferTexture, cameraRef, Game::getInstance()->activeScene);
 	Logger();
-	Hierarchy(sceneRef);
-	PropertiesPanel(sceneRef);
-	Shutdown(sceneRef);
+	Hierarchy(Game::getInstance()->activeScene);
+	PropertiesPanel(Game::getInstance()->activeScene);
+	Shutdown(Game::getInstance()->activeScene);
 }
 
 void UserInterface::Start()
@@ -48,13 +49,24 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO();
-	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+	int w, h;
+	SDL_GetWindowSize(windowArg, &w, &h);
+	io.DisplaySize = ImVec2((float)w, (float)h);
+	//io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;;
 	io.FontGlobalScale = 0.95f;
 	io.Fonts->AddFontFromFileTTF("Assets/fonts/MonaspaceNeonFrozen-Regular.ttf", 16.0f);
 	io.Fonts->Build();
 	ImGui_ImplSDL2_InitForOpenGL(windowArg, glContextArg);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
+void UserInterface::Resize(SDL_Window* windowArg)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	int w, h;
+	SDL_GetWindowSize(windowArg, &w, &h);
+	io.DisplaySize = ImVec2((float)w, (float)h);
 }
 
 void UserInterface::Shutdown(Scene* sceneRef)
@@ -108,19 +120,19 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	float buttonHeight = 25.0f;
 	float spacing = ImGui::GetStyle().ItemSpacing.x;
 
-	float totalWidth = 2 * buttonWidth + spacing;
+	float totalWidth =   buttonWidth + spacing;
 	float panelWidth = ImGui::GetContentRegionAvail().x;
 	float startX = (panelWidth - totalWidth) * 0.5f;
 
 	ImGui::SetCursorPosX(startX);
-	if (ImGui::ImageButton("##Play", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(16, 16)))
+	if (ImGui::ImageButton("##Start", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(18, 18)))
 	{
-		// Play logic
+		sceneRef->Start();
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton("##Stop", (ImTextureID)(uintptr_t)ResourceManager::stopButton->ID, ImVec2(16, 16)))
+	if (ImGui::ImageButton("##Shutdown", (ImTextureID)(uintptr_t)ResourceManager::stopButton->ID, ImVec2(18, 18)))
 	{
-		// Stop logic
+		sceneRef->Shutdown();
 	}
 
 	// Render the framebuffer in imgui image
@@ -289,9 +301,6 @@ void UserInterface::Style()
 
 void UserInterface::CreatureMenu(Creature* creatureArg)
 {
-	if (creatureMenu) {
-		ImGui::Begin("Creature", &creatureMenu);
-
 		ImGui::Text("Leg Options:");
 		ImGui::Checkbox("Gait", &creatureArg->gait);
 		ImGui::SliderFloat("Leg Width", &creatureArg->legWidth, 1.f, 5.f);
@@ -346,7 +355,7 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 			std::string label = "Segment " + std::to_string(i);
 			if (ImGui::TreeNode(label.c_str()))
 			{
-				ImGui::SliderInt("Thickness", &creatureArg->segments[i]->segmentRadius, 0.0f, 20.0f);
+				ImGui::SliderInt("Thickness", &creatureArg->segments[i]->segmentRadius, 0, 20);
 				ImGui::TreePop();
 			}
 
@@ -371,9 +380,6 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 		ImGui::SliderFloat3("Primary Color", &creatureArg->primaryColor.x, 0.f, 1.f);
 
 		ImGui::SliderFloat("Spot Size", &creatureArg->spotSize, -1.f, 1.f);
-
-		ImGui::End();
-	}
 }
 
 void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam)
@@ -384,7 +390,7 @@ void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* 
 	if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
 	{
 		glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
-		maincam->updateProjection(focus);
+		maincam->updateProjection();
 	}
 	ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
 	ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
@@ -407,7 +413,7 @@ void UserInterface::Logger()
 {
 	ImGui::Begin("Logs");
 
-	const auto& logs = Logger::GetMessages(); // Or use Logger::messages if it's public
+	const auto& logs = Logger::GetMessages();
 
 	for (const auto& entry : logs)
 	{
@@ -415,10 +421,13 @@ void UserInterface::Logger()
 		switch (entry.type)
 		{
 		case LogType::LOG_INFO:
-			color = ImVec4(0.6f, 1.0f, 0.6f, 1.0f); // Light green
+			color = ImVec4(0.6f, 1.0f, 0.6f, 1.0f); // Green
 			break;
 		case LogType::LOG_ERROR:
-			color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); // Light red
+			color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); // Red
+			break;
+		case LogType::LOG_WARNING:
+			color = ImVec4(1.0f, 0.0f, 1.0f, 1.0f); // Yellow
 			break;
 		default:
 			color = ImVec4(1, 1, 1, 1); // White
@@ -510,8 +519,8 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 	float buttonWidth = 100.0f, buttonHeight = 22.f;
 	if (selectedHierarchyItem != entt::null && sceneRef->registry.valid(selectedHierarchyItem))
 	{
-		// ALL POSSIBLE COMPONENTS
-		if (ImGui::CollapsingHeader("Name")) {
+		if (ImGui::CollapsingHeader("Name")) 
+		{
 			char buffer[64];
 			auto& name = sceneRef->registry.get<NameComponent>(selectedHierarchyItem);
 			strncpy_s(buffer, name.name.c_str(), sizeof(buffer));
@@ -545,9 +554,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::PopID();
 
 				ImGui::Spacing();
-				float popUpWidth = 200, popUpHeight = 100;
 				float panelWidth = ImGui::GetContentRegionAvail().x;
-				
 
 				ImGui::PushID(4);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
@@ -586,7 +593,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::SameLine(); ImGui::Text(fileName.c_str());
 
 				ImGui::Spacing();
-				float popUpWidth = 200, popUpHeight = 100;
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
 				ImGui::PushID(5);
@@ -604,8 +610,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 		if (sceneRef->registry.any_of<ScriptComponent>(selectedHierarchyItem))
 		{
-			auto& sprite = sceneRef->registry.get<ScriptComponent>(selectedHierarchyItem);
-
 			if (ImGui::CollapsingHeader("Script"))
 			{
 				if (ImGui::Button("Browse"))
@@ -619,7 +623,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::SameLine(); ImGui::Text(fileName.c_str());
 
 				ImGui::Spacing();
-				float popUpWidth = 200, popUpHeight = 100;
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
 				ImGui::PushID(5);
@@ -635,13 +638,37 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			}
 		}
 
+		if (sceneRef->registry.any_of<Creature>(selectedHierarchyItem))
+		{
+			auto& creature = sceneRef->registry.get<Creature>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Creature"))
+			{
+				CreatureMenu(&creature);
+
+				ImGui::Spacing();
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+
+				ImGui::PushID(4);
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<Creature>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
+				ImGui::PopID();
+			}
+		}
+
 		// ADD COMPONENT
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing();
 		float popUpWidth = 200, popUpHeight = 100;
 		float panelWidth = ImGui::GetContentRegionAvail().x;
-		float buttonWidth = 140.0f, buttonHeight = 25.f;
+		buttonWidth = 140.0f, buttonHeight = 25.f;
 		ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 		if(ImGui::Button("New Component", ImVec2(buttonWidth, buttonHeight)))
 		{
@@ -675,6 +702,14 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				if (ImGui::MenuItem("Script Component"))
 				{
 					entityWrapper.AddComponent<ScriptComponent>();
+				}
+			}
+			if (!sceneRef->registry.any_of<Creature>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Creature Component"))
+				{
+					// TODO: This is arbitrary.
+					entityWrapper.AddComponent<Creature>(15, cameraRef);
 				}
 			}
 			ImGui::EndPopup();

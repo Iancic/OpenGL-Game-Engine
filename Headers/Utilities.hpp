@@ -1,4 +1,9 @@
 #pragma once
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <commdlg.h>
+
 #include <glad/glad.h> // Link OpenGL Functions
 #include <SDL.h> // SDL: Windowing, Input, Audio
 #include <glm-master/glm/glm.hpp> // GLM: Math
@@ -6,6 +11,8 @@
 #include <imgui-master/imgui_impl_sdl2.h>
 #include <imgui-master/imgui_impl_sdlrenderer2.h>
 #include <imgui-master/imgui_impl_opengl3.h>
+#include <imgui-master/imgui_internal.h>
+#include "imgui-master/ImGuizmo.h"
 
 // C++ Utilities
 #include <iostream>
@@ -13,17 +20,16 @@
 #include <unordered_map>
 #include <thread>
 #include <cassert>
-
-// Engine Utilities Re-usable Across Different Programs
-#include "Line.hpp"
-#include "Logger.hpp"
+#include <string>
 
 #include "fmod/include/fmod.hpp"
 #include "fmod/include/fmod_errors.h"
 
 #include "entt/entt.hpp"
 
-#include "common.hpp"
+#include "Input.hpp"
+#include "Line.hpp"
+#include "Common.hpp"
 #include "Creature.hpp"
 #include "Camera.hpp"
 #include "ResourceManager.hpp"

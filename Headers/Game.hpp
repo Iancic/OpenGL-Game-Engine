@@ -5,39 +5,45 @@
 
 class Game : public Program
 {
-public:
+
+private:
+	static Game* game_Instance;
+
+	Game() = default;
 	Game(const char* title) : Program(title) {}
+
+public:
+	// Prevent copying or assignment 
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
+
+	// Get the instance
+	static Game* getInstance(const char* title = "My Game")
+	{
+		if (game_Instance == nullptr)
+		{
+			game_Instance = new Game(title);
+		}
+
+		return game_Instance;
+	}
+
 	~Game() {}
 
 	void Init() override;
 	void Shutdown() override;
 	void Render() override;
-	void HandleEvents() override;
 	void HandleInput() override;
 	void Update() override;
 
 	static inline Camera* activeCamera = nullptr;
 
-	void LoadScene();
-
-	enum class GameState
-	{
-		PAUSED,
-		PLAYING,
-		STOPPED
-	};
+	enum class GameState { PAUSED, PLAYING, STOPPED };
 	GameState gameState = GameState::PAUSED;
 
-private:
-
-	std::vector<Scene*> scenes;
 	Scene* activeScene = nullptr;
-	
-	// Events and Input:
-	SDL_GameController* controller;
-	int mouseX, mouseY;
-	const Uint8* keyState = SDL_GetKeyboardState(NULL);
-	float controllerAxisRightX, controllerAxisRightY;
-	bool keyPressedOnce[SDL_NUM_SCANCODES] = { false };
-	bool controllerButtonPressed[SDL_CONTROLLER_BUTTON_MAX] = { false };
+
+private:
+	std::vector<Scene*> scenes;
+
 };

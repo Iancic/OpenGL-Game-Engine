@@ -1,12 +1,5 @@
 #pragma once
-
-#include <imgui-master/imgui.h>
-#include <imgui-master/imgui_impl_sdl2.h>
-#include <imgui-master/imgui_impl_sdlrenderer2.h>
-#include <imgui-master/imgui_impl_opengl3.h>
-#include <imgui-master/imgui_internal.h>
-#include <string>
-#include <map>
+#include "Utilities.hpp"
 
 #include "Common.hpp"
 #include "Creature.hpp"
@@ -14,13 +7,6 @@
 #include "Character.hpp"
 
 #include "Scene.hpp"
-
-#include "imgui-master/ImGuizmo.h"
-
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#include <commdlg.h>
 
 class UserInterface
 {
@@ -56,9 +42,10 @@ public:
 	bool showPostProccesed = false;
 	bool renderDebugInfo = true;
 
-	void EngineEditor(FrameBuffer* fbo, Camera* maincam, Scene* sceneRef);
+	void EngineEditor(FrameBuffer* fbo);
 	void Start();
 	void Init(SDL_Window* windowArg, void* glContextArg);
+	void Resize(SDL_Window* windowArg);
 	void Shutdown(Scene* sceneRef);
 	void DockSpace();
 	void GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef);
@@ -71,6 +58,8 @@ public:
 	void DrawEntity();
 	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
+
+	Camera* cameraRef = nullptr;
 
 	// For Sprite Component
 	std::string OpenFileDialog();

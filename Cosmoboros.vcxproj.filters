@@ -68,6 +68,7 @@
       <Filter>Libraries</Filter>
     </ClCompile>
     <ClCompile Include="Source\MetaUtilities.cpp" />
+    <ClCompile Include="Source\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Headers\lua.h" />
     <ClInclude Include="Headers\lauxlib.h" />
     <ClInclude Include="Headers\MetaUtilities.hpp" />
+    <ClInclude Include="Headers\Input.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vSprite.glsl">

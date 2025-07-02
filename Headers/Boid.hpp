@@ -20,7 +20,7 @@ public:
 
 	glm::vec2 accumulatedDirection{};//vector{}, normalized{}, magnitude{}, direction{};
 
-	void Render(Camera* activeCamera);
+	void Render();
 	void Update(std::vector<Boid*> boidPool);
 
 	glm::vec2 Behaviour(std::vector<Boid*> boidPool);

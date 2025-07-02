@@ -18,6 +18,7 @@ Camera::Camera(float fieldOfView, glm::vec3 position, int cameraWidth, int camer
 
 void Camera::UpdateCamera(Transform* target, glm::vec2 playerDir, float deltaTime, bool inputPressed)
 {
+
 	if (!inputPressed)
 	{
 		// Get the target position and center the camera on it
@@ -44,10 +45,10 @@ void Camera::UpdateCamera(Transform* target, glm::vec2 playerDir, float deltaTim
 void Camera::zoomOut(float factor, const glm::vec2& target)
 {
 	zoom /= factor; // Decrease the zoom factor
-	updateProjection(target);
+	updateProjection();
 }
 
-void Camera::updateProjection(const glm::vec2& target)
+void Camera::updateProjection()
 {
 	// Adjust the left, right, top, bottom to zoom in/out
 	float viewWidth = SCREEN_WIDTH / zoom;

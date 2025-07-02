@@ -197,6 +197,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\IKChain.cpp" />
     <ClCompile Include="Source\IKSegment.cpp" />
+    <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\InputHandler.cpp" />
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
@@ -239,6 +240,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
     <ClInclude Include="Headers\Game.hpp" />
     <ClInclude Include="Headers\IKChain.hpp" />
     <ClInclude Include="Headers\IKSegment.hpp" />
+    <ClInclude Include="Headers\Input.hpp" />
     <ClInclude Include="Headers\InputHandler.hpp" />
     <ClInclude Include="Headers\lauxlib.h" />
     <ClInclude Include="Headers\Line.hpp" />

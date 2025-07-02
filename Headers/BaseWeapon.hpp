@@ -32,7 +32,7 @@ public:
 	glm::vec2 vector{}, normalized{}, magnitude{}, direction{};
 
 	void Update(Transform& Target, float deltaTime);
-	void Render(Camera* activeCamera);
+	void Render();
 
 	void Shoot();
 

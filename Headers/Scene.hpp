@@ -11,6 +11,7 @@ public:
 	void Start();
 	void Render();
 	void Update();
+	void Shutdown();
 
 	void BindTypes(sol::state& lua);
 	void BindEntity(sol::state& lua);
@@ -21,7 +22,10 @@ public:
 	
 	void RenderingSystem(Camera* activeCamera);
 
+	bool initialized = false;
+
 	Transform* origin = new Transform();
+
 	entt::registry registry;
 	std::vector<Entity> entities;
 private:

@@ -6,7 +6,7 @@ IKSegment::IKSegment()
 	base->position = glm::vec3{ 0 };
 }
 
-void IKSegment::Render(Camera* activeCamera, float legWidth)
+void IKSegment::Render(float legWidth)
 {
 	Line::getInstance()->Render(glm::vec3(endEffector->position.x, endEffector->position.y, 0.f), glm::vec3(base->position.x, base->position.y, 0.f), glm::vec4(255, 255, 255, 255), legWidth);
 }
