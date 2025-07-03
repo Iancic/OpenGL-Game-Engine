@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+static constexpr size_t MAX_MESSAGES = 50;
+
 enum class LogType 
 {
 	LOG_INFO,
@@ -28,6 +30,7 @@ public:
 	template<typename... Args>
 	static void Log(Args&&... args)
 	{
+		Trim();
 		std::ostringstream oss;
 		(oss << ... << args);
 
@@ -41,6 +44,7 @@ public:
 	template<typename... Args>
 	static void Error(Args&&... args)
 	{
+		Trim();
 		std::ostringstream oss;
 		(oss << ... << args);
 
@@ -54,6 +58,7 @@ public:
 	template<typename... Args>
 	static void Warning(Args&&... args)
 	{
+		Trim();
 		std::ostringstream oss;
 		(oss << ... << args);
 
@@ -66,12 +71,19 @@ public:
 
 	static const std::vector<LogEntry>& GetMessages() 
 	{
-		//if (messages.size() > 20) Flush();
+		//if (messages.size() > 100) Flush();
 		//else 
 		return messages; 
 	}
 
 	static void Flush() { messages.clear(); }
+
+	static void Trim() 
+	{
+		if (messages.size() >= MAX_MESSAGES)
+			messages.erase(messages.begin(), messages.begin() + (MAX_MESSAGES / 2));
+		;
+	}
 
 private:
 

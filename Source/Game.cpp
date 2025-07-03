@@ -15,7 +15,7 @@ void Game::Init()
 
 void Game::Update()
 {
-	if (gameState == GameState::PLAYING) activeScene->Update();
+	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update();
 }
 
 void Game::HandleInput()

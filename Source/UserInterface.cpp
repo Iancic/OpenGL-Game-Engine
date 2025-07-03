@@ -123,16 +123,28 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	float totalWidth =   buttonWidth + spacing;
 	float panelWidth = ImGui::GetContentRegionAvail().x;
 	float startX = (panelWidth - totalWidth) * 0.5f;
-
-	ImGui::SetCursorPosX(startX);
-	if (ImGui::ImageButton("##Start", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(18, 18)))
+	if (gameState == GameState::STOPPED)
 	{
-		sceneRef->Start();
+		ImGui::SetCursorPosX(startX);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 255, 0, 255));
+		if (ImGui::ImageButton("##Start", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(18, 18)))
+		{
+			gameState = GameState::PLAYING;
+			//if (!sceneRef->initialized)
+			sceneRef->Start();
+		}
+		ImGui::PopStyleColor();
 	}
-	ImGui::SameLine();
-	if (ImGui::ImageButton("##Shutdown", (ImTextureID)(uintptr_t)ResourceManager::stopButton->ID, ImVec2(18, 18)))
+	else
 	{
-		sceneRef->Shutdown();
+		ImGui::SetCursorPosX(startX);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(255, 0, 0, 255));
+		if (ImGui::ImageButton("##Shutdown", (ImTextureID)(uintptr_t)ResourceManager::stopButton->ID, ImVec2(18, 18)))
+		{
+			gameState = GameState::STOPPED;
+			sceneRef->Shutdown();
+		}
+		ImGui::PopStyleColor();
 	}
 
 	// Render the framebuffer in imgui image
@@ -315,9 +327,11 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 			ImGui::PushID(static_cast<int>(i)); // Avoid ImGui ID collisions
 			std::string legLabel = "Leg " + std::to_string(i);
 			if (ImGui::TreeNode(legLabel.c_str())) {
-				for (size_t j = 0; j < creatureArg->legs[i]->segments.size(); j++) {
+				for (size_t j = 0; j < creatureArg->legs[i]->segments.size(); j++) 
+				{
 					std::string segmentLabel = "Segment " + std::to_string(j);
-					if (ImGui::TreeNode(segmentLabel.c_str())) {
+					if (ImGui::TreeNode(segmentLabel.c_str())) 
+					{
 						ImGui::SliderFloat("Leg Length", &creatureArg->legs[i]->segments[j]->lenght, 1.0f, 30.0f);
 						ImGui::TreePop();
 					}
@@ -488,7 +502,6 @@ void UserInterface::Hierarchy(Scene* sceneRef)
 	}
 
 	ImGui::Spacing();
-	ImGui::Separator();
 	ImGui::Spacing();
 	float panelWidth = ImGui::GetContentRegionAvail().x;
 	float buttonWidth = 100.0f, buttonHeight = 25.f;
@@ -664,7 +677,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 		// ADD COMPONENT
 		ImGui::Spacing();
-		ImGui::Separator();
 		ImGui::Spacing();
 		float popUpWidth = 200, popUpHeight = 100;
 		float panelWidth = ImGui::GetContentRegionAvail().x;

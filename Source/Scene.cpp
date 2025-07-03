@@ -13,30 +13,58 @@ void Scene::Start()
 	{
 		auto& script = view.get<ScriptComponent>(entity);
 
-		// We initialize the scripts.
-		script.state = sol::state();
-		auto& Lua = script.state;
-
-		Lua.open_libraries(sol::lib::base, sol::lib::math);
-
-		Lua.set_function("print", [](sol::variadic_args args)
+		if (!script.initialized)
 		{
-			
-		});
+			// Initialize the lua script with functions and types.
+			script.initialized = true;
+			script.state = sol::state();
+			auto& Lua = script.state;
 
-		BindTypes(Lua);
-		BindEntity(Lua);
+			Lua.open_libraries(sol::lib::base, sol::lib::math);
 
-		// TODO: MODULARIZE FOR MANY COMPONENTS
-		Lua["Self"] = entity;
-		if (registry.any_of<TransformComponent>(entity))
-			Lua["Transform"] = &registry.get<TransformComponent>(entity);
+			Lua.set_function("print", [](sol::variadic_args args)
+			{
+				std::ostringstream oss;	
+				for (auto arg : args)
+				{
+					sol::type t = arg.get_type();
+					switch (t)
+					{
+						case sol::type::string:
+							oss << arg.as<std::string>();
+							break;
+						case sol::type::number:
+							oss << arg.as<double>();
+							break;
+						case sol::type::boolean:
+							oss << (arg.as<bool>() ? "true" : "false");
+							break;
+						case sol::type::nil:
+							oss << "nil";
+							break;
+						default:
+							oss << "[unsupported type]";
+							break;
+					}
+					oss << " ";
+				}
+				Logger::Log(oss.str());
+			});
 
-		Lua.script_file(script.scriptPath);
+			BindTypes(Lua);
+			BindEntity(Lua);
 
-		script.onStart = Lua["Start"];
-		script.onUpdate = Lua["Update"];
-		script.onShutdown = Lua["Shutdown"];
+			// TODO: MODULARIZE FOR MANY COMPONENTS
+			Lua["Self"] = entity;
+			if (registry.any_of<TransformComponent>(entity))
+				Lua["Transform"] = &registry.get<TransformComponent>(entity);
+
+			Lua.script_file("Scripts/Default.lua");//(script.scriptPath);
+		}
+
+		script.onStart = script.state["Start"];
+		script.onUpdate = script.state["Update"];
+		script.onShutdown = script.state["Shutdown"];
 
 		if (script.onStart.valid())
 			script.onStart();
@@ -57,12 +85,26 @@ void Scene::Update()
 	{
 		auto& script = view.get<ScriptComponent>(entity);
 		if (script.onUpdate.valid())
+		{
 			script.onUpdate(100);
+		}
 	}
 }
 
 void Scene::Shutdown()
 {
+	auto view = registry.view<ScriptComponent>();
+	for (auto entity : view)
+	{
+		auto& script = view.get<ScriptComponent>(entity);
+
+		if (script.onShutdown.valid())
+			script.onShutdown();
+	}
+
+	initialized = false;
+
+	Logger::Flush();
 }
 
 void Scene::BindTypes(sol::state& lua)

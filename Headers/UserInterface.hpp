@@ -59,6 +59,9 @@ public:
 	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
 
+	enum class GameState { PLAYING, STOPPED };
+	GameState gameState = GameState::STOPPED;
+
 	Camera* cameraRef = nullptr;
 
 	// For Sprite Component

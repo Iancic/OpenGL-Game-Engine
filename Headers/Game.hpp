@@ -38,8 +38,6 @@ public:
 
 	static inline Camera* activeCamera = nullptr;
 
-	enum class GameState { PAUSED, PLAYING, STOPPED };
-	GameState gameState = GameState::PAUSED;
 
 	Scene* activeScene = nullptr;
 

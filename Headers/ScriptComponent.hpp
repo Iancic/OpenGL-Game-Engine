@@ -9,4 +9,6 @@ struct ScriptComponent
 	sol::function onStart;
 	sol::function onUpdate;
 	sol::function onShutdown;
+
+	bool initialized = false;
 };
