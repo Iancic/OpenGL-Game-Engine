@@ -1,6 +1,5 @@
 #include "Scene.hpp"
 
-
 Scene::Scene()
 {
 
@@ -75,10 +74,11 @@ void Scene::Start()
 
 void Scene::Render()
 {
-
+	CreatureSystemRender();
+	//SpriteSystemRendering();
 }
 
-void Scene::Update()
+void Scene::Update(Input& inputSystem, float deltaTime)
 {
 	auto view = registry.view<ScriptComponent>();
 	for (auto entity : view)
@@ -89,6 +89,11 @@ void Scene::Update()
 			script.onUpdate(100);
 		}
 	}
+
+	// Obtain Mouse Position for shooting target
+	Transform target;
+	target.setPosition(inputSystem.GetMousePosition().x, inputSystem.GetMousePosition().y);
+	CreatureSystemUpdate(target, deltaTime);
 }
 
 void Scene::Shutdown()
@@ -138,6 +143,37 @@ void Scene::BindEntity(sol::state& lua)
 void Scene::Serialize()
 {
 	// TODO: yaml for components and entities.
+	if (scenePath.empty())
+	{
+		Logger::Warning("Scene not loaded yet.");
+	}
+	else
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		std::string fileName = std::filesystem::path(scenePath).filename().string();
+		out << YAML::Key << "Scene" << YAML::Value << fileName;
+		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
+		for (auto entity : entities)
+		{
+			// TODO: entity.Serialize();
+		}
+
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
+		std::ofstream fout(scenePath);
+		fout << out.c_str();
+
+		Logger::Log("Saving scene: ", scenePath);
+	}
+}
+
+void Scene::Deserialize()
+{
+	scenePath = OpenFileDialog();
+	Logger::Log("Loaded scene: ", scenePath);
 }
 
 void Scene::AddEntity(const std::string& name, const std::string& tag)
@@ -151,13 +187,52 @@ void Scene::DestroyEntity(entt::entity handle)
 	registry.destroy(handle);
 }
 
-void Scene::RenderingSystem(Camera* activeCamera)
+void Scene::CreatureSystemRender()
+{
+	auto view = registry.view<Creature>();
+	for (auto entity : view)
+	{
+		auto& creature = view.get<Creature>(entity);
+		creature.Render();
+	}
+}
+
+void Scene::CreatureSystemUpdate(Transform& target, float deltaTime)
+{
+	auto view = registry.view<Creature>();
+	for (auto entity : view)
+	{
+		auto& creature = view.get<Creature>(entity);
+		creature.Update(target, deltaTime);
+		creature.AI();
+	}
+}
+
+void Scene::SpriteSystemRendering()
 {
 	auto view = registry.view<TransformComponent, SpriteComponent>();
 
-	for (auto [entity, transform, sprite] : view.each()) 
+	for (auto [entity, transform, sprite] : view.each())
 	{
 		auto transform = view.get<TransformComponent>(entity);
 		auto sprite = view.get<SpriteComponent>(entity);
 	}
 }
+
+std::string Scene::OpenFileDialog()
+{
+	char filename[MAX_PATH] = "";
+
+	OPENFILENAMEA ofn = { 0 };
+	ofn.lStructSize = sizeof(OPENFILENAMEA);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = sizeof(filename);
+	ofn.lpstrFilter = "Scene Files\0*.yaml;\0All Files\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+		return std::string(filename);
+	return ""; // Cancelled or failed
+};

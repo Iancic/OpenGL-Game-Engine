@@ -80,8 +80,9 @@ void Program::PostRender()
 	RenderingBuffer->DrawRenderBuffer(timeElapsed);
 
 	// Engine Editor UI
-	if (isEditorOn) UI->EngineEditor(RenderingBuffer);
+	if (isEditorOn && !UI->isViewportMaximized) UI->EngineEditor(RenderingBuffer);
 
+	// SDL Draw
 	SDL_GL_SwapWindow(window);
 }
 
@@ -93,21 +94,23 @@ void Program::Quit()
 
 void Program::Time()
 {
-	timeElapsed = SDL_GetTicks();
+	Uint32 currentTicks = SDL_GetTicks();
 
-	// Cap the fps to specified number.
+	timeElapsed = currentTicks;
+
+	// Cap the FPS if not uncapped
 	if (!UNCAPPED)
 	{
-		// If we are too fast, waste some time until we reach the desired milisecond per frame.
-		int timeToWait = MIL_PER_FRAME - (SDL_GetTicks() - milisecondsPreviousFrame);
-		if (timeToWait > 0 && timeToWait <= MIL_PER_FRAME)
-			SDL_Delay(timeToWait); // Yield execution.
+		int timeToWait = MIL_PER_FRAME - (currentTicks - milisecondsPreviousFrame);
+		if (timeToWait > 0)
+			SDL_Delay(timeToWait);
+
+		// Update the ticks after delay
+		currentTicks = SDL_GetTicks();
 	}
 
-	// The difference in ticks since the last frame, converted to seconds
-	deltaTime = (SDL_GetTicks() - milisecondsPreviousFrame) / 1000.f;
-
-	milisecondsPreviousFrame = SDL_GetTicks();
+	deltaTime = (currentTicks - milisecondsPreviousFrame) / 1000.f;
+	milisecondsPreviousFrame = currentTicks;
 }
 
 int Program::GetFPS()

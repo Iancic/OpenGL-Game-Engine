@@ -69,6 +69,13 @@ void Input::EndFrame()
 	resizedWindow = false;
 }
 
+glm::vec2 Input::GetMousePosition()
+{
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	return glm::vec2(x, y);
+}
+
 bool Input::GetEvent(int key)
 {
 	switch (key)

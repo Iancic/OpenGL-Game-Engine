@@ -125,13 +125,17 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	float startX = (panelWidth - totalWidth) * 0.5f;
 	if (gameState == GameState::STOPPED)
 	{
+		ImGui::Checkbox("Play Maximized", &triggerMaximized); ImGui::SameLine();
+		ImGui::Checkbox("Post Processed", &showPostProccesed); ImGui::SameLine();
+
 		ImGui::SetCursorPosX(startX);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 255, 0, 255));
 		if (ImGui::ImageButton("##Start", (ImTextureID)(uintptr_t)ResourceManager::playButton->ID, ImVec2(18, 18)))
 		{
 			gameState = GameState::PLAYING;
-			//if (!sceneRef->initialized)
 			sceneRef->Start();
+			if (triggerMaximized)
+				isViewportMaximized = true;
 		}
 		ImGui::PopStyleColor();
 	}
@@ -143,6 +147,7 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 		{
 			gameState = GameState::STOPPED;
 			sceneRef->Shutdown();
+			isViewportMaximized = false;
 		}
 		ImGui::PopStyleColor();
 	}
@@ -153,9 +158,6 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	// Set imguzimor rect
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(imagePos.x, imagePos.y + buttonHeight, imageSize.x, imageSize.y);
-
-	//ImGui::SetCursorScreenPos(ImVec2(imagePos.x + 10, imagePos.y + 10));
-	
 
 	// TODO: view and projection do not seem to work from main camera
 	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -435,19 +437,19 @@ void UserInterface::Logger()
 		switch (entry.type)
 		{
 		case LogType::LOG_INFO:
-			color = ImVec4(0.6f, 1.0f, 0.6f, 1.0f); // Green
+			color = ImVec4(0.f, 1.0f, 0.f, 1.0f); // Green
 			break;
 		case LogType::LOG_ERROR:
-			color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); // Red
+			color = ImVec4(1.f, 0.f, 0.0f, 1.0f); // Red
 			break;
 		case LogType::LOG_WARNING:
-			color = ImVec4(1.0f, 0.0f, 1.0f, 1.0f); // Yellow
+			color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
 			break;
 		default:
 			color = ImVec4(1, 1, 1, 1); // White
 			break;
 		}
-
+		
 		ImGui::PushStyleColor(ImGuiCol_Text, color);
 		ImGui::TextUnformatted(entry.message.c_str());
 		ImGui::PopStyleColor();
@@ -591,7 +593,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				
 				if (ImGui::Button("Browse"))
 				{
-					std::string path = OpenFileDialog();
+					std::string path = OpenFileDialog(FILE_TYPE::IMAGE);
 					if (!path.empty())
 					{
 						fileName = std::filesystem::path(path).filename().string();
@@ -627,7 +629,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			{
 				if (ImGui::Button("Browse"))
 				{
-					std::string path = OpenFileDialog();
+					std::string path = OpenFileDialog(FILE_TYPE::SCRIPT);
 					if (!path.empty())
 					{
 						fileName = std::filesystem::path(path).filename().string();
@@ -720,8 +722,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			{
 				if (ImGui::MenuItem("Creature Component"))
 				{
-					// TODO: This is arbitrary.
-					entityWrapper.AddComponent<Creature>(15, cameraRef);
+					auto& creature = entityWrapper.AddComponent<Creature>(15, cameraRef);
 				}
 			}
 			ImGui::EndPopup();
@@ -738,15 +739,46 @@ void UserInterface::HeaderBar()
 	if (ImGui::BeginMenuBar())
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
-		ImGui::Button("Save");
-		ImGui::Button("Load");
-		ImGui::Button("Build");
+
+		if (ImGui::Button("Engine")) ImGui::OpenPopup("EnginePopup");
+		ImGui::SetNextWindowSize(ImVec2(125, 60));
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		if (ImGui::BeginPopup("EnginePopup"))
+		{
+			if (ImGui::MenuItem("Build Game")) { }
+			if (ImGui::MenuItem("Reload")) { }
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Scene")) ImGui::OpenPopup("ScenePopup");
+		ImGui::SetNextWindowSize(ImVec2(85, 60));
+		pos = ImGui::GetCursorScreenPos();
+		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		if (ImGui::BeginPopup("ScenePopup"))
+		{
+			if (ImGui::MenuItem("Save")) { Game::getInstance()->activeScene->Serialize(); }
+			if (ImGui::MenuItem("Load")) { Game::getInstance()->activeScene->Deserialize(); }
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Create")) ImGui::OpenPopup("CreatePopup");
+		ImGui::SetNextWindowSize(ImVec2(125, 60));
+		pos = ImGui::GetCursorScreenPos();
+		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		if (ImGui::BeginPopup("CreatePopup"))
+		{
+			if (ImGui::MenuItem("New Script")) { }
+			if (ImGui::MenuItem("New Scene ")) { }
+			ImGui::EndPopup();
+		}
+
 		ImGui::PopStyleColor();
 		ImGui::EndMenuBar();
 	}
 }
 
-std::string UserInterface::OpenFileDialog()
+std::string UserInterface::OpenFileDialog(const FILE_TYPE typeArg)
 {
 	char filename[MAX_PATH] = "";
 
@@ -755,7 +787,10 @@ std::string UserInterface::OpenFileDialog()
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = sizeof(filename);
-	ofn.lpstrFilter = "Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0";
+	if (typeArg == FILE_TYPE::SCRIPT)
+		ofn.lpstrFilter = "Script Files\0*.lua;\0All Files\0*.*\0";
+	else
+		ofn.lpstrFilter = "Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0";
 	ofn.nFilterIndex = 1;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 

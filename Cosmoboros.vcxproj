@@ -112,18 +112,18 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;DIR=R"($(ProjectDir))";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;%(AdditionalIncludeDirectories);$(SolutionDir)Headers</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;%(AdditionalIncludeDirectories);$(SolutionDir)Headers;$(SolutionDir)Libraries/yaml/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudioL_vc.lib;fmodL_vc.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudioL_vc.lib;fmodL_vc.lib;yaml-cppd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\yaml\lib\Debug</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Libraries\freeType\lib\freetype.dll" "$(OutDir)"
@@ -133,7 +133,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmod.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodL.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudio.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
-</Command>
+copy /Y "$(SolutionDir)Libraries\yaml\lib\Debug\yaml-cppd.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,15 +145,15 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;$(SolutionDir)Headers;$(SolutionDir)Libraries/sol</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;$(SolutionDir)Headers;$(SolutionDir)Libraries/sol;$(SolutionDir)Libraries/yaml/include/yaml-cpp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;;$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\fmod\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudio_vc.lib;fmod_vc.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libraries\SDL\lib;$(SolutionDir)libraries\fmod\lib;$(SolutionDir)libraries\freeType\lib;$(SolutionDir)libraries\lua\lib;$(SolutionDir)libraries\yaml\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;freetype.lib;lua54.lib;comdlg32.lib;fmodstudio_vc.lib;fmod_vc.lib;yaml-cppd.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Libraries\freeType\lib\freetype.dll" "$(OutDir)"
@@ -163,6 +163,7 @@ copy /Y "$(SolutionDir)Libraries\fmod\lib\fmod.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodL.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudio.dll" "$(OutDir)"
 copy /Y "$(SolutionDir)Libraries\fmod\lib\fmodstudioL.dll" "$(OutDir)"
+copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

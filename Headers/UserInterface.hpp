@@ -1,11 +1,7 @@
 #pragma once
 #include "Utilities.hpp"
-
-#include "Common.hpp"
-#include "Creature.hpp"
-#include "FrameBuffer.hpp"
 #include "Character.hpp"
-
+#include "Input.hpp"
 #include "Scene.hpp"
 
 class UserInterface
@@ -19,6 +15,8 @@ public:
 	// Prevent copying or assignment 
 	UserInterface(const UserInterface&) = delete;
 	UserInterface& operator=(const UserInterface&) = delete;
+
+	enum class FILE_TYPE { SCRIPT, IMAGE };
 
 	// Get the instance
 	static UserInterface* getInstance()
@@ -62,10 +60,13 @@ public:
 	enum class GameState { PLAYING, STOPPED };
 	GameState gameState = GameState::STOPPED;
 
+	// Trigger changes value on checkbox and prepares wheter fullscreen should be on runtime.
+	bool isViewportMaximized = false, triggerMaximized = false; 
+
 	Camera* cameraRef = nullptr;
 
 	// For Sprite Component
-	std::string OpenFileDialog();
+	std::string OpenFileDialog(const FILE_TYPE typeArg);
 	std::string fileName = "Empty";
 
 	bool creatureMenu = false;

@@ -42,19 +42,6 @@
 #include "Emitter.hpp"
 #include "LuaUtilities.hpp"
 
-static inline float NormalizeAxis(Sint16 value, float deadZone = 8000.0f)
-{
-	if (abs(value) < deadZone)
-		return 0.0f;
-
-	// Convert to [-1.0, 1.0] range
-	float result = value / 32767.0f;
-
-	// Optional: Scale to start at 0.0 right after dead zone
-	float adjusted = (abs(result) - (deadZone / 32767.0f)) / (1.0f - (deadZone / 32767.0f));
-	return (value > 0) ? adjusted : -adjusted;
-};
-
 // Just To Test if FMOD works
 static inline void TestSound()
 {
@@ -110,4 +97,22 @@ static inline void TestSound()
     sound->release();
     system->close();
     system->release();
+}
+
+static inline std::string OpenFileDialog()
+{
+    char filename[MAX_PATH] = "";
+
+    OPENFILENAMEA ofn = { 0 };
+    ofn.lStructSize = sizeof(OPENFILENAMEA);
+    ofn.hwndOwner = nullptr;
+    ofn.lpstrFile = filename;
+    ofn.nMaxFile = sizeof(filename);
+    ofn.lpstrFilter = "Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileNameA(&ofn))
+        return std::string(filename);
+    return ""; // Cancelled or failed
 }

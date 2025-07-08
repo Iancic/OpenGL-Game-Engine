@@ -15,19 +15,29 @@ void Game::Init()
 
 void Game::Update()
 {
-	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update();
+	if (UI->gameState == UserInterface::GameState::PLAYING) { activeScene->Update(*InputSystem, deltaTime); }
 }
 
 void Game::HandleInput()
 {
+	// Window Quit Button
 	if (InputSystem->GetEvent(SDL_QUIT)) isRunning = false;
+
+	// Quit Viewport From Fullscreen
+	if (InputSystem->GetKey(SDL_SCANCODE_ESCAPE, Input::Action::DOWN) && UI->isViewportMaximized)
+	{
+		UI->gameState = UserInterface::GameState::STOPPED;
+		activeScene->Shutdown();
+		UI->isViewportMaximized = false;
+	}
+
+	// Window Resize
 	if (InputSystem->GetEvent(SDL_WINDOWEVENT_RESIZED)) UI->Resize(window);
-	if (InputSystem->GetKey(SDL_SCANCODE_A, Input::Action::DOWN)) Logger::Log("Test message ", 123, 45.6f, true);
 }
 
 void Game::Render()
 {
-	activeScene->RenderingSystem(activeCamera);
+	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Render();
 }
 
 void Game::Shutdown()

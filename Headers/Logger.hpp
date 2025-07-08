@@ -27,6 +27,7 @@ public:
 
 	static std::string CurrentDateTimeToString();
 
+	// FOR TIME: std::string(CurrentDateTimeToString())
 	template<typename... Args>
 	static void Log(Args&&... args)
 	{
@@ -36,8 +37,9 @@ public:
 
 		LogEntry entry;
 		entry.type = LogType::LOG_INFO;
-		std::string msg = "LOG | " + CurrentDateTimeToString() + " | " + oss.str();
-		entry.message = oss.str();
+		std::string ossString = oss.str();
+		std::string msg = std::string("LOG | ") + std::string(" | ") + ossString;
+		entry.message = msg;
 		messages.push_back(entry);
 	};
 
@@ -50,8 +52,9 @@ public:
 
 		LogEntry entry;
 		entry.type = LogType::LOG_ERROR;
-		std::string msg = "ERROR | " + CurrentDateTimeToString() + " | " + oss.str();
-		entry.message = oss.str();
+		std::string ossString = oss.str();
+		std::string msg = std::string("ERROR | ") + std::string(" | ") + ossString;
+		entry.message = msg;
 		messages.push_back(entry);
 	};
 
@@ -64,8 +67,9 @@ public:
 
 		LogEntry entry;
 		entry.type = LogType::LOG_WARNING;
-		std::string msg = "WARNING | " + CurrentDateTimeToString() + " | " + oss.str();
-		entry.message = oss.str();
+		std::string ossString = oss.str();
+		std::string msg = std::string("WARNING | ") +  std::string(" | ") + ossString;
+		entry.message = msg;
 		messages.push_back(entry);
 	};
 
