@@ -765,22 +765,86 @@ void UserInterface::HeaderBar()
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
-		if (ImGui::Button("Build")) ImGui::OpenPopup("EnginePopup");
-		ImGui::SetNextWindowSize(ImVec2(300, 500));
-		ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH / 2 - 300 / 2, SCREEN_HEIGHT / 2 - 500 / 2));
-		if (ImGui::BeginPopup("EnginePopup"))
+		if (ImGui::Button("Build") && !buildTab) { buildTab = true; }
+		if (buildTab)
 		{
-			if (ImGui::MenuItem("Build")) { }
-			if (ImGui::MenuItem("Build & Run")) { }
-			ImGui::EndPopup();
-		}
+			TransparentBackground();
 
+			ImGui::SetNextWindowSize(ImVec2(300, 500), ImGuiCond_Always); // Full screen
+			ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH / 2 - 300 / 2, SCREEN_HEIGHT / 2 - 500 / 2), ImGuiCond_Always); // Top-left corner
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0); // Remove borders
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); // Remove padding
+
+			ImGui::Begin("Build Window", NULL,
+				ImGuiWindowFlags_NoDecoration | // No title bar
+				ImGuiWindowFlags_NoResize |     // Non-resizable
+				ImGuiWindowFlags_NoMove);
+
+			if (ImGui::ImageButton("##Close", (ImTextureID)(uintptr_t)ResourceManager::closeButton->ID, ImVec2(18, 18)))
+			{
+				buildTab = false;
+			}
+			ImGui::Dummy(ImVec2(0, 15));
+
+			ImGui::Text("Current Scene in Build:");
+
+			for (int i = 0; i < Game::getInstance()->scenes.size(); i++) 
+			{
+				//ImGui::Image((void*)(intptr_t)this->Images->at(i).texture, ImVec2(100 * temp_percentage, 100 * temp_percentage));
+				//ImGui::SameLine();
+				std::string sceneName = Game::getInstance()->scenes[i]->sceneName;
+
+				int selectableHeight = 18;
+				bool foo;
+
+				ImGui::PushID(i);
+				ImGui::Text("%d", i); ImGui::SameLine(); 
+				ImGui::Checkbox("##", &Game::getInstance()->scenes[i]->inBuild); ImGui::SameLine();
+				ImGui::Selectable(sceneName.c_str(), false, 0, ImVec2(0, selectableHeight));
+
+				if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
+				{
+					if (draggedIndex = -1) draggedIndex = i;
+
+					float dragDistance = ImGui::GetMouseDragDelta(0).y;
+
+					if (std::abs(dragDistance) > selectableHeight)
+					{
+						int direction = dragDistance > 0 ? 1 : -1; // Was it moved beyond the first neighouring selectable?
+						int newIndex = draggedIndex + direction;
+
+						// If the new index is valid then swap the elements and reset the dragging distance.
+						if (newIndex > -1 && newIndex < Game::getInstance()->scenes.size())
+						{
+							std::swap(Game::getInstance()->scenes[draggedIndex], Game::getInstance()->scenes[newIndex]);
+							draggedIndex = newIndex;
+
+							ImGui::ResetMouseDragDelta();
+						}
+					}
+				}
+				ImGui::Separator();
+				ImGui::PopID();
+			}
+
+			ImGui::Dummy(ImVec2(0, 15));
+
+			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(40, 40, 40, 255));
+			if (ImGui::Button("Build")) { };
+			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(40, 40, 40, 255));
+			if (ImGui::Button("Build and Run")) { };
+			ImGui::PopStyleColor(2);
+
+			ImGui::End();
+			ImGui::PopStyleVar(2);
+
+			EndTransparentBackground();
+		}
 		if (ImGui::Button("Scenes")) 
 			ImGui::OpenPopup("SceneHeaderPopup");
 
 		ImGui::SetNextWindowSize(ImVec2(85, 60));
-		pos = ImGui::GetCursorScreenPos();
+		ImVec2 pos = ImGui::GetCursorScreenPos();
 		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
 
 		if (ImGui::BeginPopup("SceneHeaderPopup"))
@@ -912,6 +976,27 @@ void UserInterface::HeaderBar()
 		}
 		ImGui::EndMenuBar();
 	}
+}
+
+void UserInterface::TransparentBackground()
+{
+	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.8f); // Transparent background
+
+	ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT), ImGuiCond_Always); // Full screen
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always); // Top-left corner
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0); // Remove borders
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); // Remove padding
+
+	ImGui::Begin("Transparent Window", NULL,
+		ImGuiWindowFlags_NoDecoration | // No title bar
+		ImGuiWindowFlags_NoResize |     // Non-resizable
+		ImGuiWindowFlags_NoMove);
+}
+
+void UserInterface::EndTransparentBackground()
+{
+	ImGui::End();
+	ImGui::PopStyleVar(2);
 }
 
 std::string UserInterface::OpenFileDialog(const FILE_TYPE typeArg)

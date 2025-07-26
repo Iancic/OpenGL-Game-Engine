@@ -4,8 +4,15 @@ Game* Game::game_Instance = nullptr;
 
 void Game::Init()
 {
+	// TESTING: build tab with multiple scenes
 	scenes.push_back(new Scene());
 	activeScene = scenes[0];
+	scenes.push_back(new Scene());
+	scenes.push_back(new Scene());
+
+	scenes[0]->sceneName = "Main Menu";
+	scenes[1]->sceneName = "Game";
+	scenes[2]->sceneName = "Exit";
 
 	activeCamera = new Camera(45.f, glm::vec3(0, 0, 0), SCREEN_WIDTH, SCREEN_HEIGHT);
 

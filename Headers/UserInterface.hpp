@@ -58,6 +58,9 @@ public:
 	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
 
+	void TransparentBackground();
+	void EndTransparentBackground();
+
 	enum class GameState { PLAYING, STOPPED };
 	GameState gameState = GameState::STOPPED;
 
@@ -81,4 +84,7 @@ public:
 	bool isInDragRegion = false;
 	const float headerHeight = 30.0f;
 
+	// Both of these are for the build window
+	bool buildTab = false;
+	int draggedIndex = -1;
 };

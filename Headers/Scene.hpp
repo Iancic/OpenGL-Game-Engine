@@ -36,6 +36,7 @@ public:
 	std::string OpenFileDialog();
 
 	bool initialized = false;
+	bool inBuild = true;
 
 	Transform* origin = new Transform();
 
