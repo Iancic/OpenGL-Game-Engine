@@ -38,7 +38,7 @@ public:
 		LogEntry entry;
 		entry.type = LogType::LOG_INFO;
 		std::string ossString = oss.str();
-		std::string msg = std::string("LOG | ") + std::string(" | ") + ossString;
+		std::string msg = std::string("LOG | ") + ossString;
 		entry.message = msg;
 		messages.push_back(entry);
 	};
@@ -53,7 +53,7 @@ public:
 		LogEntry entry;
 		entry.type = LogType::LOG_ERROR;
 		std::string ossString = oss.str();
-		std::string msg = std::string("ERROR | ") + std::string(" | ") + ossString;
+		std::string msg = std::string("ERROR | ") + ossString;
 		entry.message = msg;
 		messages.push_back(entry);
 	};
@@ -68,7 +68,7 @@ public:
 		LogEntry entry;
 		entry.type = LogType::LOG_WARNING;
 		std::string ossString = oss.str();
-		std::string msg = std::string("WARNING | ") +  std::string(" | ") + ossString;
+		std::string msg = std::string("WARNING | ") + ossString;
 		entry.message = msg;
 		messages.push_back(entry);
 	};

@@ -11,7 +11,7 @@ public:
 
 	Input();
 
-	void PollEvents();
+	void PollEvents(SDL_Window* window, bool inDragRegion);
 	void EndFrame();
 
 	glm::vec2 GetLeftStick();
@@ -55,5 +55,8 @@ private:
 	float controllerAxisRightX, controllerAxisRightY, controllerAxisLeftX, controllerAxisLeftY;
 	bool controllerButtonPressed[SDL_CONTROLLER_BUTTON_MAX] = { false };
 	bool controllerMoved = false;
+
+	bool dragging = false;
+	int drag_offset_x = 0, drag_offset_y = 0;
 };
 

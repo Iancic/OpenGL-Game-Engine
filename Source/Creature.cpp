@@ -135,9 +135,9 @@ Creature::Creature(int difficulty, Camera* camera)
 
 Creature::~Creature()
 {
-	for (auto segment : segments) delete segment;
-	for (auto weapon : weapons) delete weapon;
-	delete spriteRenderer;
+	//for (auto segment : segments) delete segment;
+	//for (auto weapon : weapons) delete weapon;
+	//delete spriteRenderer;
 }
 
 void Creature::Shoot()
@@ -274,14 +274,14 @@ void Creature::AI()
 	theta += circularSpeed * deltaTimeRef;
 }
 
-void Creature::Render()
+void Creature::Render(float deltaTime)
 {
 	if (hasGeometry) for (auto& element : segments) element->Render(activeCamera); // Render Individual Segment Geometry
 
 	for (int i = 0; i < legs.size(); i++) legs[i]->Render(activeCamera, legWidth);  // Render Legs
 
-	RenderInside();
-	RenderSprites();
+	RenderInside(deltaTime);
+	//RenderSprites();
 
 	if (hasWeapons) for (auto& element : weapons) element->Render(); // Render Weapons
 }
@@ -315,7 +315,7 @@ void Creature::RenderSprites()
 	spriteRenderer->DrawSprite(*ResourceManager::getInstance()->smileyFace, glm::vec2(0.0f, 0.0f), glm::vec2(100.0f, 100.0f), 45.f, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void Creature::RenderInside()
+void Creature::RenderInside(float deltaTime)
 {
 	glm::vec4 color = glm::vec4(1, 1, 1, 1);
 
@@ -357,7 +357,7 @@ void Creature::RenderInside()
 		shader->use();
 
 		// Set proper uniforms for perlin skin.
-		shader->setFloat("time", pulseTime);
+		shader->setFloat("time", deltaTime);
 
 		shader->setVec2("offset", offset);
 

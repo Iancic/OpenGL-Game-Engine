@@ -3,6 +3,7 @@
 #include "Character.hpp"
 #include "Input.hpp"
 #include "Scene.hpp"
+#include <fstream>
 
 class UserInterface
 {
@@ -50,7 +51,7 @@ public:
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.f, float columnWidth = 80.f);
 	void Style();
 	void CreatureMenu(Creature* creatureArg);
-	void CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam);
+	void CameraMenu(/*Creature* creatureArg, */ FrameBuffer* fbo, Camera* maincam);
 	void Logger();
 	void Hierarchy(Scene* sceneRef);
 	void DrawEntity();
@@ -65,7 +66,6 @@ public:
 
 	Camera* cameraRef = nullptr;
 
-	// For Sprite Component
 	std::string OpenFileDialog(const FILE_TYPE typeArg);
 	std::string fileName = "Empty";
 
@@ -73,5 +73,12 @@ public:
 
 	entt::entity selectedHierarchyItem;
 	std::vector<entt::entity> entitiesToDestroy;
+
+	enum class FileType { SCRIPT, SCENE };
+	void NewFile(const FileType type, const std::string name);
+
+	bool openScenePopup = false, openScriptPopup = false; // these need to be created since pop up inside pop up does not work
+	bool isInDragRegion = false;
+	const float headerHeight = 30.0f;
 
 };

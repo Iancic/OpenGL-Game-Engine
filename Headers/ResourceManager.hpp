@@ -41,6 +41,17 @@ public:
 	// Textures:
 	std::vector<Texture2D*> textures; // Used to count them
 	static inline Texture2D* smileyFace = nullptr;
+
+	// TODO
+	// -------------------------------
+	// Resource manager should be custom per game so separate between engine rezouces and shaders and the custom ones per game
+	// -------------------------------
+
+	// Icons for the engine:
 	static inline Texture2D* playButton = nullptr;
 	static inline Texture2D* stopButton = nullptr;
+
+	static inline Texture2D* minimizeButton = nullptr;
+	static inline Texture2D* closeButton = nullptr;
+	static inline Texture2D* maximizeButton = nullptr;
 };

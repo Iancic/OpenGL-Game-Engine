@@ -25,13 +25,31 @@ void ResourceManager::loadResources()
 
 	playButton = new Texture2D();
 	textures.push_back(playButton);
-	data = stbi_load("Assets/Icons/Play.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("Icons/Play.png", &width, &height, &nrChannels, 0);
 	playButton->Generate(width, height, data);
 	stbi_image_free(data);
 
 	stopButton = new Texture2D();
 	textures.push_back(stopButton);
-	data = stbi_load("Assets/Icons/Stop.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("Icons/Stop.png", &width, &height, &nrChannels, 0);
 	stopButton->Generate(width, height, data);
+	stbi_image_free(data);
+
+	minimizeButton = new Texture2D();
+	textures.push_back(minimizeButton);
+	data = stbi_load("Icons/Minimize.png", &width, &height, &nrChannels, 0);
+	minimizeButton->Generate(width, height, data);
+	stbi_image_free(data);
+
+	maximizeButton = new Texture2D();
+	textures.push_back(maximizeButton);
+	data = stbi_load("Icons/Maximize.png", &width, &height, &nrChannels, 0);
+	maximizeButton->Generate(width, height, data);
+	stbi_image_free(data);
+
+	closeButton = new Texture2D();
+	textures.push_back(closeButton);
+	data = stbi_load("Icons/Close.png", &width, &height, &nrChannels, 0);
+	closeButton->Generate(width, height, data);
 	stbi_image_free(data);
 }

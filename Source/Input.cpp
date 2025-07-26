@@ -5,7 +5,7 @@ Input::Input()
 	controller = SDL_GameControllerOpen(0);
 }
 
-void Input::PollEvents()
+void Input::PollEvents(SDL_Window* window, bool inDragRegion)
 {
 	// Controller Pressed
 	controllerAxisLeftX = NormalizeAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX));
@@ -54,6 +54,40 @@ void Input::PollEvents()
 
 		case SDL_CONTROLLERBUTTONUP:
 			break;
+
+		// ----------------------------- Code for moving the window around ---------------------------------------
+		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.button == SDL_BUTTON_LEFT && inDragRegion) 
+			{
+				dragging = true;
+
+				int x, y;
+				SDL_GetGlobalMouseState(&x, &y);
+
+				int win_x, win_y;
+				SDL_GetWindowPosition(window, &win_x, &win_y);
+
+				drag_offset_x = x - win_x;
+				drag_offset_y = y - win_y;
+			}
+        break;
+
+        case SDL_MOUSEBUTTONUP:
+            if (event.button.button == SDL_BUTTON_LEFT) 
+			{
+                dragging = false;
+            }
+            break;
+
+        case SDL_MOUSEMOTION:
+            if (dragging && inDragRegion) 
+			{
+                int x, y;
+                SDL_GetGlobalMouseState(&x, &y);
+                SDL_SetWindowPosition(window, x - drag_offset_x, y - drag_offset_y);
+            }
+            break;
+		// -------------------------------------------------------------------------------------------------------
 
 		default:
 			break;

@@ -29,6 +29,8 @@ void UserInterface::EngineEditor(FrameBuffer* fbo)
 		GameViewport(fbo->postprocessedTexture, cameraRef, Game::getInstance()->activeScene);
 	else
 		GameViewport(fbo->framebufferTexture, cameraRef, Game::getInstance()->activeScene);
+
+	CameraMenu(fbo, cameraRef);
 	Logger();
 	Hierarchy(Game::getInstance()->activeScene);
 	PropertiesPanel(Game::getInstance()->activeScene);
@@ -54,7 +56,7 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	io.DisplaySize = ImVec2((float)w, (float)h);
 	//io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;;
-	io.FontGlobalScale = 0.95f;
+	io.FontGlobalScale = 1.f;
 	io.Fonts->AddFontFromFileTTF("Assets/fonts/MonaspaceNeonFrozen-Regular.ttf", 16.0f);
 	io.Fonts->Build();
 	ImGui_ImplSDL2_InitForOpenGL(windowArg, glContextArg);
@@ -125,8 +127,6 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	float startX = (panelWidth - totalWidth) * 0.5f;
 	if (gameState == GameState::STOPPED)
 	{
-		ImGui::Checkbox("Play Maximized", &triggerMaximized); ImGui::SameLine();
-		ImGui::Checkbox("Post Processed", &showPostProccesed); ImGui::SameLine();
 
 		ImGui::SetCursorPosX(startX);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(0, 255, 0, 255));
@@ -151,6 +151,18 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 		}
 		ImGui::PopStyleColor();
 	}
+
+	// Following is rendering the current scene name
+	std::string activeScene = "Current Scene: " + Game::getInstance()->activeScene->sceneName;
+
+	float textWidth = ImGui::CalcTextSize(activeScene.c_str()).x;
+
+	// Push the next item to the right edge (minus some padding or the text width)
+	float regionMaxX = ImGui::GetWindowContentRegionMax().x;
+	float padding = 10.0f;
+
+	ImGui::SameLine(regionMaxX - textWidth - padding);
+	ImGui::TextColored(ImVec4(1, 1, 1, 1), activeScene.c_str());
 
 	// Render the framebuffer in imgui image
 	ImGui::Image((ImTextureID)(uintptr_t)fboID, imageSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -240,14 +252,15 @@ void UserInterface::Style()
 	ImVec4* colors = style.Colors;
 
 	// Darker, more contrasted tones
-	ImVec4 backgroundGray = ImVec4(0.10f, 0.10f, 0.10f, 1.00f); // almost black
-	ImVec4 windowBgGray = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);    // darker than before
-	ImVec4 baseGray = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);         // darker
-	ImVec4 hoverGray = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);        // same hover
-	ImVec4 activeGray = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);       // brighter when active
+	ImVec4 backgroundGray = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+	ImVec4 windowBgGray = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
+	ImVec4 headerBlack = ImVec4(0.075f, 0.075f, 0.075f, 1.00f);
+	ImVec4 baseGray = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+	ImVec4 hoverGray = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+	ImVec4 activeGray = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
 	// Text
-	colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.0f); // brighter text for readability
+	colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.0f);
 
 	// Backgrounds
 	colors[ImGuiCol_WindowBg] = windowBgGray;
@@ -296,7 +309,7 @@ void UserInterface::Style()
 	colors[ImGuiCol_TabUnfocusedActive] = baseGray;
 
 	// Menus
-	colors[ImGuiCol_MenuBarBg] = windowBgGray;
+	colors[ImGuiCol_MenuBarBg] = headerBlack;
 
 	// Checkmarks
 	colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f); // visible light gray
@@ -398,20 +411,20 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 		ImGui::SliderFloat("Spot Size", &creatureArg->spotSize, -1.f, 1.f);
 }
 
-void UserInterface::CameraMenu(Creature* creatureArg, FrameBuffer* fbo, Camera* maincam)
+void UserInterface::CameraMenu(/*Creature* creatureArg,*/ FrameBuffer* fbo, Camera* maincam)
 {
-	
 	ImGui::Begin("Camera");
+
+	ImGui::Checkbox("Play Maximized", &triggerMaximized); ImGui::SameLine();
+	ImGui::Checkbox("Post Processed", &showPostProccesed);
 
 	if (ImGui::SliderFloat("Zoom", &maincam->zoom, 0.f, 5.f, "%.2f"))
 	{
-		glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
+		//glm::vec2 focus = glm::vec2(creatureArg->segments[0]->transform.position.x, creatureArg->segments[0]->transform.position.y);
 		maincam->updateProjection();
 	}
 	ImGui::SliderFloat("Camera Offset", &maincam->distanceFromPlayer, 0.f, 5.f);
 	ImGui::SliderFloat("Follow Speed", &maincam->followSpeed, 0.f, 5.f);
-
-	ImGui::Checkbox("Post Processing:", &showPostProccesed);
 
 	if (showPostProccesed)
 	{
@@ -664,7 +677,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(4);
+				ImGui::PushID(6);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -722,7 +735,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			{
 				if (ImGui::MenuItem("Creature Component"))
 				{
-					auto& creature = entityWrapper.AddComponent<Creature>(15, cameraRef);
+					auto& creature = entityWrapper.AddComponent<Creature>(1, cameraRef);
 				}
 			}
 			ImGui::EndPopup();
@@ -736,44 +749,167 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 void UserInterface::HeaderBar()
 {
+	// This is used to check wether cursor is over header so we can move the window.
+	const float headerHeight = 30.0f;
+	ImVec2 headerMin = ImGui::GetWindowPos();
+	ImVec2 headerMax = ImVec2(headerMin.x + ImGui::GetWindowWidth(), headerMin.y + headerHeight);
+
+	ImVec2 mousePos = ImGui::GetMousePos();
+	isInDragRegion = mousePos.x >= headerMin.x && mousePos.x <= headerMax.x &&
+		mousePos.y >= headerMin.y && mousePos.y <= headerMax.y &&
+		!ImGui::IsAnyItemHovered();  
+
 	if (ImGui::BeginMenuBar())
 	{
+		//ImGui::Text("hovered: %d", isInDragRegion); // Debug window movement
+
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
-		if (ImGui::Button("Engine")) ImGui::OpenPopup("EnginePopup");
-		ImGui::SetNextWindowSize(ImVec2(125, 60));
+		if (ImGui::Button("Build")) ImGui::OpenPopup("EnginePopup");
+		ImGui::SetNextWindowSize(ImVec2(300, 500));
 		ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH / 2 - 300 / 2, SCREEN_HEIGHT / 2 - 500 / 2));
 		if (ImGui::BeginPopup("EnginePopup"))
 		{
-			if (ImGui::MenuItem("Build Game")) { }
-			if (ImGui::MenuItem("Reload")) { }
+			if (ImGui::MenuItem("Build")) { }
+			if (ImGui::MenuItem("Build & Run")) { }
 			ImGui::EndPopup();
 		}
 
-		if (ImGui::Button("Scene")) ImGui::OpenPopup("ScenePopup");
+		if (ImGui::Button("Scenes")) 
+			ImGui::OpenPopup("SceneHeaderPopup");
+
 		ImGui::SetNextWindowSize(ImVec2(85, 60));
 		pos = ImGui::GetCursorScreenPos();
 		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
-		if (ImGui::BeginPopup("ScenePopup"))
+
+		if (ImGui::BeginPopup("SceneHeaderPopup"))
 		{
 			if (ImGui::MenuItem("Save")) { Game::getInstance()->activeScene->Serialize(); }
 			if (ImGui::MenuItem("Load")) { Game::getInstance()->activeScene->Deserialize(); }
 			ImGui::EndPopup();
 		}
 
-		if (ImGui::Button("Create")) ImGui::OpenPopup("CreatePopup");
-		ImGui::SetNextWindowSize(ImVec2(125, 60));
-		pos = ImGui::GetCursorScreenPos();
-		ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		if (ImGui::Button("Add"))
+		{
+			ImGui::OpenPopup("CreatePopup");
+			ImGui::SetNextWindowSize(ImVec2(125, 60));
+			pos = ImGui::GetCursorScreenPos();
+			ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+		}
 		if (ImGui::BeginPopup("CreatePopup"))
 		{
-			if (ImGui::MenuItem("New Script")) { }
-			if (ImGui::MenuItem("New Scene ")) { }
+			if (ImGui::MenuItem("New Script"))
+			{
+				openScriptPopup = true;
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("New Scene ")) 
+			{
+				openScenePopup = true;
+				ImGui::CloseCurrentPopup();
+			}
 			ImGui::EndPopup();
 		}
 
+		if (openScriptPopup)
+		{
+			ImVec2 pos = ImGui::GetCursorScreenPos();
+			ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+			ImGui::OpenPopup("ScriptPopup");
+			openScriptPopup = false;
+		}
+
+		if (ImGui::BeginPopup("ScriptPopup"))
+		{
+			static char buffer[64];
+			buffer[sizeof(buffer) - 1] = '\0';
+
+			ImGui::Text("Script Name"); ImGui::SameLine();
+			ImGui::SetNextItemWidth(125);
+			ImGui::InputText("##", buffer, sizeof(buffer));
+
+			ImGui::SameLine();
+			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(40, 40, 40, 255));
+			if (ImGui::Button("Add"))
+			{
+				NewFile(FileType::SCRIPT, buffer);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::PopStyleColor();
+
+			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) &&
+				!ImGui::IsAnyItemActive() &&
+				ImGui::IsMouseDown(ImGuiMouseButton_Left))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (openScenePopup)
+		{
+			ImVec2 pos = ImGui::GetCursorScreenPos();
+			ImGui::SetNextWindowPos(ImVec2(pos.x - 65, pos.y + 25));
+			ImGui::OpenPopup("ScenePopup");
+			openScenePopup = false;
+		}
+
+		if (ImGui::BeginPopup("ScenePopup"))
+		{
+			static char buffer[64];
+			buffer[sizeof(buffer) - 1] = '\0';
+
+			ImGui::Text("Scene Name"); ImGui::SameLine();
+			ImGui::SetNextItemWidth(125);
+			ImGui::InputText("##", buffer, sizeof(buffer));
+
+			ImGui::SameLine();
+			ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(40, 40, 40, 255));
+			if (ImGui::Button("Add"))
+			{
+				NewFile(FileType::SCENE, buffer);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::PopStyleColor();
+
+			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) &&
+				!ImGui::IsAnyItemActive() &&
+				ImGui::IsMouseDown(ImGuiMouseButton_Left))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
 		ImGui::PopStyleColor();
+
+		// Following is rendering the maximize, minimize and close
+		// Push the next item to the right edge (minus some padding or the text width)
+		float regionMaxX = ImGui::GetWindowContentRegionMax().x;
+		float padding = 30.0f;
+
+		ImGui::SameLine(regionMaxX - padding * 3);
+		if (ImGui::ImageButton("##Minimize", (ImTextureID)(uintptr_t)ResourceManager::minimizeButton->ID, ImVec2(18, 18)))
+		{
+			SDL_MinimizeWindow(Game::getInstance()->window);
+		}
+		regionMaxX = ImGui::GetWindowContentRegionMax().x;
+
+		ImGui::SameLine(regionMaxX - padding * 2);
+		if (ImGui::ImageButton("##Maximize", (ImTextureID)(uintptr_t)ResourceManager::maximizeButton->ID, ImVec2(18, 18)))
+		{
+			// TODO: add an alternative way to go back to the original resolution
+			SDL_MaximizeWindow(Game::getInstance()->window);
+		}
+		regionMaxX = ImGui::GetWindowContentRegionMax().x;
+
+		ImGui::SameLine(regionMaxX - padding);
+		if (ImGui::ImageButton("##Close", (ImTextureID)(uintptr_t)ResourceManager::closeButton->ID, ImVec2(18, 18)))
+		{
+			Game::getInstance()->Quit();
+		}
 		ImGui::EndMenuBar();
 	}
 }
@@ -797,4 +933,53 @@ std::string UserInterface::OpenFileDialog(const FILE_TYPE typeArg)
 	if (GetOpenFileNameA(&ofn))
 		return std::string(filename);
 	return ""; // Cancelled or failed
+}
+
+void UserInterface::NewFile(const FileType type, const std::string name)
+{
+	std::string extension, typeLocation, fullPath;
+	switch (type)
+	{
+		case FileType::SCENE:
+			typeLocation = "Assets/Scenes/";
+			extension = ".yaml";
+			break;
+		case FileType::SCRIPT:
+			typeLocation = "Assets/Scripts/";
+			extension = ".lua";
+			break;
+	}
+
+	fullPath = typeLocation + name + extension;
+
+	if (std::filesystem::exists(fullPath)) 
+	{
+		Logger::Error("File already exists.");
+		return;
+	}
+
+	ofstream file(fullPath);
+	file.close();
+
+	if (extension == ".lua")
+	{
+		ofstream file(fullPath);
+
+		const char* basicLoops = R""""(function Start()
+	print("Start")
+end
+
+function Update(dt)
+	print("Update")
+end
+
+function Shutdown()
+	print("Shutdown")
+end
+		)"""";
+		file << basicLoops;
+	}
+
+	file.close();
+	Logger::Log("Created file: " + fullPath);
 }

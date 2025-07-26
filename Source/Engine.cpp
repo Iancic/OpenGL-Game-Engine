@@ -11,9 +11,8 @@ void Engine::Run()
 
     while (activeProgram->Running())
     {
-        activeProgram->InputSystem->PollEvents();
+        activeProgram->InputSystem->PollEvents(activeProgram->window, activeProgram->UI->isInDragRegion); // Pass window for draggable window
         activeProgram->HandleInput();
-        activeProgram->Time();
         activeProgram->Update();
         activeProgram->InputSystem->EndFrame();
         activeProgram->PreRender();

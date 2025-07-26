@@ -23,17 +23,17 @@ public:
 	int GetMS();
 
 	Input* InputSystem = nullptr;
+	UserInterface* UI = nullptr;
+	SDL_Window* window;
 
 protected:
 	bool isRunning;
 	bool isEditorOn = true;
-	
+
 	ResourceManager* Resources = ResourceManager::getInstance();
-	UserInterface* UI = nullptr;
 
 	FrameBuffer* RenderingBuffer = nullptr;
 	SDL_GLContext glContext;
-	SDL_Window* window;
 
 	int milisecondsPreviousFrame;
 	double deltaTime;

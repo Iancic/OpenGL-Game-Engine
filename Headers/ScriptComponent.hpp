@@ -4,7 +4,7 @@
 struct ScriptComponent
 {
 	sol::state state;
-	std::string scriptPath = "Scripts/Default.lua";
+	std::string scriptPath = "Assets/Scripts/Default.lua";
 
 	sol::function onStart;
 	sol::function onUpdate;

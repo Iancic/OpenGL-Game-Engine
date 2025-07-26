@@ -58,7 +58,7 @@ void Scene::Start()
 			if (registry.any_of<TransformComponent>(entity))
 				Lua["Transform"] = &registry.get<TransformComponent>(entity);
 
-			Lua.script_file("Scripts/Default.lua");//(script.scriptPath);
+			Lua.script_file("Assets/Scripts/Default.lua");
 		}
 
 		script.onStart = script.state["Start"];
@@ -72,9 +72,9 @@ void Scene::Start()
 	initialized = true;
 }
 
-void Scene::Render()
+void Scene::Render(float deltaTime)
 {
-	CreatureSystemRender();
+	CreatureSystemRender(deltaTime);
 	//SpriteSystemRendering();
 }
 
@@ -86,7 +86,7 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 		auto& script = view.get<ScriptComponent>(entity);
 		if (script.onUpdate.valid())
 		{
-			script.onUpdate(100);
+			script.onUpdate(deltaTime);
 		}
 	}
 
@@ -173,6 +173,8 @@ void Scene::Serialize()
 void Scene::Deserialize()
 {
 	scenePath = OpenFileDialog();
+	sceneName = std::filesystem::path(scenePath).filename().string();
+
 	Logger::Log("Loaded scene: ", scenePath);
 }
 
@@ -187,13 +189,13 @@ void Scene::DestroyEntity(entt::entity handle)
 	registry.destroy(handle);
 }
 
-void Scene::CreatureSystemRender()
+void Scene::CreatureSystemRender(float deltaTime)
 {
 	auto view = registry.view<Creature>();
 	for (auto entity : view)
 	{
 		auto& creature = view.get<Creature>(entity);
-		creature.Render();
+		creature.Render(deltaTime);
 	}
 }
 

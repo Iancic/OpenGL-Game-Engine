@@ -16,7 +16,7 @@ public:
 	~Scene() = default;
 
 	void Start();
-	void Render();
+	void Render(float deltaTime);
 	void Update(Input& inputSystem, float deltaTime);
 	void Shutdown();
 
@@ -31,7 +31,7 @@ public:
 	
 	void SpriteSystemRendering();
 	void CreatureSystemUpdate(Transform& target, float deltaTime);
-	void CreatureSystemRender();
+	void CreatureSystemRender(float deltaTime);
 
 	std::string OpenFileDialog();
 
@@ -42,7 +42,7 @@ public:
 	entt::registry registry;
 	std::vector<Entity> entities;
 
-	std::string sceneName, scenePath;
+	std::string sceneName = "Not Loaded", scenePath;
 private:
 	
 };

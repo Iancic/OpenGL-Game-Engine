@@ -89,10 +89,10 @@ public:
 	void AI();
 	float theta = 0.f; // AI circular motion
 
-	void Render();
+	void Render(float deltaTime);
 	void RenderDebug();
 	void RenderSprites();
-	void RenderInside();
+	void RenderInside(float deltaTime);
 
 	void Shoot();
 

@@ -15,7 +15,9 @@ void Game::Init()
 
 void Game::Update()
 {
-	if (UI->gameState == UserInterface::GameState::PLAYING) { activeScene->Update(*InputSystem, deltaTime); }
+	Time();
+
+	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update(*InputSystem, deltaTime);
 }
 
 void Game::HandleInput()
@@ -37,7 +39,7 @@ void Game::HandleInput()
 
 void Game::Render()
 {
-	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Render();
+	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Render(deltaTime);
 }
 
 void Game::Shutdown()
