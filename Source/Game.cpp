@@ -25,6 +25,8 @@ void Game::Update()
 	Time();
 
 	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update(*InputSystem, deltaTime);
+
+	activeCamera->updateProjection();
 }
 
 void Game::HandleInput()
@@ -46,7 +48,7 @@ void Game::HandleInput()
 
 void Game::Render()
 {
-	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Render(deltaTime);
+	activeScene->Render(deltaTime, activeCamera);
 }
 
 void Game::Shutdown()

@@ -603,7 +603,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 			if (ImGui::CollapsingHeader("Sprite"))
 			{
-				
 				if (ImGui::Button("Browse"))
 				{
 					std::string path = OpenFileDialog(FILE_TYPE::IMAGE);
@@ -612,6 +611,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 						fileName = std::filesystem::path(path).filename().string();
 						sprite.texturePath = path;
 						sprite.texture = Texture2D();
+						stbi_set_flip_vertically_on_load(true);
 						int width, height, nrChannels;
 						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 						sprite.texture.Generate(width, height, data);
@@ -690,7 +690,72 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			}
 		}
 
-		// ADD COMPONENT
+		if (sceneRef->registry.any_of<AnimationComponent>(selectedHierarchyItem))
+		{
+			auto& animation = sceneRef->registry.get<AnimationComponent>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Animation"))
+			{
+				static char buffer[64];
+				buffer[sizeof(buffer) - 1] = '\0';
+				std::string animFileName;
+
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				buttonWidth = 140.0f, buttonHeight = 25.f;
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+
+				if (ImGui::Button("Add Animation", ImVec2{buttonWidth, buttonHeight}))
+				{
+					std::string path = OpenFileDialog(FILE_TYPE::IMAGE);
+					if (!path.empty())
+					{
+						animFileName = std::filesystem::path(path).filename().string();
+
+						Animation newAnim;
+						newAnim.texturePath = path;
+						newAnim.name = animFileName;
+						newAnim.texture = Texture2D();
+						newAnim.loop = false;
+						newAnim.spriteHeight = 0.f;
+						newAnim.spriteWidth = 0.f;
+						newAnim.duration = 0;
+
+						stbi_set_flip_vertically_on_load(true);
+						int width, height, nrChannels;
+						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+						newAnim.texture.Generate(width, height, data);
+						stbi_image_free(data);
+
+						animation.animations.insert({ animFileName, newAnim });
+					}
+				}
+
+				ImGui::Spacing();
+
+				for (auto anim : animation.animations)
+				{
+					ImGui::Indent(15.f);
+
+					std::string animationName = anim.first;
+					if (ImGui::CollapsingHeader(animationName.c_str()))
+					{
+						float inputWidth = 45.f;
+						ImGui::Text("Sprite:  Width"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##1", &anim.second.spriteWidth, 0.0f, 0.0f, ImGuiInputTextFlags_None);
+						ImGui::SameLine(); ImGui::Text("Height"); ImGui::SameLine();  ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##2", &anim.second.spriteHeight, 0.0f, 0.0f, ImGuiInputTextFlags_None);
+
+						ImGui::Text("Duration"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputFloat("##3", &anim.second.duration, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
+						ImGui::Text("Loop"); ImGui::SameLine(); ImGui::Checkbox("##4", &anim.second.loop);
+					}
+
+					ImGui::Unindent();
+				}
+			}
+
+		}
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Separator();
 		ImGui::Spacing();
 		ImGui::Spacing();
 		float popUpWidth = 200, popUpHeight = 100;
@@ -731,6 +796,13 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 					entityWrapper.AddComponent<ScriptComponent>();
 				}
 			}
+			if (!sceneRef->registry.any_of<AnimationComponent>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Animation Component"))
+				{
+					auto& animation = entityWrapper.AddComponent<AnimationComponent>();
+				}
+			}
 			if (!sceneRef->registry.any_of<Creature>(selectedHierarchyItem))
 			{
 				if (ImGui::MenuItem("Creature Component"))
@@ -766,6 +838,7 @@ void UserInterface::HeaderBar()
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
 		if (ImGui::Button("Build") && !buildTab) { buildTab = true; }
+
 		if (buildTab)
 		{
 			TransparentBackground();
@@ -948,32 +1021,6 @@ void UserInterface::HeaderBar()
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleColor();
-
-		// Following is rendering the maximize, minimize and close
-		// Push the next item to the right edge (minus some padding or the text width)
-		float regionMaxX = ImGui::GetWindowContentRegionMax().x;
-		float padding = 30.0f;
-
-		ImGui::SameLine(regionMaxX - padding * 3);
-		if (ImGui::ImageButton("##Minimize", (ImTextureID)(uintptr_t)ResourceManager::minimizeButton->ID, ImVec2(18, 18)))
-		{
-			SDL_MinimizeWindow(Game::getInstance()->window);
-		}
-		regionMaxX = ImGui::GetWindowContentRegionMax().x;
-
-		ImGui::SameLine(regionMaxX - padding * 2);
-		if (ImGui::ImageButton("##Maximize", (ImTextureID)(uintptr_t)ResourceManager::maximizeButton->ID, ImVec2(18, 18)))
-		{
-			// TODO: add an alternative way to go back to the original resolution
-			SDL_MaximizeWindow(Game::getInstance()->window);
-		}
-		regionMaxX = ImGui::GetWindowContentRegionMax().x;
-
-		ImGui::SameLine(regionMaxX - padding);
-		if (ImGui::ImageButton("##Close", (ImTextureID)(uintptr_t)ResourceManager::closeButton->ID, ImVec2(18, 18)))
-		{
-			Game::getInstance()->Quit();
-		}
 		ImGui::EndMenuBar();
 	}
 }

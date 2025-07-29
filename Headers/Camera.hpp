@@ -10,7 +10,7 @@ public:
 	Transform* transform = nullptr;
 	int width, height;
 
-	float desiredZoom = 3.5f;
+	float desiredZoom = 5.f;
 	float followSpeed = 1.f;
 	float distanceFromPlayer = 1.f;
 
@@ -25,7 +25,7 @@ public:
 	void UpdateCamera(Transform* target, glm::vec2 playerDir, float deltaTime, bool inputPressed);
 
 	float left = 0.0f, right = SCREEN_WIDTH, bottom = SCREEN_HEIGHT, top = 0.0f;
-	float zoom = 1.0f;  // Default zoom level, 1.0 means no zoom
+	float zoom = 5.f;  // Default zoom level, 1.0 means no zoom
 
 	glm::mat4 projectionMatrix;
 	glm::mat4 view = glm::mat4(1.0f);

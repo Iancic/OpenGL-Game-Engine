@@ -1,10 +1,5 @@
 #include "Scene.hpp"
 
-Scene::Scene()
-{
-
-}
-
 void Scene::Start()
 {
 	auto view = registry.view<ScriptComponent>();
@@ -22,13 +17,13 @@ void Scene::Start()
 			Lua.open_libraries(sol::lib::base, sol::lib::math);
 
 			Lua.set_function("print", [](sol::variadic_args args)
-			{
-				std::ostringstream oss;	
-				for (auto arg : args)
 				{
-					sol::type t = arg.get_type();
-					switch (t)
+					std::ostringstream oss;
+					for (auto arg : args)
 					{
+						sol::type t = arg.get_type();
+						switch (t)
+						{
 						case sol::type::string:
 							oss << arg.as<std::string>();
 							break;
@@ -44,11 +39,11 @@ void Scene::Start()
 						default:
 							oss << "[unsupported type]";
 							break;
+						}
+						oss << " ";
 					}
-					oss << " ";
-				}
-				Logger::Log(oss.str());
-			});
+					Logger::Log(oss.str());
+				});
 
 			BindTypes(Lua);
 			BindEntity(Lua);
@@ -72,14 +67,9 @@ void Scene::Start()
 	initialized = true;
 }
 
-void Scene::Render(float deltaTime)
-{
-	CreatureSystemRender(deltaTime);
-	//SpriteSystemRendering();
-}
-
 void Scene::Update(Input& inputSystem, float deltaTime)
 {
+	// Update all existing entities with script component attached.
 	auto view = registry.view<ScriptComponent>();
 	for (auto entity : view)
 	{
@@ -89,11 +79,13 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 			script.onUpdate(deltaTime);
 		}
 	}
+}
 
-	// Obtain Mouse Position for shooting target
-	Transform target;
-	target.setPosition(inputSystem.GetMousePosition().x, inputSystem.GetMousePosition().y);
-	CreatureSystemUpdate(target, deltaTime);
+void Scene::Render(float deltaTime, Camera* activeCamera)
+{
+	// Render all components that need so.
+	System_Sprite(activeCamera);
+	System_Animation(activeCamera);
 }
 
 void Scene::Shutdown()
@@ -132,7 +124,7 @@ void Scene::BindEntity(sol::state& lua)
 {
 	lua.new_usertype<entt::entity>("Self");
 
-	// TODO: MODULARIZE FOR MANY COMPONENTS
+	
 	lua.set_function("get_component", [this, &lua](entt::entity entity, const std::string& type) -> sol::object {
 		if (type == "Transform" && registry.any_of<TransformComponent>(entity))
 			return sol::make_object(lua, &registry.get<TransformComponent>(entity));
@@ -142,7 +134,6 @@ void Scene::BindEntity(sol::state& lua)
 
 void Scene::Serialize()
 {
-	// TODO: yaml for components and entities.
 	if (scenePath.empty())
 	{
 		Logger::Warning("Scene not loaded yet.");
@@ -157,10 +148,10 @@ void Scene::Serialize()
 
 		for (auto entity : entities)
 		{
-			// TODO: entity.Serialize();
+			// TODO: MODULARIZE FOR MANY COMPONENTS
 		}
 
-		out << YAML::EndSeq;
+		//out << YAML::EndSeq;
 		out << YAML::EndMap;
 
 		std::ofstream fout(scenePath);
@@ -189,36 +180,20 @@ void Scene::DestroyEntity(entt::entity handle)
 	registry.destroy(handle);
 }
 
-void Scene::CreatureSystemRender(float deltaTime)
-{
-	auto view = registry.view<Creature>();
-	for (auto entity : view)
-	{
-		auto& creature = view.get<Creature>(entity);
-		creature.Render(deltaTime);
-	}
-}
-
-void Scene::CreatureSystemUpdate(Transform& target, float deltaTime)
-{
-	auto view = registry.view<Creature>();
-	for (auto entity : view)
-	{
-		auto& creature = view.get<Creature>(entity);
-		creature.Update(target, deltaTime);
-		creature.AI();
-	}
-}
-
-void Scene::SpriteSystemRendering()
+void Scene::System_Sprite(Camera* activeCamera)
 {
 	auto view = registry.view<TransformComponent, SpriteComponent>();
 
 	for (auto [entity, transform, sprite] : view.each())
-	{
-		auto transform = view.get<TransformComponent>(entity);
-		auto sprite = view.get<SpriteComponent>(entity);
-	}
+		sprite.spriteRenderer.DrawSprite(activeCamera, sprite.texture, glm::vec2{ transform.Translation.x, transform.Translation.y }, glm::vec2(transform.Scale.x, transform.Scale.y), transform.Rotation.x);
+}
+
+void Scene::System_Animation(Camera* activeCamera)
+{
+	auto view = registry.view<TransformComponent, AnimationComponent>();
+
+	for (auto [entity, transform, animation] : view.each())
+		animation.animations.at(animation.currentAnimation).spriteRenderer.DrawSprite(activeCamera, animation.animations.at(animation.currentAnimation).texture, glm::vec2{ transform.Translation.x, transform.Translation.y }, glm::vec2(transform.Scale.x, transform.Scale.y), transform.Rotation.x);
 }
 
 std::string Scene::OpenFileDialog()

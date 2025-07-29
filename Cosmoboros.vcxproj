@@ -168,6 +168,8 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Animation.cpp" />
+    <ClCompile Include="Source\AnimationComponent.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui.cpp" />
     <ClCompile Include="Libraries\imgui-master\ImGuizmo.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui_demo.cpp" />
@@ -218,6 +220,8 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\UserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\Animation.hpp" />
+    <ClInclude Include="Headers\AnimationComponent.hpp" />
     <ClInclude Include="Headers\Actor.hpp" />
     <ClInclude Include="Headers\AudioComponent.hpp" />
     <ClInclude Include="Headers\BaseWeapon.hpp" />

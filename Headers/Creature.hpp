@@ -91,7 +91,6 @@ public:
 
 	void Render(float deltaTime);
 	void RenderDebug();
-	void RenderSprites();
 	void RenderInside(float deltaTime);
 
 	void Shoot();

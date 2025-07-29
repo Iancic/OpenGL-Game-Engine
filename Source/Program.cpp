@@ -40,7 +40,7 @@ Program::Program(const char* title)
 
 	int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
-	SDL_SetWindowBordered(window, SDL_FALSE);
+	//SDL_SetWindowBordered(window, SDL_FALSE);
 
 	glContext = SDL_GL_CreateContext(window);
 

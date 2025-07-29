@@ -38,9 +38,6 @@ public:
 
 	static inline Camera* activeCamera = nullptr;
 
-	Scene* activeScene = nullptr;
-	std::vector<Scene*> scenes;
-
 private:
 
 };

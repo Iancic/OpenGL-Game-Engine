@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-    Program* game = Game::getInstance("Engine");
+    Program* game = Game::getInstance("Untitled");
     Engine* engine = new Engine(game);
     engine->Run();
 

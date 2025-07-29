@@ -69,6 +69,8 @@
     </ClCompile>
     <ClCompile Include="Source\MetaUtilities.cpp" />
     <ClCompile Include="Source\Input.cpp" />
+    <ClCompile Include="Source\AnimationComponent.cpp" />
+    <ClCompile Include="Source\Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
@@ -218,6 +220,8 @@
     <ClInclude Include="Headers\lauxlib.h" />
     <ClInclude Include="Headers\MetaUtilities.hpp" />
     <ClInclude Include="Headers\Input.hpp" />
+    <ClInclude Include="Headers\AnimationComponent.hpp" />
+    <ClInclude Include="Headers\Animation.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vSprite.glsl">

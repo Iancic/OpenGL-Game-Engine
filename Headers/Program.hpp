@@ -26,6 +26,9 @@ public:
 	UserInterface* UI = nullptr;
 	SDL_Window* window;
 
+	Scene* activeScene = nullptr;
+	std::vector<Scene*> scenes;
+
 protected:
 	bool isRunning;
 	bool isEditorOn = true;

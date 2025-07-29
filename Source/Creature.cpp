@@ -291,30 +291,6 @@ void Creature::RenderDebug()
 	for (auto& element : segments) element->RenderDebug();
 }
 
-void Creature::RenderSprites()
-{
-	ResourceManager::getInstance()->spriteShader->use();
-
-	// Model matrix
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(segments[0]->transform.position));
-	model = glm::scale(model, glm::vec3(1.0f));
-	ResourceManager::getInstance()->spriteShader->setMat4("model", model);
-	ResourceManager::getInstance()->spriteShader->setMat4("projection", activeCamera->GetProjectionMatrix()); // set this in constructor or per-frame
-
-	// Texture
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ResourceManager::getInstance()->smileyFace->ID);
-	ResourceManager::getInstance()->spriteShader->setInt("image", 0);
-
-	// Draw
-	glBindVertexArray(spriteRenderer->quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-
-	spriteRenderer->DrawSprite(*ResourceManager::getInstance()->smileyFace, glm::vec2(0.0f, 0.0f), glm::vec2(100.0f, 100.0f), 45.f, glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
 void Creature::RenderInside(float deltaTime)
 {
 	glm::vec4 color = glm::vec4(1, 1, 1, 1);

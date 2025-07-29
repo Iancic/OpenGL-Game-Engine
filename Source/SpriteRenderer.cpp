@@ -11,11 +11,12 @@ SpriteRenderer::~SpriteRenderer()
     glDeleteVertexArrays(1, &this->quadVAO);
 }
 
-void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color)
+void SpriteRenderer::DrawSprite(Camera* activeCamera, Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color)
 {
-    // prepare transformations
-    // TODO: move this in component?
-    this->shader->use();
+    ResourceManager::getInstance()->spriteShader->use();
+
+    ResourceManager::getInstance()->spriteShader->setMat4("projection", activeCamera->GetProjectionMatrix());
+
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position, 0.0f));
 
@@ -30,7 +31,7 @@ void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec
 
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();
-
+    
     glBindVertexArray(this->quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
