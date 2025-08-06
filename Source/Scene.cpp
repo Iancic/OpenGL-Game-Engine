@@ -84,7 +84,7 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 void Scene::Render(float deltaTime, Camera* activeCamera)
 {
 	// Render all components that need so.
-	System_Sprite(activeCamera);
+	//System_Sprite(activeCamera);
 	System_Animation(activeCamera);
 }
 
@@ -193,7 +193,22 @@ void Scene::System_Animation(Camera* activeCamera)
 	auto view = registry.view<TransformComponent, AnimationComponent>();
 
 	for (auto [entity, transform, animation] : view.each())
-		animation.animations.at(animation.currentAnimation).spriteRenderer.DrawSprite(activeCamera, animation.animations.at(animation.currentAnimation).texture, glm::vec2{ transform.Translation.x, transform.Translation.y }, glm::vec2(transform.Scale.x, transform.Scale.y), transform.Rotation.x);
+	{
+		if (animation.animations.size() != 0)
+		{
+			std::vector<SpriteInfo> testVector;
+
+			SpriteInfo frame1;
+			frame1.PixelX = 64;
+			frame1.PixelY = 64;
+			frame1.SpriteRow = 0;
+			frame1.SpriteCol = 4;
+			frame1.SpriteWidth = 64;
+
+			testVector.push_back(frame1);
+			animation.animations.at(animation.currentAnimation).texture.Render(testVector);
+		}
+	}
 }
 
 std::string Scene::OpenFileDialog()

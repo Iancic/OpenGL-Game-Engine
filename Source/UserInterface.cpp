@@ -714,24 +714,20 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 						Animation newAnim;
 						newAnim.texturePath = path;
 						newAnim.name = animFileName;
-						newAnim.texture = Texture2D();
+						newAnim.texture = SpriteBatch(path.c_str(), 6, 1, SCREEN_WIDTH, SCREEN_HEIGHT);
 						newAnim.loop = false;
-						newAnim.spriteHeight = 0.f;
-						newAnim.spriteWidth = 0.f;
+						newAnim.spriteHeight = 500.f;
+						newAnim.spriteWidth = 500.f;
 						newAnim.duration = 0;
 
-						stbi_set_flip_vertically_on_load(true);
-						int width, height, nrChannels;
-						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-						newAnim.texture.Generate(width, height, data);
-						stbi_image_free(data);
-
 						animation.animations.insert({ animFileName, newAnim });
+						animation.currentAnimation = animFileName;
 					}
 				}
 
 				ImGui::Spacing();
 
+				/*
 				for (auto anim : animation.animations)
 				{
 					ImGui::Indent(15.f);
@@ -749,6 +745,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 					ImGui::Unindent();
 				}
+				*/
 			}
 
 		}

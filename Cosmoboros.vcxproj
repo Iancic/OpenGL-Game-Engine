@@ -208,13 +208,17 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\MetaUtilities.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
     <ClCompile Include="Source\Program.cpp" />
+    <ClCompile Include="Source\QuadArray.cpp" />
     <ClCompile Include="Source\Random.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Segment.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
+    <ClCompile Include="Source\SpriteBatch.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
+    <ClCompile Include="Source\SpriteTechnique.cpp" />
     <ClCompile Include="Source\Star.cpp" />
+    <ClCompile Include="Source\Technique.cpp" />
     <ClCompile Include="Source\Texture2D.cpp" />
     <ClCompile Include="Source\Transform.cpp" />
     <ClCompile Include="Source\UserInterface.cpp" />
@@ -260,15 +264,19 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\Perlin.hpp" />
     <ClInclude Include="Headers\PhysicsComponent.hpp" />
     <ClInclude Include="Headers\Program.hpp" />
+    <ClInclude Include="Headers\QuadArray.hpp" />
     <ClInclude Include="Headers\Random.hpp" />
     <ClInclude Include="Headers\ResourceManager.hpp" />
     <ClInclude Include="Headers\Scene.hpp" />
     <ClInclude Include="Headers\ScriptComponent.hpp" />
     <ClInclude Include="Headers\Segment.hpp" />
     <ClInclude Include="Headers\Shader.hpp" />
+    <ClInclude Include="Headers\SpriteBatch.hpp" />
     <ClInclude Include="Headers\SpriteComponent.hpp" />
     <ClInclude Include="Headers\SpriteRenderer.hpp" />
+    <ClInclude Include="Headers\SpriteTechnique.hpp" />
     <ClInclude Include="Headers\Star.hpp" />
+    <ClInclude Include="Headers\Technique.h" />
     <ClInclude Include="Headers\TextComponent.hpp" />
     <ClInclude Include="Headers\Texture2D.hpp" />
     <ClInclude Include="Headers\Transform.hpp" />
@@ -310,16 +318,6 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="Assets\Shaders\fFrameBuffer.glsl" />
-    <None Include="Assets\Shaders\fPerlin.glsl" />
-    <None Include="Assets\Shaders\fSpine.glsl" />
-    <None Include="Assets\Shaders\fSprite.glsl" />
-    <None Include="Assets\Shaders\fBasic.glsl" />
-    <None Include="Assets\Shaders\vFrameBuffer.glsl" />
-    <None Include="Assets\Shaders\vPerlin.glsl" />
-    <None Include="Assets\Shaders\vSpine.glsl" />
-    <None Include="Assets\Shaders\vSprite.glsl" />
-    <None Include="Assets\Shaders\vBasic.glsl" />
     <None Include="imgui.ini" />
     <None Include="Libraries\fmod\include\fmod.cs" />
     <None Include="Libraries\fmod\include\fmod_dsp.cs" />

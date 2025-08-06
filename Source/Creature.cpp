@@ -35,6 +35,7 @@ Creature::Creature(int difficulty, Camera* camera)
 	int baseLenght = 3;
 	creatureLenght = difficulty + baseLenght;
 	desiredLenght = creatureLenght;
+
 	// Creature Width
 	segmentSpacing = 10;
 	int baseCreatureWidth = 8 + difficulty;

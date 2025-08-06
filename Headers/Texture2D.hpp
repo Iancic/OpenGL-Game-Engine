@@ -1,5 +1,15 @@
 #pragma once
 #include <glad/glad.h>
+#include <cstdint>
+
+struct SpriteInfo
+{
+    uint8_t PixelX = 0;
+    uint8_t PixelY = 0;
+    uint8_t SpriteRow = 0;    // Sprite location in the sprite sheet - row
+    uint8_t SpriteCol = 0;    // Sprite location in the sprite sheet - col
+    uint8_t SpriteWidth = 0;
+};
 
 class Texture2D
 {

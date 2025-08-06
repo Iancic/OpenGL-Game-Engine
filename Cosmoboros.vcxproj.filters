@@ -71,6 +71,10 @@
     <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\AnimationComponent.cpp" />
     <ClCompile Include="Source\Animation.cpp" />
+    <ClCompile Include="Source\QuadArray.cpp" />
+    <ClCompile Include="Source\SpriteBatch.cpp" />
+    <ClCompile Include="Source\Technique.cpp" />
+    <ClCompile Include="Source\SpriteTechnique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\glad\glad.h" />
@@ -222,38 +226,12 @@
     <ClInclude Include="Headers\Input.hpp" />
     <ClInclude Include="Headers\AnimationComponent.hpp" />
     <ClInclude Include="Headers\Animation.hpp" />
+    <ClInclude Include="Headers\SpriteBatch.hpp" />
+    <ClInclude Include="Headers\QuadArray.hpp" />
+    <ClInclude Include="Headers\Technique.h" />
+    <ClInclude Include="Headers\SpriteTechnique.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\vSprite.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\vSpine.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\vPerlin.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\vFrameBuffer.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\vBasic.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\fSprite.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\fSpine.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\fPerlin.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\fFrameBuffer.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\fBasic.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Scripts\RandomNumber.lua" />
     <None Include="Libraries\fmod\include\fmod_studio.cs">
       <Filter>Libraries</Filter>

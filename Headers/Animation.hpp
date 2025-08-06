@@ -1,15 +1,17 @@
 #pragma once
-#include "Texture2D.hpp"
-#include "SpriteRenderer.hpp"
+#include "SpriteBatch.hpp"
 #include <string>
 
-struct Animation
+class Animation
 {
+public:
+	Animation() = default;
+	~Animation() = default;
+
 	std::string name;
 	std::string texturePath;
 
-	Texture2D texture;
-	SpriteRenderer spriteRenderer;
+	SpriteBatch texture;
 
 	int spriteWidth, spriteHeight;
 	float duration;

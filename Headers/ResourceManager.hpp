@@ -37,6 +37,7 @@ public:
 	Shader* perlinShader = nullptr;
 	Shader* textShader = nullptr;
 	Shader* particleShader = nullptr;
+	Shader* animationShader = nullptr;
 
 	// Textures:
 	std::vector<Texture2D*> textures; // Used to count them
