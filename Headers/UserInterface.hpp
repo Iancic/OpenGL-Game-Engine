@@ -3,7 +3,6 @@
 #include "Character.hpp"
 #include "Input.hpp"
 #include "Scene.hpp"
-#include <fstream>
 
 class UserInterface
 {

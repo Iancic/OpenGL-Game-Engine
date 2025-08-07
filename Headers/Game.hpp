@@ -38,6 +38,4 @@ public:
 
 	static inline Camera* activeCamera = nullptr;
 
-private:
-
 };

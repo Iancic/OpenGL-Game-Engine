@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Input.hpp"
 
 Input::Input()

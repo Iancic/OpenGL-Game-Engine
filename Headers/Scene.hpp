@@ -1,12 +1,8 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#include <commdlg.h>
+#include "precomp.h"
+
 #include "Entity.hpp"
 #include "Camera.hpp"
-#define YAML_CPP_STATIC_DEFINE 
-#include "yaml-cpp/yaml.h"
 #include "Input.hpp"
 
 class Scene

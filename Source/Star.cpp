@@ -1,5 +1,5 @@
+#include "precomp.h"
 #include "Star.hpp"
-#include <iostream>
 
 Star::Star(float x, float y, int difficulty)
 {

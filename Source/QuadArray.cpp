@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "QuadArray.hpp"
 
 #define POSITION_LOCATION 0
@@ -5,7 +6,7 @@
 #define NUM_VERTICES 6
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0])) // OGLDev Utility Macro
 
-QuadArray::QuadArray(uint8_t MaxNumQuads)
+QuadArray::QuadArray(int MaxNumQuads)
 {
     m_maxNumQuads = MaxNumQuads;
 

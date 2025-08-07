@@ -1,14 +1,6 @@
 #pragma once
-#include <glm-master/glm/glm.hpp>
-
-#include <SDL.h>
+#include "precomp.h"
 #include "glad/glad.h"
-
-#include <string>
-#include <iostream>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
 
 using namespace std;
 

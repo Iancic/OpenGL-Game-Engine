@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Transform.hpp"
 
 void Transform::setPosition(float pX, float pY, float pZ)

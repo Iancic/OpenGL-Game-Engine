@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Circle.hpp"
 
 Circle* Circle::circle_Instance = nullptr;

@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "ResourceManager.hpp"
 
 ResourceManager* ResourceManager::resources_Instance = nullptr;

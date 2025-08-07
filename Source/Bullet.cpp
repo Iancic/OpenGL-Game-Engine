@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Bullet.hpp"
 
 Bullet::Bullet(Transform origin, glm::vec2 Direction)

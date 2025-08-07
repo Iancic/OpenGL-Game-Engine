@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "BaseWeapon.hpp"
 
 BaseWeapon::BaseWeapon(Transform* Slot, Camera* camera)

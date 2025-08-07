@@ -1,11 +1,9 @@
 #pragma once
+#include "precomp.h"
+
 #include "Shader.hpp"
 #include "Texture2D.hpp"
 #include "ResourceManager.hpp"
-#include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/matrix_transform.hpp>
-#include <glm-master/glm/gtc/type_ptr.hpp>
-
 #include "Camera.hpp"
 
 class SpriteRenderer

@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Line.hpp"
 
 Line* Line::line_Instance = nullptr;

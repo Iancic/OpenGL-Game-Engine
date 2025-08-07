@@ -1,6 +1,5 @@
+#include "precomp.h"
 #include "Shader.hpp"
-#include <iostream>
-#include <fstream>
 
 Shader::Shader(const char* shaderPath, const string vertexName, const string fragmentName)
 {

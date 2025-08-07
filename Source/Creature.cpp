@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Creature.hpp"
 
 Creature::Creature(int difficulty, Camera* camera)

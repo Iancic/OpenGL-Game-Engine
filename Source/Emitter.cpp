@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Emitter.hpp"
 
 Emitter::Emitter()

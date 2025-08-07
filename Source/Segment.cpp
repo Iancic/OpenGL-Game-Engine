@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Segment.hpp"
 
 Segment::Segment(Segment* Target, int desiredShape, int desiredRadius, int desiredSpacing)

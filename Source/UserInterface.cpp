@@ -1,6 +1,7 @@
-﻿#include "UserInterface.hpp"
+﻿#include "precomp.h"
+#include "UserInterface.hpp"
 #include "Logger.hpp"
-#include <Game.hpp>
+#include "Game.hpp"
 
 UserInterface* UserInterface::ui_Instance = nullptr;
 
@@ -611,7 +612,6 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 						fileName = std::filesystem::path(path).filename().string();
 						sprite.texturePath = path;
 						sprite.texture = Texture2D();
-						stbi_set_flip_vertically_on_load(true);
 						int width, height, nrChannels;
 						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 						sprite.texture.Generate(width, height, data);
@@ -727,7 +727,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 				ImGui::Spacing();
 
-				/*
+				
 				for (auto anim : animation.animations)
 				{
 					ImGui::Indent(15.f);
@@ -736,16 +736,25 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 					if (ImGui::CollapsingHeader(animationName.c_str()))
 					{
 						float inputWidth = 45.f;
+						ImGui::Text("ANIMATION:");
+						ImGui::Separator();
 						ImGui::Text("Sprite:  Width"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##1", &anim.second.spriteWidth, 0.0f, 0.0f, ImGuiInputTextFlags_None);
 						ImGui::SameLine(); ImGui::Text("Height"); ImGui::SameLine();  ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##2", &anim.second.spriteHeight, 0.0f, 0.0f, ImGuiInputTextFlags_None);
 
 						ImGui::Text("Duration"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputFloat("##3", &anim.second.duration, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
 						ImGui::Text("Loop"); ImGui::SameLine(); ImGui::Checkbox("##4", &anim.second.loop);
+
+						ImGui::Spacing();
+
+						ImGui::Text("SPRITE SHEET:");
+						ImGui::Separator();
+						ImGui::InputInt("Pixel_X", &anim.second.frames[0].PixelX);
+						ImGui::InputInt("Pixel_Y", &anim.second.frames[0].PixelY);
 					}
 
 					ImGui::Unindent();
 				}
-				*/
+				
 			}
 
 		}

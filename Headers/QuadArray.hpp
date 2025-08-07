@@ -10,7 +10,7 @@
 class QuadArray
 {
 public:
-    QuadArray(uint8_t MaxNumQuads);
+    QuadArray(int MaxNumQuads);
 
     ~QuadArray();
 

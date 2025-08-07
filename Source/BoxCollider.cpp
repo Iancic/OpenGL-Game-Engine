@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "BoxCollider.hpp"
 
 BoxCollider::BoxCollider()

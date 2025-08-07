@@ -1,6 +1,5 @@
+#include "precomp.h"
 #include "Camera.hpp"
-#include <algorithm> // for std::clamp
-#include <cmath>     // for std::fabs if needed
 
 Camera::Camera(float fieldOfView, glm::vec3 position, int cameraWidth, int cameraHeight)
 	: Front(glm::vec3(0.0f, 0.0f, -1.0f)), WorldUp(glm::vec3(0.0f, 1.0f, 0.0f))

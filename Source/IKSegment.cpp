@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "IKSegment.hpp"
 
 IKSegment::IKSegment()

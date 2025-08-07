@@ -118,6 +118,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Libraries;$(SolutionDir)Libraries/freeType/include;%(AdditionalIncludeDirectories);$(SolutionDir)Headers;$(SolutionDir)Libraries/yaml/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -170,16 +172,36 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
   <ItemGroup>
     <ClCompile Include="Source\Animation.cpp" />
     <ClCompile Include="Source\AnimationComponent.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui.cpp" />
-    <ClCompile Include="Libraries\imgui-master\ImGuizmo.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_demo.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_draw.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_sdl2.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_impl_sdlrenderer2.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_tables.cpp" />
-    <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp" />
-    <ClCompile Include="libraries\stb\stb_image.cpp" />
+    <ClCompile Include="libraries\imgui-master\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Libraries\imgui-master\ImGuizmo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_opengl3.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdl2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_impl_sdlrenderer2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\imgui-master\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="libraries\stb\stb_image.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\Actor.cpp" />
     <ClCompile Include="Source\BaseWeapon.cpp" />
     <ClCompile Include="Source\Boid.cpp" />
@@ -197,7 +219,9 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\Entity.cpp" />
     <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Game.cpp" />
-    <ClCompile Include="Source\glad.c" />
+    <ClCompile Include="Source\glad.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\IKChain.cpp" />
     <ClCompile Include="Source\IKSegment.cpp" />
     <ClCompile Include="Source\Input.cpp" />
@@ -205,8 +229,10 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\MetaUtilities.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
+    <ClCompile Include="Source\precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\Program.cpp" />
     <ClCompile Include="Source\QuadArray.cpp" />
     <ClCompile Include="Source\Random.cpp" />
@@ -216,9 +242,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\Shader.cpp" />
     <ClCompile Include="Source\SpriteBatch.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
-    <ClCompile Include="Source\SpriteTechnique.cpp" />
     <ClCompile Include="Source\Star.cpp" />
-    <ClCompile Include="Source\Technique.cpp" />
     <ClCompile Include="Source\Texture2D.cpp" />
     <ClCompile Include="Source\Transform.cpp" />
     <ClCompile Include="Source\UserInterface.cpp" />
@@ -258,11 +282,10 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\lua.hpp" />
     <ClInclude Include="Headers\luaconf.h" />
     <ClInclude Include="Headers\lualib.h" />
-    <ClInclude Include="Headers\LuaUtilities.hpp" />
-    <ClInclude Include="Headers\MetaUtilities.hpp" />
     <ClInclude Include="Headers\NameComponent.hpp" />
     <ClInclude Include="Headers\Perlin.hpp" />
     <ClInclude Include="Headers\PhysicsComponent.hpp" />
+    <ClInclude Include="Headers\precomp.h" />
     <ClInclude Include="Headers\Program.hpp" />
     <ClInclude Include="Headers\QuadArray.hpp" />
     <ClInclude Include="Headers\Random.hpp" />
@@ -274,9 +297,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\SpriteBatch.hpp" />
     <ClInclude Include="Headers\SpriteComponent.hpp" />
     <ClInclude Include="Headers\SpriteRenderer.hpp" />
-    <ClInclude Include="Headers\SpriteTechnique.hpp" />
     <ClInclude Include="Headers\Star.hpp" />
-    <ClInclude Include="Headers\Technique.h" />
     <ClInclude Include="Headers\TextComponent.hpp" />
     <ClInclude Include="Headers\Texture2D.hpp" />
     <ClInclude Include="Headers\Transform.hpp" />

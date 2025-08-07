@@ -16,7 +16,6 @@
     <ClCompile Include="Source\Engine.cpp" />
     <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Game.cpp" />
-    <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\IKChain.cpp" />
     <ClCompile Include="Source\IKSegment.cpp" />
     <ClCompile Include="Source\InputHandler.cpp" />
@@ -67,17 +66,17 @@
     <ClCompile Include="libraries\stb\stb_image.cpp">
       <Filter>Libraries</Filter>
     </ClCompile>
-    <ClCompile Include="Source\MetaUtilities.cpp" />
     <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\AnimationComponent.cpp" />
     <ClCompile Include="Source\Animation.cpp" />
     <ClCompile Include="Source\QuadArray.cpp" />
     <ClCompile Include="Source\SpriteBatch.cpp" />
-    <ClCompile Include="Source\Technique.cpp" />
-    <ClCompile Include="Source\SpriteTechnique.cpp" />
+    <ClCompile Include="Source\precomp.cpp" />
+    <ClCompile Include="Source\glad.c">
+      <Filter>Libraries</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libraries\glad\glad.h" />
     <ClInclude Include="Headers\Actor.hpp" />
     <ClInclude Include="Headers\BaseWeapon.hpp" />
     <ClInclude Include="Headers\Boid.hpp" />
@@ -115,18 +114,7 @@
     <ClInclude Include="Headers\Utilities.hpp" />
     <ClInclude Include="Headers\Vertex.hpp" />
     <ClInclude Include="Headers\CircleCollider.hpp" />
-    <ClInclude Include="Libraries\lua\include\lauxlib.h" />
-    <ClInclude Include="Headers\LuaUtilities.hpp" />
     <ClInclude Include="Headers\Entity.hpp" />
-    <ClInclude Include="Headers\NameComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\TransformComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\SpriteComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="Libraries\fmod\include\fmod_studio_common.h">
       <Filter>Libraries</Filter>
     </ClInclude>
@@ -217,19 +205,36 @@
     <ClInclude Include="Headers\EmitterComponent.hpp" />
     <ClInclude Include="Headers\AudioComponent.hpp" />
     <ClInclude Include="Libraries\sol\sol.hpp" />
-    <ClInclude Include="Headers\lualib.h" />
-    <ClInclude Include="Headers\luaconf.h" />
-    <ClInclude Include="Headers\lua.hpp" />
-    <ClInclude Include="Headers\lua.h" />
-    <ClInclude Include="Headers\lauxlib.h" />
-    <ClInclude Include="Headers\MetaUtilities.hpp" />
     <ClInclude Include="Headers\Input.hpp" />
     <ClInclude Include="Headers\AnimationComponent.hpp" />
     <ClInclude Include="Headers\Animation.hpp" />
     <ClInclude Include="Headers\SpriteBatch.hpp" />
     <ClInclude Include="Headers\QuadArray.hpp" />
-    <ClInclude Include="Headers\Technique.h" />
-    <ClInclude Include="Headers\SpriteTechnique.hpp" />
+    <ClInclude Include="Headers\TransformComponent.hpp" />
+    <ClInclude Include="Headers\SpriteComponent.hpp" />
+    <ClInclude Include="Headers\NameComponent.hpp" />
+    <ClInclude Include="Headers\precomp.h" />
+    <ClInclude Include="libraries\glad\glad.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\lua\include\lauxlib.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\lauxlib.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\luaconf.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\lua.hpp">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\lua.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\lualib.h">
+      <Filter>Libraries</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\RandomNumber.lua" />
@@ -253,18 +258,6 @@
   <ItemGroup>
     <Filter Include="Libraries">
       <UniqueIdentifier>{7ca575bb-64f4-4066-8b48-118d88ecf37a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{97cebae8-caaf-4a09-ac36-81ba6ea539b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{20368d7f-9e08-42ea-a324-71a3d52a2c57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{3f822e9e-1951-4270-86ea-69ce620e104f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Components">
-      <UniqueIdentifier>{464b1586-6267-4c2b-be61-5b146db92375}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

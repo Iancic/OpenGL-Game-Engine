@@ -1,8 +1,5 @@
+#include "precomp.h"
 #include "Logger.hpp"
-#include <iostream>
-#include <windows.h>
-#include <chrono>
-#include <ctime>
 
 std::vector<LogEntry> Logger::messages;
 

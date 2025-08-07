@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "SpriteRenderer.hpp"
 
 SpriteRenderer::SpriteRenderer()

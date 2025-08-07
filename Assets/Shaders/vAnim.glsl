@@ -28,5 +28,5 @@ void main()
 
     gl_Position = gWVP * vec4(pos, Position.z, 1.0);
 
-    TexCoord0 = texCoordBase + (Position.xy + vec2(0.5)) * texSize;
+    TexCoord0 = texCoordBase + Position.xy * texSize;
 }

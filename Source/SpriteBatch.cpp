@@ -1,5 +1,5 @@
+#include "precomp.h"
 #include "SpriteBatch.hpp"
-
 
 SpriteBatch::SpriteBatch(const char* pFilename, int NumSpritesX, int NumSpritesY, int WindowWidth, int WindowHeight)
 {
@@ -10,7 +10,7 @@ SpriteBatch::SpriteBatch(const char* pFilename, int NumSpritesX, int NumSpritesY
     m_windowHeight = (float)WindowHeight;
     m_windowAR = m_windowHeight / m_windowWidth;
 
-    uint8_t NumSprites = NumSpritesX * NumSpritesY;
+    int NumSprites = NumSpritesX * NumSpritesY;
     m_pQuads = new QuadArray(NumSprites);
 
     ConfigUniformBlock();
@@ -20,14 +20,11 @@ SpriteBatch::SpriteBatch(const char* pFilename, int NumSpritesX, int NumSpritesY
     InitSpriteTech();
 
     CalcSpriteInfo();
-    
-    
 }
 
 
 void SpriteBatch::InitSpriteSheet(const char* pFilename)
 {
-    stbi_set_flip_vertically_on_load(true);
     m_pSpriteSheet = new Texture2D();
     int width, height, nrChannels;
     unsigned char* data = stbi_load(pFilename, &width, &height, &nrChannels, 0);
@@ -46,8 +43,8 @@ void SpriteBatch::InitSpriteTech()
 
 void SpriteBatch::CalcSpriteInfo()
 {
-    float SpriteWidth = (float)m_pSpriteSheet->Width * 5 / m_numSpritesX;
-    float SpriteHeight = (float)m_pSpriteSheet->Height * 5 / m_numSpritesY;
+    float SpriteWidth = (float)m_pSpriteSheet->Width / m_numSpritesX;
+    float SpriteHeight = (float)m_pSpriteSheet->Height / m_numSpritesY;
 
     m_spriteAspectRatio = SpriteHeight / SpriteWidth;
 
@@ -85,14 +82,13 @@ void SpriteBatch::ScreenPosToNDC(float mouse_x, float mouse_y, float& ndc_x, flo
     ndc_y = (2.0f * mouse_y) / m_windowHeight - 1.0f;
 }
 
-void SpriteBatch::Render(const std::vector<SpriteInfo>& sprites)
+void SpriteBatch::Render(const std::vector<SpriteInfo>& sprites, glm::vec2 position, float size, float rotate)
 {
     ResourceManager::getInstance()->animationShader->use();
 
-    float scale = 6.0f;  // example: 2x bigger
     float gWVP[16] = {
-        scale, 0.0f, 0.0f, 0.0f,
-        0.0f, scale, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
     };
@@ -101,11 +97,12 @@ void SpriteBatch::Render(const std::vector<SpriteInfo>& sprites)
     glUniformMatrix4fv(wvpLoc, 1, GL_FALSE, gWVP);
 
     GLuint scaleLoc = glGetUniformLocation(ResourceManager::getInstance()->animationShader->ID, "gScale");
-    glUniform1f(scaleLoc, scale);
+    glUniform1f(scaleLoc, size);
 
     float NDCX, NDCY;
 
-    for (int SpriteIndex = 0; SpriteIndex < sprites.size(); SpriteIndex++) {
+    for (int SpriteIndex = 0; SpriteIndex < sprites.size(); SpriteIndex++) 
+    {
 
         const SpriteInfo& Info = sprites[SpriteIndex];
 
@@ -117,25 +114,10 @@ void SpriteBatch::Render(const std::vector<SpriteInfo>& sprites)
         float UBase = (float)Info.SpriteCol * m_texUSize;
         float VBase = (float)Info.SpriteRow * m_texVSize;
 
-        // TODO: THIS HERE IS HARDCODED
-       // {
-            int testIndex = 0;  // first quad
+        float quadX = NDCX - (TileWidthNDC / 2.0f);
+        float quadY = NDCY - (TileHeightNDC / 2.0f);
 
-            float centerX = -0.1f;  // NDC center X
-            float centerY = -0.1f;  // NDC center Y
-
-            float biggerSize = 0.1f;  // about 30% of the screen size (NDC)
-
-           // float uBase = 0.0f;      // start at left of texture atlas (change as needed)
-            //float vBase = 0.0f;      // start at top of texture atlas
-            float uSize = 1.0f / m_numSpritesX;  // one sprite width in UV
-            float vSize = 1.0f / m_numSpritesY;  // one sprite height in UV
-
-            SetQuad(testIndex, centerX, centerY, biggerSize, biggerSize, UBase, VBase, uSize, vSize);
-       // }
-
-        // TODO: THIS IS HOW IT SHOULD WORK PROPERLY
-        //SetQuad(SpriteIndex, NDCX, NDCY, TileWidthNDC, TileHeightNDC, UBase, VBase, m_texUSize, m_texVSize);
+        SetQuad(SpriteIndex, quadX, quadY, TileWidthNDC, TileHeightNDC, UBase, VBase, m_texUSize, m_texVSize);
     }
 
     UpdateProgram();
@@ -174,8 +156,6 @@ void SpriteBatch::RenderAll()
 
 void SpriteBatch::SetQuad(int Index, float NDCX, float NDCY, float Width, float Height, float u, float v, float TexWidth, float TexHeight)
 {
-    //assert(Index < SPRITE_TECH_MAX_QUADS);
-
     Vector2f* pBasePos = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.BasePos);
     Vector2f* pWidthHeight = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.WidthHeight);
     Vector2f* pTexCoords = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.TexCoords);
@@ -189,9 +169,6 @@ void SpriteBatch::SetQuad(int Index, float NDCX, float NDCY, float Width, float 
     pTexCoords[Index].y = v;
     pTexWidthHeight[Index].x = TexWidth;
     pTexWidthHeight[Index].y = TexHeight;  
-
-    printf("[SetQuad %d] Pos: %.2f,%.2f | Size: %.2f,%.2f | UV: %.2f,%.2f | UVSize: %.2f,%.2f\n",
-        Index, NDCX, NDCY, Width, Height, u, v, TexWidth, TexHeight);
 }
 
 void SpriteBatch::ConfigUniformBlock()

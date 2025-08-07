@@ -1,9 +1,5 @@
 #pragma once
-#include <vector>
-#include <cassert>
-#include <filesystem>
-#include <string>
-#include <stb/stb_image.h>
+#include "precomp.h"
 
 #include "Texture2D.hpp"
 #include "QuadArray.hpp"
@@ -83,7 +79,7 @@ public:
     SpriteBatch(const char* pFilename, int NumSpritesX, int NumSpritesY, int WindowWidth, int WindowHeight);
     ~SpriteBatch() = default;
 
-    void Render(const std::vector<SpriteInfo>& sprites);
+    void Render(const std::vector<SpriteInfo>& sprites, glm::vec2 position, float size, float rotate);
 
     void RenderAll();
 

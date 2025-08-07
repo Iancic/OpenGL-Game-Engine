@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Scene.hpp"
 
 void Scene::Start()
@@ -83,8 +84,7 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 
 void Scene::Render(float deltaTime, Camera* activeCamera)
 {
-	// Render all components that need so.
-	//System_Sprite(activeCamera);
+	System_Sprite(activeCamera);
 	System_Animation(activeCamera);
 }
 
@@ -185,9 +185,12 @@ void Scene::System_Sprite(Camera* activeCamera)
 	auto view = registry.view<TransformComponent, SpriteComponent>();
 
 	for (auto [entity, transform, sprite] : view.each())
+	{
 		sprite.spriteRenderer.DrawSprite(activeCamera, sprite.texture, glm::vec2{ transform.Translation.x, transform.Translation.y }, glm::vec2(transform.Scale.x, transform.Scale.y), transform.Rotation.x);
+	}
 }
 
+// TODO: currently the animation can only be scaled uniformly on both axis. Only x - scale affects that.
 void Scene::System_Animation(Camera* activeCamera)
 {
 	auto view = registry.view<TransformComponent, AnimationComponent>();
@@ -196,17 +199,8 @@ void Scene::System_Animation(Camera* activeCamera)
 	{
 		if (animation.animations.size() != 0)
 		{
-			std::vector<SpriteInfo> testVector;
-
-			SpriteInfo frame1;
-			frame1.PixelX = 64;
-			frame1.PixelY = 64;
-			frame1.SpriteRow = 0;
-			frame1.SpriteCol = 4;
-			frame1.SpriteWidth = 64;
-
-			testVector.push_back(frame1);
-			animation.animations.at(animation.currentAnimation).texture.Render(testVector);
+			Animation currentAnim = animation.animations.at(animation.currentAnimation);
+			currentAnim.texture.Render(currentAnim.frames, glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
 		}
 	}
 }

@@ -1,7 +1,10 @@
+#include "precomp.h"
 #include "Program.hpp"
 
 Program::Program(const char* title)
 {
+	stbi_set_flip_vertically_on_load(true);
+
 	FMOD::System* system = nullptr;
 	FMOD_RESULT result;
 

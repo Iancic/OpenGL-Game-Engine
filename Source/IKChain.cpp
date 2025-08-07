@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "IKChain.hpp"
 
 IKChain::IKChain(glm::vec2 startPos)

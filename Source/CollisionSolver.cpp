@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "CollisionSolver.hpp"
 
 CollisionSolver* CollisionSolver::collision_solver_Instance = nullptr;

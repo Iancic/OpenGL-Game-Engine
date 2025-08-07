@@ -1,3 +1,4 @@
+#include "precomp.h"
 #include "Game.hpp"
 
 Game* Game::game_Instance = nullptr;

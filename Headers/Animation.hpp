@@ -5,13 +5,14 @@
 class Animation
 {
 public:
-	Animation() = default;
+	Animation();
 	~Animation() = default;
 
 	std::string name;
 	std::string texturePath;
 
 	SpriteBatch texture;
+	std::vector<SpriteInfo> frames;
 
 	int spriteWidth, spriteHeight;
 	float duration;

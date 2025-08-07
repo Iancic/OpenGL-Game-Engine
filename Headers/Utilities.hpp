@@ -1,31 +1,5 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#include <commdlg.h>
-
-#include <glad/glad.h> // Link OpenGL Functions
-#include <SDL.h> // SDL: Windowing, Input, Audio
-#include <glm-master/glm/glm.hpp> // GLM: Math
-#include <imgui-master/imgui.h> // ImGui
-#include <imgui-master/imgui_impl_sdl2.h>
-#include <imgui-master/imgui_impl_sdlrenderer2.h>
-#include <imgui-master/imgui_impl_opengl3.h>
-#include <imgui-master/imgui_internal.h>
-#include "imgui-master/ImGuizmo.h"
-
-// C++ Utilities
-#include <iostream>
-#include <map>
-#include <unordered_map>
-#include <thread>
-#include <cassert>
-#include <string>
-
-#include "fmod/include/fmod.hpp"
-#include "fmod/include/fmod_errors.h"
-
-#include "entt/entt.hpp"
+#include "precomp.h"
 
 #include "Input.hpp"
 #include "Line.hpp"
@@ -40,7 +14,6 @@
 #include "BoxCollider.hpp"
 #include "CollisionSolver.hpp"
 #include "Emitter.hpp"
-#include "LuaUtilities.hpp"
 
 // Just To Test if FMOD works
 static inline void TestSound()
