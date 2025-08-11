@@ -84,8 +84,13 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 
 void Scene::Render(float deltaTime, Camera* activeCamera)
 {
+	// TODO: This current system goes through each component and does a draw call.
 	System_Sprite(activeCamera);
 	System_Animation(activeCamera);
+
+	// TODO: Go through each component, gather rendering data from all.
+	// Do one batch render for all.
+	// Tilemaps, animations, sprites, particles.
 }
 
 void Scene::Shutdown()
@@ -171,8 +176,15 @@ void Scene::Deserialize()
 
 void Scene::AddEntity(const std::string& name, const std::string& tag)
 {
+	// NOTE: When you add entities to a scene they come with a name, hierarchy and order component.
 	entt::entity handle = registry.create();
 	registry.emplace<NameComponent>(handle, name, tag);
+	registry.emplace<HierarchyComponent>(handle);
+
+	// Order is automatic based on the size of the registry to keep it simple.
+	auto view = registry.view<OrderComponent>();
+	int nextOrder = static_cast<int>(view.size());
+	registry.emplace<OrderComponent>(handle, nextOrder);
 }
 
 void Scene::DestroyEntity(entt::entity handle)
@@ -190,7 +202,6 @@ void Scene::System_Sprite(Camera* activeCamera)
 	}
 }
 
-// TODO: currently the animation can only be scaled uniformly on both axis. Only x - scale affects that.
 void Scene::System_Animation(Camera* activeCamera)
 {
 	auto view = registry.view<TransformComponent, AnimationComponent>();
@@ -200,7 +211,9 @@ void Scene::System_Animation(Camera* activeCamera)
 		if (animation.animations.size() != 0)
 		{
 			Animation currentAnim = animation.animations.at(animation.currentAnimation);
-			currentAnim.texture.Render(currentAnim.frames, glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
+			currentAnim.Render(glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
+
+			//currentAnim.texture.Render(currentAnim.frameInfo, glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
 		}
 	}
 }

@@ -14,8 +14,8 @@ public:
 
     ~QuadArray();
 
-    void Render(uint8_t NumQuads = 0);
-
+    void Render();
+    GLuint m_VAO = -1;
 private:
 
     void CreateVertexBuffer();
@@ -28,6 +28,6 @@ private:
     };
 
     uint8_t m_maxNumQuads = 0;
-    GLuint m_VAO = -1;
+    
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 };

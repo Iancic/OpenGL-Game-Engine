@@ -3,8 +3,6 @@
 
 struct SpriteInfo
 {
-    int PixelX = 0;
-    int PixelY = 0;
     int SpriteRow = 0;    // Sprite location in the sprite sheet - row
     int SpriteCol = 0;    // Sprite location in the sprite sheet - col
     int SpriteWidth = 0;

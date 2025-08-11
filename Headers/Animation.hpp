@@ -1,20 +1,23 @@
 #pragma once
+#include "precomp.h"
+#include "Common.hpp"
 #include "SpriteBatch.hpp"
-#include <string>
 
 class Animation
 {
 public:
-	Animation();
+	Animation(std::string path, std::string animFileName, bool looped, bool onStartArg, int individualFrameWidthArg, int NumSpritesX, int NumSpritesY, float AnimSpeed);
 	~Animation() = default;
+
+	void Render(glm::vec2 position, float size, float rotate);
 
 	std::string name;
 	std::string texturePath;
 
 	SpriteBatch texture;
-	std::vector<SpriteInfo> frames;
+	SpriteInfo frameInfo;
 
-	int spriteWidth, spriteHeight;
-	float duration;
-	bool loop;
+	int individualFrameWidth;
+	float speed;
+	bool loop, onStart;
 };

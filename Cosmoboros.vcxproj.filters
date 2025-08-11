@@ -75,6 +75,7 @@
     <ClCompile Include="Source\glad.c">
       <Filter>Libraries</Filter>
     </ClCompile>
+    <ClCompile Include="OrderComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Actor.hpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="Headers\lualib.h">
       <Filter>Libraries</Filter>
     </ClInclude>
+    <ClInclude Include="OrderComponent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\RandomNumber.lua" />

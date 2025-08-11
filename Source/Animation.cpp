@@ -1,14 +1,23 @@
 #include "precomp.h"
 #include "Animation.hpp"
 
-Animation::Animation()
+Animation::Animation(std::string path, std::string animFileName, bool looped, bool onStartArg, int individualFrameWidthArg, int NumSpritesX, int NumSpritesY, float AnimSpeed)
 {
-	SpriteInfo frame1;
-	frame1.PixelX = 0;
-	frame1.PixelY = 0;
-	frame1.SpriteRow = 0;
-	frame1.SpriteCol = 4;
-	frame1.SpriteWidth = 64;
+	individualFrameWidth = individualFrameWidthArg;
 
-	frames.push_back(frame1);
+	frameInfo.SpriteRow = 0;
+	frameInfo.SpriteCol = 4;
+	frameInfo.SpriteWidth = individualFrameWidth;
+
+	texturePath = path;
+	name = animFileName;
+	texture = SpriteBatch(path.c_str(), NumSpritesX, NumSpritesY, SCREEN_WIDTH, SCREEN_HEIGHT);
+	loop = looped;
+	onStart = onStartArg;
+	speed = AnimSpeed;
+}
+
+void Animation::Render(glm::vec2 position, float size, float rotate)
+{
+	texture.RenderSingleSprite(frameInfo, position, size, rotate);
 }

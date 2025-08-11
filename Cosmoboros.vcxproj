@@ -170,6 +170,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="OrderComponent.cpp" />
     <ClCompile Include="Source\Animation.cpp" />
     <ClCompile Include="Source\AnimationComponent.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui.cpp">
@@ -336,6 +337,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Libraries\lua\include\lualib.h" />
     <ClInclude Include="Libraries\sol\sol.hpp" />
     <ClInclude Include="libraries\stb\stb_image.h" />
+    <ClInclude Include="OrderComponent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

@@ -474,64 +474,7 @@ void UserInterface::Logger()
 
 void UserInterface::Hierarchy(Scene* sceneRef)
 {
-	ImGui::Begin("Hierarchy");
-
-	for (auto entity : sceneRef->registry.view<entt::entity>())
-	{
-		// Out of the entt id make one for IMGUI
-		int id = static_cast<int>(entity);
-		ImGui::PushID(id);
-
-		// Get name of the Entity
-		std::string label = "Entity" + std::to_string(id);
-		if (sceneRef->registry.any_of<NameComponent>(entity)) 
-		{
-			auto& name = sceneRef->registry.get<NameComponent>(entity);
-			label = name.name;
-		}
-
-		// Draw the selectable
-		float availableWidth = ImGui::GetContentRegionAvail().x;
-		float buttonWidth = 20.0f;
-		float spacing = 5.0f; // Spacing between selectable and button
-
-		// TODO: wrap this inside a Tree Node for scene graph functionality
-		bool clicked = ImGui::Selectable(label.c_str(), selectedHierarchyItem == entity, 0, ImVec2(availableWidth - buttonWidth - spacing, 0));
-		if (clicked) selectedHierarchyItem = entity;
-
-		ImGui::PopID();
-
-		// Delete BUTTON
-		if (selectedHierarchyItem == entity)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-			ImGui::SameLine();
-			// align the button at the right
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + spacing);
-			if (ImGui::SmallButton("X"))
-			{
-				entitiesToDestroy.push_back(entity);
-				if (selectedHierarchyItem == entity) selectedHierarchyItem = entt::null;
-			}
-			ImGui::PopStyleColor();
-		}
-	}
-
-	ImGui::Spacing();
-	ImGui::Spacing();
-	float panelWidth = ImGui::GetContentRegionAvail().x;
-	float buttonWidth = 100.0f, buttonHeight = 25.f;
-	ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
-
-	if (ImGui::Button("New Entity", ImVec2(buttonWidth, buttonHeight)))
-		sceneRef->AddEntity("Test", "Test");
-
-	ImGui::End();
-}
-
-void UserInterface::DrawEntity()
-{
-
+	DrawHierarchyPanel(sceneRef, selectedHierarchyItem);
 }
 
 void UserInterface::PropertiesPanel(Scene* sceneRef)
@@ -696,30 +639,72 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 			if (ImGui::CollapsingHeader("Animation"))
 			{
+				ImGui::Spacing();
+
+				float inputWidth = 25.f;
+				float spacing = ImGui::GetStyle().ItemSpacing.x;
+
+				// First row: "Frame Count: Horizontal [input] Vertical [input]"
+				// Measure all widths
+				float label1Width = ImGui::CalcTextSize("Frame Count:  Horizontal").x;
+				float input1Width = inputWidth;
+				float label2Width = ImGui::CalcTextSize("Vertical").x;
+				float input2Width = inputWidth;
+
+				// Total width of group
+				float groupWidth = label1Width + spacing + input1Width + spacing + label2Width + spacing + input2Width;
+
+				// Center the group
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+				ImGui::SetCursorPosX((panelWidth - groupWidth) * 0.5f);
+
+				// Draw the group
+				ImGui::Text("Frame Count: Horizontal");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(input1Width);
+				ImGui::InputInt("##1", &spriteCountHor, 0, 36);
+
+				ImGui::SameLine();
+				ImGui::Text("Vertical");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(input2Width);
+				ImGui::InputInt("##2", &spriteCountVer, 0, 36);
+
+				// Second row: "Frame Width: [input]"
+				float label3Width = ImGui::CalcTextSize("Frame Width:").x;
+				float input3Width = inputWidth;
+				float group2Width = label3Width + spacing + input3Width;
+
+				ImGui::SetCursorPosX((panelWidth - group2Width) * 0.5f);
+				ImGui::Text("Frame Width:");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(input3Width);
+				ImGui::InputInt("##3", &animFrameWidth, 0, 256);
+
 				static char buffer[64];
 				buffer[sizeof(buffer) - 1] = '\0';
 				std::string animFileName;
 
-				float panelWidth = ImGui::GetContentRegionAvail().x;
-				buttonWidth = 140.0f, buttonHeight = 25.f;
+				ImGui::Spacing();
+
+				// Button to open popup and create the animation.
+				float buttonWidth = 140.0f, buttonHeight = 25.f;
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+
+				ImGui::Spacing();
 
 				if (ImGui::Button("Add Animation", ImVec2{buttonWidth, buttonHeight}))
 				{
 					std::string path = OpenFileDialog(FILE_TYPE::IMAGE);
 					if (!path.empty())
 					{
+						// Extracting name from chosen file.
 						animFileName = std::filesystem::path(path).filename().string();
 
-						Animation newAnim;
-						newAnim.texturePath = path;
-						newAnim.name = animFileName;
-						newAnim.texture = SpriteBatch(path.c_str(), 6, 1, SCREEN_WIDTH, SCREEN_HEIGHT);
-						newAnim.loop = false;
-						newAnim.spriteHeight = 500.f;
-						newAnim.spriteWidth = 500.f;
-						newAnim.duration = 0;
+						// Creating a new animation.
+						Animation newAnim(path, animFileName, true, true, animFrameWidth, spriteCountHor, spriteCountVer, 10.f);
 
+						// Adding the animation to the map inside the component with it's corresponding name.
 						animation.animations.insert({ animFileName, newAnim });
 						animation.currentAnimation = animFileName;
 					}
@@ -727,43 +712,40 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 				ImGui::Spacing();
 
-				
-				for (auto anim : animation.animations)
-				{
-					ImGui::Indent(15.f);
+				ImGui::Text("Loaded Animations:");
 
-					std::string animationName = anim.first;
+				ImGui::Indent(15.f);
+
+				for (auto iterator = animation.animations.begin(); iterator != animation.animations.end();)
+				{
+					std::string animationName = iterator->first;
 					if (ImGui::CollapsingHeader(animationName.c_str()))
 					{
-						float inputWidth = 45.f;
-						ImGui::Text("ANIMATION:");
-						ImGui::Separator();
-						ImGui::Text("Sprite:  Width"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##1", &anim.second.spriteWidth, 0.0f, 0.0f, ImGuiInputTextFlags_None);
-						ImGui::SameLine(); ImGui::Text("Height"); ImGui::SameLine();  ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputInt("##2", &anim.second.spriteHeight, 0.0f, 0.0f, ImGuiInputTextFlags_None);
-
-						ImGui::Text("Duration"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth); ImGui::InputFloat("##3", &anim.second.duration, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
-						ImGui::Text("Loop"); ImGui::SameLine(); ImGui::Checkbox("##4", &anim.second.loop);
-
-						ImGui::Spacing();
-
-						ImGui::Text("SPRITE SHEET:");
-						ImGui::Separator();
-						ImGui::InputInt("Pixel_X", &anim.second.frames[0].PixelX);
-						ImGui::InputInt("Pixel_Y", &anim.second.frames[0].PixelY);
+						ImGui::Text("Speed:"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth + 25); ImGui::InputFloat("##5", &iterator->second.speed, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
+						ImGui::Text("Loop:"); ImGui::SameLine(); ImGui::Checkbox("##4", &iterator->second.loop); ImGui::Text("On Start:"); ImGui::SameLine(); ImGui::Checkbox("##6", &iterator->second.onStart);
+						
+						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+						ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+						if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+						{
+							iterator = animation.animations.erase(iterator); // erase and move to the next element
+							ImGui::PopStyleColor();
+							continue; // skip incrementing the iterator
+						}
+						ImGui::PopStyleColor();
 					}
 
-					ImGui::Unindent();
+					++iterator; // incremenet only if not erased
 				}
-				
-			}
 
+				ImGui::Unindent();
+			}
 		}
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+		ImGui::Dummy(ImVec2{ 0, 12 });
 		ImGui::Separator();
-		ImGui::Spacing();
-		ImGui::Spacing();
+		ImGui::Dummy(ImVec2{0, 12});
+
 		float popUpWidth = 200, popUpHeight = 100;
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		buttonWidth = 140.0f, buttonHeight = 25.f;
@@ -869,8 +851,6 @@ void UserInterface::HeaderBar()
 
 			for (int i = 0; i < Game::getInstance()->scenes.size(); i++) 
 			{
-				//ImGui::Image((void*)(intptr_t)this->Images->at(i).texture, ImVec2(100 * temp_percentage, 100 * temp_percentage));
-				//ImGui::SameLine();
 				std::string sceneName = Game::getInstance()->scenes[i]->sceneName;
 
 				int selectableHeight = 18;
@@ -1120,4 +1100,308 @@ end
 
 	file.close();
 	Logger::Log("Created file: " + fullPath);
+}
+
+void UserInterface::DrawEntityNode(entt::entity entity, Scene* sceneRef, entt::entity& selectedEntity, int& draggedEntityIndex, float selectableHeight)
+{
+	auto& registry = sceneRef->registry;
+
+	// Compose label
+	std::string label;
+	if (registry.any_of<NameComponent>(entity))
+		label = registry.get<NameComponent>(entity).name;
+	else
+		label = "Entity" + std::to_string((int)entity);
+
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	if (selectedEntity == entity)
+		flags |= ImGuiTreeNodeFlags_Selected;
+
+	auto& hc = registry.get_or_emplace<HierarchyComponent>(entity);
+	bool hasChildren = !hc.childrenID.empty();
+
+	bool opened = false;
+	if (hasChildren)
+	{
+		opened = ImGui::TreeNodeEx((void*)(intptr_t)entity, flags, "%s", label.c_str());
+	}
+	else
+	{
+		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		ImGui::TreeNodeEx((void*)(intptr_t)entity, flags, "%s", label.c_str());
+	}
+
+	// Select on click
+	if (ImGui::IsItemClicked())
+		selectedEntity = entity;
+
+	// Drag source
+	if (ImGui::BeginDragDropSource())
+	{
+		ImGui::SetDragDropPayload("DND_ENTITY", &entity, sizeof(entt::entity));
+		ImGui::Text("%s", label.c_str());
+		ImGui::EndDragDropSource();
+	}
+
+	// Drop target on this node
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ENTITY"))
+		{
+			entt::entity dropped = *(const entt::entity*)payload->Data;
+
+			if (dropped != entity)
+			{
+				auto& droppedHC = registry.get_or_emplace<HierarchyComponent>(dropped);
+
+				// Check if dropping onto its current parent => DE-PARENT
+				if (droppedHC.parentID == entity)
+				{
+					// Remove dropped from parent's children list
+					auto& parentHC = registry.get<HierarchyComponent>(entity);
+					parentHC.childrenID.erase(
+						std::remove(parentHC.childrenID.begin(), parentHC.childrenID.end(), dropped),
+						parentHC.childrenID.end());
+
+					droppedHC.parentID = entt::null; // Set to root
+				}
+				else
+				{
+					// Normal reparenting
+					if (droppedHC.parentID != entt::null)
+					{
+						auto& oldParent = registry.get<HierarchyComponent>(droppedHC.parentID);
+						oldParent.childrenID.erase(
+							std::remove(oldParent.childrenID.begin(), oldParent.childrenID.end(), dropped),
+							oldParent.childrenID.end());
+					}
+
+					droppedHC.parentID = entity;
+
+					// Add to new parent's children list if not already present
+					if (std::find(hc.childrenID.begin(), hc.childrenID.end(), dropped) == hc.childrenID.end())
+					{
+						hc.childrenID.push_back(dropped);
+					}
+				}
+			}
+		}
+		ImGui::EndDragDropTarget();
+	}
+
+	// Drag reorder of children (only if node opened)
+	if (opened)
+	{
+		// Sort children by order
+		std::sort(hc.childrenID.begin(), hc.childrenID.end(),
+			[&](entt::entity a, entt::entity b) {
+				return registry.get<OrderComponent>(a).order < registry.get<OrderComponent>(b).order;
+			});
+
+		int draggedChildIndex = -1;
+		for (int i = 0; i < (int)hc.childrenID.size(); i++)
+		{
+			auto child = hc.childrenID[i];
+
+			// Handle sibling reordering drag (you can adapt this logic if needed)
+			if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
+			{
+				if (draggedChildIndex == -1)
+					draggedChildIndex = i;
+
+				float dragDistance = ImGui::GetMouseDragDelta(0).y;
+
+				if (std::abs(dragDistance) > selectableHeight)
+				{
+					int direction = dragDistance > 0 ? 1 : -1;
+					int newIndex = draggedChildIndex + direction;
+
+					if (newIndex >= 0 && newIndex < (int)hc.childrenID.size())
+					{
+						auto& orderA = registry.get<OrderComponent>(hc.childrenID[draggedChildIndex]);
+						auto& orderB = registry.get<OrderComponent>(hc.childrenID[newIndex]);
+						std::swap(orderA.order, orderB.order);
+
+						draggedChildIndex = newIndex;
+						ImGui::ResetMouseDragDelta();
+					}
+				}
+			}
+
+			DrawEntityNode(child, sceneRef, selectedEntity, draggedChildIndex, selectableHeight);
+		}
+
+		ImGui::TreePop();
+	}
+}
+
+void UserInterface::DrawHierarchyPanel(Scene* sceneRef, entt::entity& selectedEntity)
+{
+	ImGui::Begin("Hierarchy");
+
+	int rootDraggedIndex = -1;
+	float selectableHeight = ImGui::GetTextLineHeightWithSpacing();
+
+	auto& registry = sceneRef->registry;
+
+	// Gather root entities (parentID == null)
+	auto view = registry.view<HierarchyComponent>();
+	std::vector<entt::entity> roots;
+	for (auto entity : view) {
+		if (registry.get<HierarchyComponent>(entity).parentID == entt::null) {
+			roots.push_back(entity);
+		}
+	}
+
+	// Sort roots by OrderComponent
+	std::sort(roots.begin(), roots.end(),
+		[&](entt::entity a, entt::entity b) {
+			return registry.get<OrderComponent>(a).order < registry.get<OrderComponent>(b).order;
+		});
+
+	// Draw root nodes with drag-drop reorder and drop targets for reparenting
+	for (int i = 0; i < (int)roots.size(); i++) {
+		entt::entity root = roots[i];
+
+		// Compose label
+		std::string label;
+		if (registry.any_of<NameComponent>(root))
+			label = registry.get<NameComponent>(root).name;
+		else
+			label = "Entity" + std::to_string((int)root);
+
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		if (selectedEntity == root)
+			flags |= ImGuiTreeNodeFlags_Selected;
+
+		auto& hc = registry.get_or_emplace<HierarchyComponent>(root);
+		bool hasChildren = !hc.childrenID.empty();
+
+		bool opened = false;
+		if (hasChildren)
+			opened = ImGui::TreeNodeEx((void*)(intptr_t)root, flags, "%s", label.c_str());
+		else {
+			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+			ImGui::TreeNodeEx((void*)(intptr_t)root, flags, "%s", label.c_str());
+		}
+
+		if (ImGui::IsItemClicked())
+			selectedEntity = root;
+
+		// Drag source for root
+		if (ImGui::BeginDragDropSource()) {
+			ImGui::SetDragDropPayload("DND_ENTITY", &root, sizeof(entt::entity));
+			ImGui::Text("%s", label.c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		// Drop target on root node for reparenting or de-parenting
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ENTITY")) {
+				entt::entity dropped = *(const entt::entity*)payload->Data;
+				if (dropped != root) {
+					auto& droppedHC = registry.get_or_emplace<HierarchyComponent>(dropped);
+
+					// If dropped onto its current parent -> de-parent
+					if (droppedHC.parentID == root) {
+						auto& parentHC = registry.get<HierarchyComponent>(root);
+						parentHC.childrenID.erase(
+							std::remove(parentHC.childrenID.begin(), parentHC.childrenID.end(), dropped),
+							parentHC.childrenID.end());
+						droppedHC.parentID = entt::null; // Make root
+					}
+					else {
+						// Remove from old parent if any
+						if (droppedHC.parentID != entt::null) {
+							auto& oldParent = registry.get<HierarchyComponent>(droppedHC.parentID);
+							oldParent.childrenID.erase(
+								std::remove(oldParent.childrenID.begin(), oldParent.childrenID.end(), dropped),
+								oldParent.childrenID.end());
+						}
+
+						// Reparent to this root
+						droppedHC.parentID = root;
+
+						if (std::find(hc.childrenID.begin(), hc.childrenID.end(), dropped) == hc.childrenID.end())
+							hc.childrenID.push_back(dropped);
+					}
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		// Drag reorder roots
+		if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
+			if (rootDraggedIndex == -1)
+				rootDraggedIndex = i;
+
+			float dragDistance = ImGui::GetMouseDragDelta(0).y;
+			if (std::abs(dragDistance) > selectableHeight) {
+				int direction = dragDistance > 0 ? 1 : -1;
+				int newIndex = rootDraggedIndex + direction;
+
+				if (newIndex >= 0 && newIndex < (int)roots.size()) {
+					auto& orderA = registry.get<OrderComponent>(roots[rootDraggedIndex]);
+					auto& orderB = registry.get<OrderComponent>(roots[newIndex]);
+
+					std::swap(orderA.order, orderB.order);
+					std::swap(roots[rootDraggedIndex], roots[newIndex]);
+
+					rootDraggedIndex = newIndex;
+					ImGui::ResetMouseDragDelta();
+				}
+			}
+		}
+
+		// Recursively draw children nodes
+		if (opened) {
+			// Sort children before drawing
+			std::sort(hc.childrenID.begin(), hc.childrenID.end(),
+				[&](entt::entity a, entt::entity b) {
+					return registry.get<OrderComponent>(a).order < registry.get<OrderComponent>(b).order;
+				});
+
+			int draggedChildIndex = -1;
+			for (auto& child : hc.childrenID)
+				DrawEntityNode(child, sceneRef, selectedEntity, draggedChildIndex, selectableHeight);
+
+			ImGui::TreePop();
+		}
+	}
+
+	// Large empty drop target area to de-parent by dropping anywhere else
+	ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, 10));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+	ImGui::BeginChild("##emptyspace", ImGui::GetContentRegionAvail(), false, ImGuiWindowFlags_NoMove);
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ENTITY")) {
+			entt::entity dropped = *(const entt::entity*)payload->Data;
+			auto& droppedHC = registry.get_or_emplace<HierarchyComponent>(dropped);
+
+			if (droppedHC.parentID != entt::null) {
+				auto& oldParent = registry.get<HierarchyComponent>(droppedHC.parentID);
+				oldParent.childrenID.erase(
+					std::remove(oldParent.childrenID.begin(), oldParent.childrenID.end(), dropped),
+					oldParent.childrenID.end());
+				droppedHC.parentID = entt::null; // Make root
+			}
+		}
+		ImGui::EndDragDropTarget();
+	}
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+
+	// New Entity button centered
+	ImGui::Spacing();
+	ImGui::Spacing();
+	float panelWidth = ImGui::GetContentRegionAvail().x;
+	float buttonWidth = 100.0f, buttonHeight = 25.f;
+	ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+
+	if (ImGui::Button("New Entity", ImVec2(buttonWidth, buttonHeight)))
+		sceneRef->AddEntity("Entity", "Default");
+
+	ImGui::End();
 }

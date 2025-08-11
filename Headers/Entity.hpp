@@ -1,22 +1,14 @@
 #pragma once
-#include "entt/entt.hpp"
+#include "precomp.h"
 
-#include "NameComponent.hpp"
-#include "TransformComponent.hpp"
-#include "SpriteComponent.hpp"
-#include "ScriptComponent.hpp"
-#include "AudioComponent.hpp"
-#include "EmitterComponent.hpp"
-#include "TextComponent.hpp"
-#include "AnimationComponent.hpp"
+#include "Components.h"
 #include "Creature.hpp"
 
 class Entity
 {
 public:
 	Entity(entt::entity handle, entt::registry& registry)
-		: handle(handle), registry(registry) {
-	};
+		: handle(handle), registry(registry) { };
 
 	// Utility: Remove & Add Component
 	template<typename T, typename... Args>

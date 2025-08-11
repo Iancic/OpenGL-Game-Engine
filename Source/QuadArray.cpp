@@ -78,17 +78,11 @@ void QuadArray::CreateQuadIDBuffer()
 }
 
 
-void QuadArray::Render(uint8_t NumQuads)
+void QuadArray::Render()
 {
-    assert(NumQuads <= m_maxNumQuads);
-
-    if (NumQuads == 0) {
-        NumQuads = m_maxNumQuads;
-    }
-
     glBindVertexArray(m_VAO);
 
-    glDrawArrays(GL_TRIANGLES, 0, NumQuads * NUM_VERTICES);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
 
     glBindVertexArray(0);
 }

@@ -83,7 +83,16 @@ public:
 	bool isInDragRegion = false;
 	const float headerHeight = 30.0f;
 
+	// For adding animations
+	int animFrameWidth;
+	int spriteCountHor, spriteCountVer;
+
 	// Both of these are for the build window
 	bool buildTab = false;
 	int draggedIndex = -1;
+	float selectableHeight = 25.0f;
+	int draggedEntityIndex = -1, currentIndex = 0;
+
+	void DrawEntityNode(entt::entity entity, Scene* sceneRef, entt::entity& selectedEntity, int& draggedEntityIndex, float selectableHeight);
+	void DrawHierarchyPanel(Scene* sceneRef, entt::entity& selectedEntity);
 };

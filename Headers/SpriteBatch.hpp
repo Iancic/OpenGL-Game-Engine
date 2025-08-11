@@ -79,11 +79,17 @@ public:
     SpriteBatch(const char* pFilename, int NumSpritesX, int NumSpritesY, int WindowWidth, int WindowHeight);
     ~SpriteBatch() = default;
 
-    void Render(const std::vector<SpriteInfo>& sprites, glm::vec2 position, float size, float rotate);
+    void Render(SpriteInfo& frameInfo, glm::vec2 position, float size, float rotate);
 
     void RenderAll();
 
+    void RenderSingleSprite(SpriteInfo& frameInfo, glm::vec2 position, float size, float rotate);
+
     void InitSpriteSheet(const char* pFilename);
+
+    // constructor params
+    int m_numSpritesX = 0.0f;
+    int m_numSpritesY = 0.0f;
 
 private:
 
@@ -95,8 +101,6 @@ private:
 
     // constructor params
     const char* m_pFilename = NULL;
-    float m_numSpritesX = 0.0f;
-    float m_numSpritesY = 0.0f;
     float m_windowWidth = 0.0f;
     float m_windowHeight = 0.0f;
 
