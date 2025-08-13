@@ -23,7 +23,7 @@ public:
     unsigned int Filter_Min; // filtering mode if texture pixels < screen pixels
     unsigned int Filter_Max; // filtering mode if texture pixels > screen pixels
 
-    void Generate(unsigned int width, unsigned int height, unsigned char* data);
+    void Generate(unsigned int width, unsigned int height, unsigned char* data, bool interpolate = true);
 
     void Bind() const;
 };

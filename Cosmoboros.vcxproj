@@ -170,7 +170,6 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="OrderComponent.cpp" />
     <ClCompile Include="Source\Animation.cpp" />
     <ClCompile Include="Source\AnimationComponent.cpp" />
     <ClCompile Include="libraries\imgui-master\imgui.cpp">
@@ -223,6 +222,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\glad.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\HierarchyComponent.cpp" />
     <ClCompile Include="Source\IKChain.cpp" />
     <ClCompile Include="Source\IKSegment.cpp" />
     <ClCompile Include="Source\Input.cpp" />
@@ -230,6 +230,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\Line.cpp" />
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\OrderComponent.cpp" />
     <ClCompile Include="Source\Perlin.cpp" />
     <ClCompile Include="Source\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -265,6 +266,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\CollisionSolver.hpp" />
     <ClInclude Include="Headers\Command.hpp" />
     <ClInclude Include="Headers\Common.hpp" />
+    <ClInclude Include="Headers\Components.h" />
     <ClInclude Include="Headers\Creature.hpp" />
     <ClInclude Include="Headers\Emitter.hpp" />
     <ClInclude Include="Headers\EmitterComponent.hpp" />
@@ -272,6 +274,8 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\Entity.hpp" />
     <ClInclude Include="Headers\FrameBuffer.hpp" />
     <ClInclude Include="Headers\Game.hpp" />
+    <ClInclude Include="Headers\HierarchyComponent.hpp" />
+    <ClInclude Include="Headers\Icons.h" />
     <ClInclude Include="Headers\IKChain.hpp" />
     <ClInclude Include="Headers\IKSegment.hpp" />
     <ClInclude Include="Headers\Input.hpp" />
@@ -284,6 +288,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\luaconf.h" />
     <ClInclude Include="Headers\lualib.h" />
     <ClInclude Include="Headers\NameComponent.hpp" />
+    <ClInclude Include="Headers\OrderComponent.hpp" />
     <ClInclude Include="Headers\Perlin.hpp" />
     <ClInclude Include="Headers\PhysicsComponent.hpp" />
     <ClInclude Include="Headers\precomp.h" />
@@ -337,7 +342,6 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Libraries\lua\include\lualib.h" />
     <ClInclude Include="Libraries\sol\sol.hpp" />
     <ClInclude Include="libraries\stb\stb_image.h" />
-    <ClInclude Include="OrderComponent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

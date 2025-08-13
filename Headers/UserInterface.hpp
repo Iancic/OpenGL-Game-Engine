@@ -3,6 +3,7 @@
 #include "Character.hpp"
 #include "Input.hpp"
 #include "Scene.hpp"
+#include "Icons.h"
 
 class UserInterface
 {
@@ -53,9 +54,10 @@ public:
 	void CameraMenu(/*Creature* creatureArg, */ FrameBuffer* fbo, Camera* maincam);
 	void Logger();
 	void Hierarchy(Scene* sceneRef);
-	void DrawEntity();
 	void PropertiesPanel(Scene* sceneRef);
 	void HeaderBar();
+
+	bool IconButtonWithText(ImTextureID icon, const char* label, const ImVec2& iconSize, const ImVec2& padding = ImVec2(1, 1));
 
 	void TransparentBackground();
 	void EndTransparentBackground();

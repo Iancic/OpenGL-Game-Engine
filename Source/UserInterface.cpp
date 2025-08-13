@@ -2,6 +2,7 @@
 #include "UserInterface.hpp"
 #include "Logger.hpp"
 #include "Game.hpp"
+#include "Icons.h"
 
 UserInterface* UserInterface::ui_Instance = nullptr;
 
@@ -59,7 +60,9 @@ void UserInterface::Init(SDL_Window* windowArg, void* glContextArg)
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;;
 	io.FontGlobalScale = 1.f;
 	io.Fonts->AddFontFromFileTTF("Assets/fonts/MonaspaceNeonFrozen-Regular.ttf", 16.0f);
+	LoadIconFont(io, "Assets/fonts/icons.ttf", 16.0f); // merges icons
 	io.Fonts->Build();
+	io.ConfigWindowsMoveFromTitleBarOnly = false;
 	ImGui_ImplSDL2_InitForOpenGL(windowArg, glContextArg);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 }
@@ -414,7 +417,7 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 
 void UserInterface::CameraMenu(/*Creature* creatureArg,*/ FrameBuffer* fbo, Camera* maincam)
 {
-	ImGui::Begin("Camera");
+	ImGui::Begin((const char*)(ICON_SLIDERS " Camera"));
 
 	ImGui::Checkbox("Play Maximized", &triggerMaximized); ImGui::SameLine();
 	ImGui::Checkbox("Post Processed", &showPostProccesed);
@@ -441,7 +444,7 @@ void UserInterface::CameraMenu(/*Creature* creatureArg,*/ FrameBuffer* fbo, Came
 
 void UserInterface::Logger()
 {
-	ImGui::Begin("Logs");
+	ImGui::Begin((const char*)(ICON_INFO " Logs"));
 
 	const auto& logs = Logger::GetMessages();
 
@@ -479,7 +482,7 @@ void UserInterface::Hierarchy(Scene* sceneRef)
 
 void UserInterface::PropertiesPanel(Scene* sceneRef)
 {
-	ImGui::Begin("Properties");
+	ImGui::Begin((const char*)(ICON_MENU " Properties"));
 
 	if (selectedHierarchyItem != entt::null && !sceneRef->registry.valid(selectedHierarchyItem)) {
 		selectedHierarchyItem = entt::null;
@@ -742,9 +745,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			}
 		}
 
-		ImGui::Dummy(ImVec2{ 0, 12 });
-		ImGui::Separator();
-		ImGui::Dummy(ImVec2{0, 12});
+		ImGui::Dummy(ImVec2{ 0, 14 });
 
 		float popUpWidth = 200, popUpHeight = 100;
 		float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -821,11 +822,9 @@ void UserInterface::HeaderBar()
 
 	if (ImGui::BeginMenuBar())
 	{
-		//ImGui::Text("hovered: %d", isInDragRegion); // Debug window movement
-
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
-		if (ImGui::Button("Build") && !buildTab) { buildTab = true; }
+		if (ImGui::Button((const char*)(ICON_COG " Build")) && !buildTab) { buildTab = true; }
 
 		if (buildTab)
 		{
@@ -894,12 +893,11 @@ void UserInterface::HeaderBar()
 			if (ImGui::Button("Build and Run")) { };
 			ImGui::PopStyleColor(2);
 
-			ImGui::End();
 			ImGui::PopStyleVar(2);
-
+			ImGui::End();
 			EndTransparentBackground();
 		}
-		if (ImGui::Button("Scenes")) 
+		if (ImGui::Button((const char*)(ICON_WRENCH " Scenes")))
 			ImGui::OpenPopup("SceneHeaderPopup");
 
 		ImGui::SetNextWindowSize(ImVec2(85, 60));
@@ -913,7 +911,7 @@ void UserInterface::HeaderBar()
 			ImGui::EndPopup();
 		}
 
-		if (ImGui::Button("Add"))
+		if (ImGui::Button((const char*)(ICON_FOLDER " Add")))
 		{
 			ImGui::OpenPopup("CreatePopup");
 			ImGui::SetNextWindowSize(ImVec2(125, 60));
@@ -1010,6 +1008,31 @@ void UserInterface::HeaderBar()
 		ImGui::EndMenuBar();
 	}
 }
+
+bool UserInterface::IconButtonWithText(ImTextureID icon, const char* label, const ImVec2& iconSize, const ImVec2& padding)
+{
+	ImGui::PushID(label);
+	float additionalLenght = 5.f;
+	// Calculate total size (icon + spacing + text)
+	ImVec2 textSize = ImGui::CalcTextSize(label);
+	ImVec2 buttonSize(iconSize.x + padding.x + textSize.x + additionalLenght,
+		(iconSize.y > textSize.y ? iconSize.y : textSize.y) + padding.y * 2);
+
+	bool pressed = ImGui::Button("", buttonSize); // single unified clickable area
+
+	// Draw icon
+	ImVec2 cursorPos = ImGui::GetItemRectMin();
+	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + padding.x, cursorPos.y + (buttonSize.y - iconSize.y) * 0.5f));
+	ImGui::Image(icon, iconSize);
+
+	// Draw text next to icon
+	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + iconSize.x + padding.x * 2, cursorPos.y + (buttonSize.y - textSize.y) * 0.5f));
+	ImGui::TextUnformatted(label);
+
+	ImGui::PopID();
+	return pressed;
+}
+
 
 void UserInterface::TransparentBackground()
 {
@@ -1237,7 +1260,7 @@ void UserInterface::DrawEntityNode(entt::entity entity, Scene* sceneRef, entt::e
 
 void UserInterface::DrawHierarchyPanel(Scene* sceneRef, entt::entity& selectedEntity)
 {
-	ImGui::Begin("Hierarchy");
+	ImGui::Begin((const char*)(ICON_LIST_NESTED " Hierarchy"));
 
 	int rootDraggedIndex = -1;
 	float selectableHeight = ImGui::GetTextLineHeightWithSpacing();
@@ -1369,33 +1392,8 @@ void UserInterface::DrawHierarchyPanel(Scene* sceneRef, entt::entity& selectedEn
 		}
 	}
 
-	// Large empty drop target area to de-parent by dropping anywhere else
-	ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, 10));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
-	ImGui::BeginChild("##emptyspace", ImGui::GetContentRegionAvail(), false, ImGuiWindowFlags_NoMove);
-	if (ImGui::BeginDragDropTarget()) {
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ENTITY")) {
-			entt::entity dropped = *(const entt::entity*)payload->Data;
-			auto& droppedHC = registry.get_or_emplace<HierarchyComponent>(dropped);
+	ImGui::Dummy(ImVec2{ 0, 14 });
 
-			if (droppedHC.parentID != entt::null) {
-				auto& oldParent = registry.get<HierarchyComponent>(droppedHC.parentID);
-				oldParent.childrenID.erase(
-					std::remove(oldParent.childrenID.begin(), oldParent.childrenID.end(), dropped),
-					oldParent.childrenID.end());
-				droppedHC.parentID = entt::null; // Make root
-			}
-		}
-		ImGui::EndDragDropTarget();
-	}
-	ImGui::EndChild();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-
-	// New Entity button centered
-	ImGui::Spacing();
-	ImGui::Spacing();
 	float panelWidth = ImGui::GetContentRegionAvail().x;
 	float buttonWidth = 100.0f, buttonHeight = 25.f;
 	ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
