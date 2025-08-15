@@ -24,7 +24,7 @@
     <ProjectGuid>{98905115-b1af-4697-bdcf-13c8a6e49541}</ProjectGuid>
     <RootNamespace>ProceduralCreatures</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Cosmoboros</ProjectName>
+    <ProjectName>Core</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

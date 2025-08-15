@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    Program* game = Game::getInstance("Untitled");
+    Program* game = Game::getInstance("Untitled Editor");
     Engine* engine = new Engine(game);
     engine->Run();
 
