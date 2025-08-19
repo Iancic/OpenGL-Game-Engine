@@ -25,6 +25,8 @@ void Game::Update()
 {
 	Time();
 
+	activeScene->System_SceneGraph();
+
 	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update(*InputSystem, deltaTime);
 
 	activeCamera->updateProjection();

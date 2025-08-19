@@ -4,7 +4,6 @@
 #include <glm-master/glm/gtc/type_ptr.hpp>
 #include <vector>
 
-#include "Transform.hpp"
 #include "ResourceManager.hpp"
 #include "Camera.hpp"
 #include "Common.hpp"

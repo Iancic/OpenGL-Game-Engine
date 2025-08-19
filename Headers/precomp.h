@@ -20,9 +20,12 @@
 #include <SDL.h> 
 
 // GLM: Math
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/matrix_transform.hpp>
 #include <glm-master/glm/gtc/type_ptr.hpp>
+#include <glm-master/glm/gtc/matrix_transform.hpp>
+#include <glm-master/glm/gtx/matrix_decompose.hpp>
+#include <glm-master/glm/gtx/quaternion.hpp>
 
 // ImGui:
 #include <imgui-master/imgui.h> 

@@ -70,7 +70,7 @@ void Scene::Start()
 
 void Scene::Update(Input& inputSystem, float deltaTime)
 {
-	// Update all existing entities with script component attached.
+	// Update all existing entities with Script Component attached.
 	auto view = registry.view<ScriptComponent>();
 	for (auto entity : view)
 	{
@@ -117,12 +117,14 @@ void Scene::BindTypes(sol::state& lua)
 		"z", &glm::vec3::z
 	);
 
+	/*
 	// TODO: MODULARIZE FOR MANY COMPONENTS
 	lua.new_usertype<TransformComponent>("Transform",
 		"translation", &TransformComponent::Translation,
 		"scale", &TransformComponent::Scale,
 		"rotation", &TransformComponent::Rotation
 	);
+	*/
 }
 
 void Scene::BindEntity(sol::state& lua)
@@ -198,7 +200,9 @@ void Scene::System_Sprite(Camera* activeCamera)
 
 	for (auto [entity, transform, sprite] : view.each())
 	{
-		sprite.spriteRenderer.DrawSprite(activeCamera, sprite.texture, glm::vec2{ transform.Translation.x, transform.Translation.y }, glm::vec2(transform.Scale.x, transform.Scale.y), transform.Rotation.x);
+		sprite.spriteRenderer.DrawSprite(activeCamera, sprite.texture, glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x, transform.GetTranslation(transform.WorldMatrix).y },
+			glm::vec2{ transform.GetScale(transform.WorldMatrix).x,  transform.GetScale(transform.WorldMatrix).y },
+			transform.GetRotationEuler(transform.WorldMatrix).x);
 	}
 }
 
@@ -211,11 +215,51 @@ void Scene::System_Animation(Camera* activeCamera)
 		if (animation.animations.size() != 0)
 		{
 			Animation currentAnim = animation.animations.at(animation.currentAnimation);
-			currentAnim.Render(glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
+			currentAnim.Render(glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x,  transform.GetTranslation(transform.WorldMatrix).y }, transform.GetScale(transform.WorldMatrix).x, transform.GetRotationEuler(transform.WorldMatrix).y);
 
 			//currentAnim.texture.Render(currentAnim.frameInfo, glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
 		}
 	}
+}
+
+void Scene::System_SceneGraph()
+{
+	auto viewHierarchy = registry.view<TransformComponent, HierarchyComponent>();
+
+	for (auto [entity, transform, hierarchy] : viewHierarchy.each())
+	{
+		// Root nodes (no parent)
+		if (hierarchy.parentID == entt::null)
+		{
+			// For root, world = local
+			transform.WorldMatrix = transform.LocalMatrix;
+
+			// Recursively apply to children
+			System_RecurseTransform(entity, transform.WorldMatrix);
+		}
+	}
+}
+
+void Scene::System_RecurseTransform(entt::entity parent, const glm::mat4& parentWorldMatrix)
+{
+	const auto& hierarchy = registry.get<HierarchyComponent>(parent);
+
+	for (entt::entity child : hierarchy.childrenID)
+	{
+		if (registry.all_of<TransformComponent, HierarchyComponent>(child))
+		{
+			auto& childTransform = registry.get<TransformComponent>(child);
+
+			// Compute world transform: parent world * child local
+			childTransform.WorldMatrix = parentWorldMatrix * childTransform.LocalMatrix;
+
+			// Recurse if the child has its own children
+			const auto& childHierarchy = registry.get<HierarchyComponent>(child);
+			if (!childHierarchy.childrenID.empty())
+				System_RecurseTransform(child, childTransform.WorldMatrix);
+		}
+	}
+
 }
 
 std::string Scene::OpenFileDialog()

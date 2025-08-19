@@ -1,4 +1,6 @@
 #pragma once
+#include "precomp.h"
+
 #include "Transform.hpp"
 
 class Camera

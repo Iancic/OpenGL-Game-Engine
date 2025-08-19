@@ -15,5 +15,7 @@ public:
 	void setPosition(float pX, float pY, float pZ = 0.f);
 	void setRotation(float rX, float rY, float rZ = 0.f);
 	void setScale(float sX, float sY, float sZ = 1.f);
+
+	
 };
 

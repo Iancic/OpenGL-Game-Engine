@@ -32,6 +32,8 @@ public:
 	// Systems
 	void System_Sprite(Camera* activeCamera);
 	void System_Animation(Camera* activeCamera);
+	void System_SceneGraph();
+	void System_RecurseTransform(entt::entity ID, const glm::mat4& parentMatrix);
 
 	std::string OpenFileDialog();
 
@@ -42,5 +44,5 @@ public:
 
 	std::string sceneName = "Not Loaded", scenePath;
 private:
-	
+
 };

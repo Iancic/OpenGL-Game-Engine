@@ -1,4 +1,5 @@
 #pragma once
+#include "precomp.h"
 #include "Transform.hpp"
 #include "Camera.hpp"
 #include "Circle.hpp"

@@ -170,7 +170,7 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 
 	// Render the framebuffer in imgui image
 	ImGui::Image((ImTextureID)(uintptr_t)fboID, imageSize, ImVec2(0, 1), ImVec2(1, 0));
-
+	
 	// Set imguzimor rect
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(imagePos.x, imagePos.y + buttonHeight, imageSize.x, imageSize.y);
@@ -182,29 +182,59 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	if (selectedHierarchyItem != entt::null && sceneRef->registry.any_of<TransformComponent>(selectedHierarchyItem))
 	{
 		auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), transform.Translation);
+		const auto& hierarchy = sceneRef->registry.get<HierarchyComponent>(selectedHierarchyItem);
 
-		// From glm mat4 to C array for ImGui
+		// Copy matrices for ImGuizmo
 		float view[16], proj[16], model[16];
 		memcpy(view, glm::value_ptr(viewMatrix), sizeof(view));
 		memcpy(proj, glm::value_ptr(projMatrix), sizeof(proj));
-		memcpy(model, glm::value_ptr(modelMatrix), sizeof(model));
+		memcpy(model, glm::value_ptr(transform.WorldMatrix), sizeof(model));
 
-		// Actual Gizmo
-		ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y, ImGuizmo::LOCAL, model); // ROTATE - SCALE
+		ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y, ImGuizmo::LOCAL, model);
+
 		if (ImGuizmo::IsUsing())
 		{
-			glm::mat4 updatedModel = glm::make_mat4(model);
+			glm::mat4 updatedWorld = glm::make_mat4(model);
 
-			// Decompose the matrix to update Translation / Rotation / Scale
-			glm::vec3 translation, rotation, scale;
-			ImGuizmo::DecomposeMatrixToComponents(model, glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+			if (hierarchy.parentID != entt::null && sceneRef->registry.any_of<TransformComponent>(hierarchy.parentID))
+			{
+				auto& parentTransform = sceneRef->registry.get<TransformComponent>(hierarchy.parentID);
+				glm::mat4 parentWorldInverse = glm::inverse(parentTransform.WorldMatrix);
+				transform.LocalMatrix = parentWorldInverse * updatedWorld;
 
-			auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
-			transform.Translation = translation;
+				/*
+					The gizmo moves the child in world space.
+
+					But your data stores local space.
+
+					You must convert new world transform back into local space.
+
+					This requires multiplying by the inverse of the parent's world transform.
+
+					Visual recap
+					Parent at(10, 0, 0) world space
+					Child local at(5, 0, 0)
+					Child world = Parent(10) + ChildLocal(5) = 15
+
+					After gizmo move :
+					Child world = 20
+					New child local = 20 - Parent(10) = 10
+
+					If you skip the inverse, you'd wrongly set:
+
+					Child local = 20 (same as world)
+
+					So world would become : 10 (parent)+20 (child) = 30 — wrong!
+				*/
+			}
+			else
+			{
+				// No parent — local = world
+				transform.LocalMatrix = updatedWorld;
+			}
 		}
 	}
-
+	
 	ImGui::End();
 }
 
@@ -494,6 +524,16 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 	float buttonWidth = 100.0f, buttonHeight = 22.f;
 	if (selectedHierarchyItem != entt::null && sceneRef->registry.valid(selectedHierarchyItem))
 	{
+		// NOTE: Only for debugging the scenegraph functionality:
+		if (ImGui::CollapsingHeader("Hierarchy"))
+		{
+			auto& hierarchyComponent = sceneRef->registry.get<HierarchyComponent>(selectedHierarchyItem);
+			auto& orderComponent = sceneRef->registry.get<OrderComponent>(selectedHierarchyItem);
+
+			if (hierarchyComponent.parentID == entt::null) ImGui::Text("Parent, of %i.", hierarchyComponent.childrenID.size());
+			else ImGui::Text("Children.");
+		}
+
 		if (ImGui::CollapsingHeader("Name")) 
 		{
 			char buffer[64];
@@ -517,16 +557,21 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
 
 			if (ImGui::CollapsingHeader("Transform"))
-			{
+			{	/*
 				ImGui::PushID(1);
-					DrawVec3Control("Position", transform.Translation);
+					DrawVec3Control("Position", transform.GetTranslation(transform.WorldMatrix));
 				ImGui::PopID();
 				ImGui::PushID(2);
-					DrawVec3Control("Rotation", transform.Rotation);
+					DrawVec3Control("Rotation", transform.GetRotationEuler(transform.WorldMatrix));
 				ImGui::PopID();
 				ImGui::PushID(3);
-					DrawVec3Control(" Scale  ", transform.Scale);
+					DrawVec3Control(" Scale  ", transform.GetScale(transform.WorldMatrix));
 				ImGui::PopID();
+				*/
+
+				DrawVec3ControlFromMatrix("Translation", transform.LocalMatrix, "Translation", 0.0f);
+				DrawVec3ControlFromMatrix("Rotation", transform.LocalMatrix, "Rotation", 0.0f);
+				DrawVec3ControlFromMatrix("Scale", transform.LocalMatrix, "Scale", 1.0f);
 
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -768,7 +813,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			{
 				if (ImGui::MenuItem("Transform Component"))
 				{
-					entityWrapper.AddComponent<TransformComponent>(glm::vec3{ 0.f }, glm::vec3{ 0.f }, glm::vec3{ 0.f });
+					entityWrapper.AddComponent<TransformComponent>();
 				}
 			}
 			if (!sceneRef->registry.any_of<SpriteComponent>(selectedHierarchyItem))
@@ -801,6 +846,15 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			}
 			ImGui::EndPopup();
 		}
+
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+		ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+		if (ImGui::Button("Delete Entity", ImVec2(buttonWidth, buttonHeight)))
+		{
+			sceneRef->DestroyEntity(selectedHierarchyItem);
+		}
+		ImGui::PopStyleColor();
+		ImGui::Spacing();
 	}
 	else 
 		ImGui::Text("No entity selected.");
