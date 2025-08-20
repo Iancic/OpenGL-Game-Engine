@@ -238,48 +238,6 @@ void UserInterface::GameViewport(GLuint fboID, Camera* maincam, Scene* sceneRef)
 	ImGui::End();
 }
 
-void UserInterface::DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
-{
-	ImGui::PushID(label.c_str());
-	ImGui::BeginTable("Vec3Control", 4, ImGuiTableFlags_SizingFixedFit);
-	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
-	ImGui::TableSetupColumn("X");
-	ImGui::TableSetupColumn("Y");
-	ImGui::TableSetupColumn("Z");
-
-	ImGui::TableNextRow();
-
-	// Label
-	ImGui::TableSetColumnIndex(0);
-	if (ImGui::Button(label.c_str())) values = glm::vec3(resetValue);
-
-	// Common settings
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-	ImGui::TableSetColumnIndex(1);
-	ImGui::SetNextItemWidth(70); // Fill remaining column space
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.8f, 0.1f, 0.15f, 0.3f });
-	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-	ImGui::PopStyleColor();
-
-	ImGui::TableSetColumnIndex(2);
-	ImGui::SetNextItemWidth(70);
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.2f, 0.7f, 0.2f, 0.3f });
-	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-	ImGui::PopStyleColor();
-
-	ImGui::TableSetColumnIndex(3);
-	ImGui::SetNextItemWidth(70);
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4{ 0.1f, 0.25f, 0.8f, 0.3f });
-	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-	ImGui::PopStyleColor();
-
-	ImGui::SameLine();
-	ImGui::EndTable();
-	ImGui::PopID();
-}
-
 void UserInterface::Style()
 {
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -360,8 +318,16 @@ void UserInterface::Style()
 	style.TabRounding = 1.0f;
 }
 
+void UserInterface::EmitterMenu(Emitter* emitterArg)
+{
+	ImGui::Text("Test");
+}
+
 void UserInterface::CreatureMenu(Creature* creatureArg)
 {
+		ImGui::Checkbox("AI Controller", &creatureArg->AIcontrolled);
+		ImGui::Spacing();
+
 		ImGui::Text("Leg Options:");
 		ImGui::Checkbox("Gait", &creatureArg->gait);
 		ImGui::SliderFloat("Leg Width", &creatureArg->legWidth, 1.f, 5.f);
@@ -445,7 +411,7 @@ void UserInterface::CreatureMenu(Creature* creatureArg)
 		ImGui::SliderFloat("Spot Size", &creatureArg->spotSize, -1.f, 1.f);
 }
 
-void UserInterface::CameraMenu(/*Creature* creatureArg,*/ FrameBuffer* fbo, Camera* maincam)
+void UserInterface::CameraMenu(FrameBuffer* fbo, Camera* maincam)
 {
 	ImGui::Begin((const char*)(ICON_SLIDERS " Camera"));
 
@@ -557,18 +523,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			auto& transform = sceneRef->registry.get<TransformComponent>(selectedHierarchyItem);
 
 			if (ImGui::CollapsingHeader("Transform"))
-			{	/*
-				ImGui::PushID(1);
-					DrawVec3Control("Position", transform.GetTranslation(transform.WorldMatrix));
-				ImGui::PopID();
-				ImGui::PushID(2);
-					DrawVec3Control("Rotation", transform.GetRotationEuler(transform.WorldMatrix));
-				ImGui::PopID();
-				ImGui::PushID(3);
-					DrawVec3Control(" Scale  ", transform.GetScale(transform.WorldMatrix));
-				ImGui::PopID();
-				*/
-
+			{	
 				DrawVec3ControlFromMatrix("Translation", transform.LocalMatrix, "Translation", 0.0f);
 				DrawVec3ControlFromMatrix("Rotation", transform.LocalMatrix, "Rotation", 0.0f);
 				DrawVec3ControlFromMatrix("Scale", transform.LocalMatrix, "Scale", 1.0f);
@@ -674,6 +629,30 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
 				{
 					sceneRef->registry.remove<Creature>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
+				ImGui::PopID();
+			}
+		}
+
+		if (sceneRef->registry.any_of<Emitter>(selectedHierarchyItem))
+		{
+			auto& emitter = sceneRef->registry.get<Emitter>(selectedHierarchyItem);
+
+			if (ImGui::CollapsingHeader("Emitter"))
+			{
+				EmitterMenu(&emitter);
+				
+				ImGui::Spacing();
+				float panelWidth = ImGui::GetContentRegionAvail().x;
+
+				ImGui::PushID(6);
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<Emitter>(selectedHierarchyItem);
 				}
 				ImGui::PopStyleColor();
 				ImGui::Spacing();
@@ -834,14 +813,21 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 			{
 				if (ImGui::MenuItem("Animation Component"))
 				{
-					auto& animation = entityWrapper.AddComponent<AnimationComponent>();
+					entityWrapper.AddComponent<AnimationComponent>();
 				}
 			}
 			if (!sceneRef->registry.any_of<Creature>(selectedHierarchyItem))
 			{
 				if (ImGui::MenuItem("Creature Component"))
 				{
-					auto& creature = entityWrapper.AddComponent<Creature>(1, cameraRef);
+					entityWrapper.AddComponent<Creature>(1, cameraRef);
+				}
+			}
+			if (!sceneRef->registry.any_of<Emitter>(selectedHierarchyItem))
+			{
+				if (ImGui::MenuItem("Emitter Component"))
+				{
+					entityWrapper.AddComponent<Emitter>();
 				}
 			}
 			ImGui::EndPopup();

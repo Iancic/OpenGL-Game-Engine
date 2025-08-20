@@ -104,16 +104,18 @@ void Program::Time()
 
 	timeElapsed = currentTicks;
 
+	/*
 	// Cap the FPS if not uncapped
 	if (!UNCAPPED)
 	{
 		int timeToWait = MIL_PER_FRAME - (currentTicks - milisecondsPreviousFrame);
-		if (timeToWait > 0)
+		if (timeToWait > 0.f)
 			SDL_Delay(timeToWait);
 
 		// Update the ticks after delay
 		currentTicks = SDL_GetTicks();
 	}
+	*/
 
 	deltaTime = (currentTicks - milisecondsPreviousFrame) / 1000.f;
 	milisecondsPreviousFrame = currentTicks;
@@ -121,10 +123,10 @@ void Program::Time()
 
 int Program::GetFPS()
 {
-	return (deltaTime > 0.0) ? static_cast<int>(1.0 / deltaTime) : 0;
+	return (deltaTime > 0.0) ? static_cast<int>(1.0f / deltaTime) : 0.f;
 }
 
 int Program::GetMS()
 {
-	return static_cast<int>(deltaTime * 1000.0);;
+	return static_cast<int>(deltaTime * 1000.0f);
 }

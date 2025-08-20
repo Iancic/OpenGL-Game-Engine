@@ -68,7 +68,7 @@ void Scene::Start()
 	initialized = true;
 }
 
-void Scene::Update(Input& inputSystem, float deltaTime)
+void Scene::Update(float deltaTime, Input& inputSystem)
 {
 	// Update all existing entities with Script Component attached.
 	auto view = registry.view<ScriptComponent>();
@@ -80,13 +80,18 @@ void Scene::Update(Input& inputSystem, float deltaTime)
 			script.onUpdate(deltaTime);
 		}
 	}
+	System_Emitter(deltaTime);
+	System_Creature(deltaTime);
 }
 
-void Scene::Render(float deltaTime, Camera* activeCamera)
+void Scene::Render(Camera* activeCamera)
 {
 	// TODO: This current system goes through each component and does a draw call.
 	System_Sprite(activeCamera);
 	System_Animation(activeCamera);
+
+	System_Emitter_Render(activeCamera);
+	System_Creature_Render();
 
 	// TODO: Go through each component, gather rendering data from all.
 	// Do one batch render for all.
@@ -260,6 +265,46 @@ void Scene::System_RecurseTransform(entt::entity parent, const glm::mat4& parent
 		}
 	}
 
+}
+
+void Scene::System_Creature(float deltaTime)
+{
+	const auto& view = registry.view<Creature, TransformComponent>();
+
+	for (auto [entity, creature, transform] : view.each())
+	{
+		creature.Update(deltaTime, &transform);
+	}
+}
+
+void Scene::System_Creature_Render()
+{
+	const auto& view = registry.view<Creature, TransformComponent>();
+
+	for (auto [entity, creature, transform] : view.each())
+	{
+		creature.Render();
+	}
+}
+
+void Scene::System_Emitter(float deltaTime)
+{
+	const auto& view = registry.view<Emitter, TransformComponent>();
+
+	for (auto [entity, emitter, transform] : view.each())
+	{
+		emitter.Update(deltaTime, &transform);
+	}
+}
+
+void Scene::System_Emitter_Render(Camera* activeCamera)
+{
+	const auto& view = registry.view<Emitter, TransformComponent>();
+
+	for (auto [entity, emitter, transform] : view.each())
+	{
+		emitter.Render(activeCamera);
+	}
 }
 
 std::string Scene::OpenFileDialog()

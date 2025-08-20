@@ -27,7 +27,7 @@ void Game::Update()
 
 	activeScene->System_SceneGraph();
 
-	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update(*InputSystem, deltaTime);
+	if (UI->gameState == UserInterface::GameState::PLAYING) activeScene->Update(deltaTime , *InputSystem);
 
 	activeCamera->updateProjection();
 }
@@ -51,7 +51,7 @@ void Game::HandleInput()
 
 void Game::Render()
 {
-	activeScene->Render(deltaTime, activeCamera);
+	activeScene->Render(activeCamera);
 }
 
 void Game::Shutdown()

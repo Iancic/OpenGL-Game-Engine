@@ -75,8 +75,6 @@ public:
 
 	static const std::vector<LogEntry>& GetMessages() 
 	{
-		//if (messages.size() > 100) Flush();
-		//else 
 		return messages; 
 	}
 

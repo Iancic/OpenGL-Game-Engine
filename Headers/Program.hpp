@@ -38,7 +38,7 @@ protected:
 	FrameBuffer* RenderingBuffer = nullptr;
 	SDL_GLContext glContext;
 
-	int milisecondsPreviousFrame;
-	double deltaTime;
+	float milisecondsPreviousFrame = 0.f;
+	float deltaTime = 0.f;
 	float timeElapsed;
 };

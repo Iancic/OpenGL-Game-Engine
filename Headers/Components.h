@@ -10,3 +10,4 @@
 #include "AnimationComponent.hpp"
 #include "HierarchyComponent.hpp"
 #include "OrderComponent.hpp"
+#include "Emitter.hpp"

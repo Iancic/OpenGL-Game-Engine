@@ -1,14 +1,12 @@
 #pragma once
-#include "common.hpp"
+#include "precomp.h"
+
 #include "Segment.hpp"
-#include "BaseWeapon.hpp"
-#include "Line.hpp"
 #include "IKChain.hpp"
-#include "SpriteRenderer.hpp"
 #include "Perlin.hpp"
 #include "Vertex.hpp"
 #include "CollisionSolver.hpp"
-#include <vector>
+#include "TransformComponent.hpp"
 
 class Creature
 {
@@ -34,12 +32,14 @@ public:
 	int creatureLenght = 5;
 	int segmentSpacing = 10;
 
+	float deltaTimeRef; // Hold a reference for deltaTime to use everywhere
+
 	std::vector<int> creatureShape;
 	std::vector<int> segmentShape;
 
 	bool hasGeometry = false, hasWeapons = true;
+	bool AIcontrolled = false;
 	
-	float deltaTimeRef; // Hold a reference for deltaTime to use everywhere
 
 	// Leg Options:
 	bool gait = true;
@@ -61,7 +61,6 @@ public:
 	glm::vec2 lastRight;
 
 	std::vector<Segment*> segments;
-	std::vector<BaseWeapon*> weapons;
 	int weaponsCreated = 0;
 
 	int maxRadius;
@@ -74,26 +73,23 @@ public:
 	// Perlin Noise Skin
 	// Put them in a struct
 	float spotSize = 0.f;
-	float pulseTime;
+	float pulseTime = 0.f;
 	glm::vec2 offset{0.5f, 0.5f};
 	float rotationSpeed = 1.f;
-	float zoomFactor = 8.0f, dynamicSpeed = 0.f;
+	float zoomFactor = 8.0f, dynamicSpeed = 0.1f;
 	glm::vec3 primaryColor = glm::vec3(0);
 	glm::vec3 secondaryColor = glm::vec3(255);
-
-	SpriteRenderer* spriteRenderer = nullptr; // Used to draw all sprites
 	
 	std::vector<BoxCollider*> colliders;
 
-	void Update(Transform& target, float deltaTime);
+	void Update(float deltaTime, TransformComponent* transform);
 	void AI();
+	
 	float theta = 0.f; // AI circular motion
 
-	void Render(float deltaTime);
+	void Render();
 	void RenderDebug();
-	void RenderInside(float deltaTime);
-
-	void Shoot();
+	void RenderInside();
 
 	void AddPoints(int valueArg);
 	void LevelUp();
@@ -104,9 +100,6 @@ public:
 
 	void IncreaseSpeed(float valueArg);
 	void DecreaseSpeed(float valueArg);
-
-	void IncreaseWeaponSlots();
-	void DecreaseWeaponSlots();
 
 	void IncreaseHealth(int valueArg);
 	void DecreaseHealth(int valueArg);
@@ -123,7 +116,6 @@ public:
 	int desiredSegmentSpacing;
 	void AddSpacing();
 	void RemoveSpacing();
-
 
 	void MoveWest();
 	void MoveEast();

@@ -13,8 +13,8 @@ public:
 
 	// Cycle
 	void Start();
-	void Render(float deltaTime, Camera* activeCamera);
-	void Update(Input& inputSystem, float deltaTime);
+	void Render(Camera* activeCamera);
+	void Update(float deltaTime, Input& inputSystem);
 	void Shutdown();
 
 	// Lua Utilities
@@ -34,15 +34,19 @@ public:
 	void System_Animation(Camera* activeCamera);
 	void System_SceneGraph();
 	void System_RecurseTransform(entt::entity ID, const glm::mat4& parentMatrix);
+	void System_Creature(float deltaTime);
+	void System_Creature_Render();
+	void System_Emitter(float deltaTime);
+	void System_Emitter_Render(Camera* activeCamera);
 
 	std::string OpenFileDialog();
-
-	bool initialized = false, inBuild = true;
 
 	entt::registry registry;
 	std::vector<Entity> entities;
 
 	std::string sceneName = "Not Loaded", scenePath;
+
+	bool initialized = false, inBuild = true;
 private:
 
 };

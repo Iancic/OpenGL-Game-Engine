@@ -42,6 +42,6 @@ class FireCommand : public Command
 {
 	virtual void execute(Creature& creature)
 	{
-		creature.Shoot();
+		
 	};
 };

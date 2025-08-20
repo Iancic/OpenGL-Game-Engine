@@ -6,13 +6,16 @@ Emitter::Emitter()
 	//particlePool.resize(10);
 }
 
-void Emitter::Emit(const ParticleProperties& particleprops)
+void Emitter::Emit(const ParticleProperties& particleprops, TransformComponent* transformArg)
 {
+	float emitterPosX = transformArg->GetTranslation(transformArg->WorldMatrix).x;
+	float emitterPosY = transformArg->GetTranslation(transformArg->WorldMatrix).y;
+
 	// Set particle witht the next index iin pool to active and initialize it's properties.
 	particlePool.push_back(new Particle());
 
-	//particle.transform.position.x = 0.f;
-	//particle.transform.position.y = 0.f;
+	particlePool[particlePool.size() - 1]->transform.position.x = emitterPosX;
+	particlePool[particlePool.size() - 1]->transform.position.y = emitterPosY;
 
 	// Velocity
 	particlePool[particlePool.size() - 1]->velocity.x += Random::RandomFloat() * particleprops.velocityVariationX;
@@ -29,8 +32,10 @@ void Emitter::Emit(const ParticleProperties& particleprops)
 	particlePool[particlePool.size() - 1]->sizeEnd = particleprops.sizeEnd; // Size end and begin used for interpolation
 }
 
-void Emitter::Update(float deltaTime)
+void Emitter::Update(float deltaTime, TransformComponent* transformArg)
 {
+	if (isEmitting) Emit(properties, transformArg);
+
 	for (size_t i = 0; i < particlePool.size(); ++i )
 	{
 		Particle* particle = particlePool[i];
@@ -43,7 +48,7 @@ void Emitter::Update(float deltaTime)
 		}
 
 		particle->lifeTimeRemaining -= deltaTime;
-		particle->transform.position += glm::vec3{ particle->velocity.x * deltaTime, particle->velocity.y * deltaTime, 0.f };
+		particle->transform.position += glm::vec3{ particle->velocity.x * deltaTime,  particle->velocity.y * deltaTime, 0.f };
 		particle->rotation -= particle->rotationSpeed * deltaTime;
 
 		float interpolationFactor = 1.0f - (particle->lifeTimeRemaining / particle->lifeTime);

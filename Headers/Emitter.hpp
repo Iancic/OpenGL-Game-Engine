@@ -4,6 +4,7 @@
 #include "Camera.hpp"
 #include "Circle.hpp"
 #include "SpriteRenderer.hpp"
+#include "TransformComponent.hpp"
 
 struct ParticleProperties
 {
@@ -27,9 +28,13 @@ class Emitter
 public:
 	Emitter();
 
-	void Emit(const ParticleProperties& particleprops);
-	void Update(float deltaTime);
+	void Emit(const ParticleProperties& particleprops, TransformComponent* transformArg);
+	void Update(float deltaTime, TransformComponent* transformArg);
 	void Render(Camera* activeCamera);
+
+	bool isEmitting = true;
+
+	ParticleProperties properties;
 
 private:
 

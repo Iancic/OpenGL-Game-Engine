@@ -95,15 +95,6 @@ Creature::Creature(int difficulty, Camera* camera)
 			segments.push_back(new Segment(segments[i - 1], segmentShape[i], creatureShape[i], segmentSpacing));
 	}
 
-	for (int i = 0; i <= creatureLenght; i += 2)
-	{
-		if (weaponsCreated < weaponSlots)
-		{
-			weapons.push_back(new BaseWeapon(&segments[i]->transform, activeCamera));
-			weaponsCreated++;
-		}
-	}
-
 	// Spawn Position
 	float positionX = 0;
 
@@ -129,8 +120,6 @@ Creature::Creature(int difficulty, Camera* camera)
 	stepStartPositions.resize(legCount);
 	stepTargetPositions.resize(legCount);
 
-	spriteRenderer = new SpriteRenderer();
-
 	// Setup Colliders
 	for (auto& segment : segments) colliders.push_back(segment->collider);
 }
@@ -138,22 +127,13 @@ Creature::Creature(int difficulty, Camera* camera)
 Creature::~Creature()
 {
 	//for (auto segment : segments) delete segment;
-	//for (auto weapon : weapons) delete weapon;
-	//delete spriteRenderer;
 }
 
-void Creature::Shoot()
+void Creature::Update(float deltaTime, TransformComponent* transform)
 {
-	for (auto& element : weapons)
-	{
-		element->Shoot();
-	}
-}
-
-void Creature::Update(Transform& target, float deltaTime)
-{
+	Logger::Log(deltaTime);
 	deltaTimeRef = deltaTime;
-	pulseTime += deltaTime; // This is required to make animated noise.
+	pulseTime += deltaTimeRef; // This is required to make animated noise.
 
 	if (points >= maxPoints) LevelUp();
 
@@ -176,12 +156,6 @@ void Creature::Update(Transform& target, float deltaTime)
 		segments[i]->Constraint();
 	}
 
-	// Update each weapon
-	for (auto& element : weapons)
-	{
-		element->Update(target, deltaTime);
-	}
-	
 	// Direction vectors
 	for (int i = 0; i < creatureLenght; i++)
 	{
@@ -265,6 +239,13 @@ void Creature::Update(Transform& target, float deltaTime)
 
 	float broadPhaseSize{};
 	for (auto& segment : segments) { broadPhaseSize += segment->segmentRadius + segment->segmentSpacing; }
+
+	// So the creature moves based on the transform component.
+	segments[0]->transform.position.x = transform->GetTranslation(transform->WorldMatrix).x;
+	segments[0]->transform.position.y = transform->GetTranslation(transform->WorldMatrix).y;
+
+	// TODO: Move this to a script
+	//if (AIcontrolled) AI();
 }
 
 void Creature::AI()
@@ -276,16 +257,13 @@ void Creature::AI()
 	theta += circularSpeed * deltaTimeRef;
 }
 
-void Creature::Render(float deltaTime)
+void Creature::Render()
 {
 	if (hasGeometry) for (auto& element : segments) element->Render(activeCamera); // Render Individual Segment Geometry
 
 	for (int i = 0; i < legs.size(); i++) legs[i]->Render(activeCamera, legWidth);  // Render Legs
 
-	RenderInside(deltaTime);
-	//RenderSprites();
-
-	if (hasWeapons) for (auto& element : weapons) element->Render(); // Render Weapons
+	RenderInside();
 }
 
 void Creature::RenderDebug()
@@ -293,7 +271,7 @@ void Creature::RenderDebug()
 	for (auto& element : segments) element->RenderDebug();
 }
 
-void Creature::RenderInside(float deltaTime)
+void Creature::RenderInside()
 {
 	glm::vec4 color = glm::vec4(1, 1, 1, 1);
 
@@ -335,7 +313,7 @@ void Creature::RenderInside(float deltaTime)
 		shader->use();
 
 		// Set proper uniforms for perlin skin.
-		shader->setFloat("time", deltaTime);
+		shader->setFloat("time", pulseTime);
 
 		shader->setVec2("offset", offset);
 
@@ -458,27 +436,6 @@ void Creature::IncreaseSpeed(float valueArg)
 void Creature::DecreaseSpeed(float valueArg)
 {
 	movementSpeed -= valueArg;
-}
-
-void Creature::IncreaseWeaponSlots()
-{
-	weaponSlots += 1;
-
-	for (int i = weaponsCreated; i <= creatureLenght; i += 2)
-	{
-		if (weaponsCreated < weaponSlots)
-		{
-			weapons.push_back(new BaseWeapon(&segments[i]->transform, activeCamera));
-			weaponsCreated += 1;
-		}
-	}
-}
-
-void Creature::DecreaseWeaponSlots()
-{
-	weaponSlots -= 1;
-	weaponsCreated -= 1;
-	weapons.pop_back();
 }
 
 void Creature::IncreaseHealth(int valueArg)
