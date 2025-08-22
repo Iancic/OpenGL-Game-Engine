@@ -321,6 +321,24 @@ void UserInterface::Style()
 void UserInterface::EmitterMenu(Emitter* emitterArg)
 {
 	ImGui::Text("Test");
+
+	ImGui::Checkbox("Playing", &emitterArg->isEmitting);
+	ImGui::Spacing();
+
+	ImGui::Text("Properties");
+	ImGui::SliderFloat4("Color Start", &emitterArg->properties.colorBegin.x, 0.2f, 1.f);
+	ImGui::SliderFloat4("Color End", &emitterArg->properties.colorEnd.x, 0.2f, 1.f);
+
+	ImGui::Spacing();
+	ImGui::SliderFloat("Velocity X", &emitterArg->properties.velocityVariationX, 1.f, 15.f);
+	ImGui::SliderFloat("Velocity Y", &emitterArg->properties.velocityVariationY, 1.f, 15.f);
+
+	ImGui::Spacing();
+	ImGui::SliderFloat("Size Begin", &emitterArg->properties.sizeBegin, 1.f, 15.f);
+	ImGui::SliderFloat("Size End", &emitterArg->properties.sizeEnd, 1.f, 15.f);
+	ImGui::SliderFloat("Size Variation", &emitterArg->properties.sizeVariation, 1.f, 15.f);
+	ImGui::SliderFloat("Lifetime", &emitterArg->properties.lifeTime, 0.1f, 10.f);
+
 }
 
 void UserInterface::CreatureMenu(Creature* creatureArg)
@@ -584,13 +602,18 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 		if (sceneRef->registry.any_of<ScriptComponent>(selectedHierarchyItem))
 		{
+			auto& script = sceneRef->registry.get<ScriptComponent>(selectedHierarchyItem);
+
+
 			if (ImGui::CollapsingHeader("Script"))
 			{
+
 				if (ImGui::Button("Browse"))
 				{
 					std::string path = OpenFileDialog(FILE_TYPE::SCRIPT);
 					if (!path.empty())
 					{
+						script.scriptPath = std::filesystem::path(path).filename().string();
 						fileName = std::filesystem::path(path).filename().string();
 					}
 				}

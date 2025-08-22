@@ -6,7 +6,7 @@ Emitter::Emitter()
 	//particlePool.resize(10);
 }
 
-void Emitter::Emit(const ParticleProperties& particleprops, TransformComponent* transformArg)
+void Emitter::Emit(TransformComponent* transformArg)
 {
 	float emitterPosX = transformArg->GetTranslation(transformArg->WorldMatrix).x;
 	float emitterPosY = transformArg->GetTranslation(transformArg->WorldMatrix).y;
@@ -18,23 +18,23 @@ void Emitter::Emit(const ParticleProperties& particleprops, TransformComponent* 
 	particlePool[particlePool.size() - 1]->transform.position.y = emitterPosY;
 
 	// Velocity
-	particlePool[particlePool.size() - 1]->velocity.x += Random::RandomFloat() * particleprops.velocityVariationX;
-	particlePool[particlePool.size() - 1]->velocity.y += Random::RandomFloat() * particleprops.velocityVariationY;
+	particlePool[particlePool.size() - 1]->velocity.x += Random::RandomFloat() * properties.velocityVariationX;
+	particlePool[particlePool.size() - 1]->velocity.y += Random::RandomFloat() * properties.velocityVariationY;
 
 	// Color
-	particlePool[particlePool.size() - 1]->colorBegin = particleprops.colorBegin;
-	particlePool[particlePool.size() - 1]->colorEnd = particleprops.colorEnd;
+	particlePool[particlePool.size() - 1]->colorBegin = properties.colorBegin;
+	particlePool[particlePool.size() - 1]->colorEnd = properties.colorEnd;
 
 	// Others
-	particlePool[particlePool.size() - 1]->lifeTime = particleprops.lifeTime;
-	particlePool[particlePool.size() - 1]->lifeTimeRemaining = particleprops.lifeTime;
-	particlePool[particlePool.size() - 1]->sizeBegin = particleprops.sizeBegin + particleprops.sizeVariation * (Random::RandomFloat() - 0.5f);
-	particlePool[particlePool.size() - 1]->sizeEnd = particleprops.sizeEnd; // Size end and begin used for interpolation
+	particlePool[particlePool.size() - 1]->lifeTime = properties.lifeTime;
+	particlePool[particlePool.size() - 1]->lifeTimeRemaining = properties.lifeTime;
+	particlePool[particlePool.size() - 1]->sizeBegin = properties.sizeBegin + properties.sizeVariation * (Random::RandomFloat() - 0.5f);
+	particlePool[particlePool.size() - 1]->sizeEnd = properties.sizeEnd; // Size end and begin used for interpolation
 }
 
 void Emitter::Update(float deltaTime, TransformComponent* transformArg)
 {
-	if (isEmitting) Emit(properties, transformArg);
+	//if (isEmitting) Emit(properties, transformArg);
 
 	for (size_t i = 0; i < particlePool.size(); ++i )
 	{

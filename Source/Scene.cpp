@@ -46,6 +46,35 @@ void Scene::Start()
 					Logger::Log(oss.str());
 				});
 
+			Lua.set_function("error", [](sol::variadic_args args)
+				{
+					std::ostringstream oss;
+					for (auto arg : args)
+					{
+						sol::type t = arg.get_type();
+						switch (t)
+						{
+						case sol::type::string:
+							oss << arg.as<std::string>();
+							break;
+						case sol::type::number:
+							oss << arg.as<double>();
+							break;
+						case sol::type::boolean:
+							oss << (arg.as<bool>() ? "true" : "false");
+							break;
+						case sol::type::nil:
+							oss << "nil";
+							break;
+						default:
+							oss << "[unsupported type]";
+							break;
+						}
+						oss << " ";
+					}
+					Logger::Error(oss.str());
+				});
+
 			BindTypes(Lua);
 			BindEntity(Lua);
 
@@ -54,7 +83,10 @@ void Scene::Start()
 			if (registry.any_of<TransformComponent>(entity))
 				Lua["Transform"] = &registry.get<TransformComponent>(entity);
 
-			Lua.script_file("Assets/Scripts/Default.lua");
+			if (registry.any_of<Emitter>(entity))
+				Lua["Emitter"] = &registry.get<Emitter>(entity);
+
+			Lua.script_file(script.scriptPath);
 		}
 
 		script.onStart = script.state["Start"];
@@ -68,6 +100,8 @@ void Scene::Start()
 	initialized = true;
 }
 
+// TODO: This is weird because I call them here manually but i go for ecs way with scripting so the scripts
+// should say Emitter.Update()
 void Scene::Update(float deltaTime, Input& inputSystem)
 {
 	// Update all existing entities with Script Component attached.
@@ -116,20 +150,27 @@ void Scene::Shutdown()
 
 void Scene::BindTypes(sol::state& lua)
 {
+	// TODO: MODULARIZE FOR MANY COMPONENTS
+
 	lua.new_usertype<glm::vec3>("vec3",
 		"x", &glm::vec3::x,
 		"y", &glm::vec3::y,
 		"z", &glm::vec3::z
 	);
 
-	/*
-	// TODO: MODULARIZE FOR MANY COMPONENTS
-	lua.new_usertype<TransformComponent>("Transform",
-		"translation", &TransformComponent::Translation,
-		"scale", &TransformComponent::Scale,
-		"rotation", &TransformComponent::Rotation
+	sol::usertype<Emitter> emitter_type = lua.new_usertype<Emitter>("Emitter",
+		sol::constructors<Emitter()>()
 	);
-	*/
+
+	emitter_type["Emit"] = &Emitter::Emit;
+
+	lua.new_usertype<TransformComponent>("Transform",
+		sol::constructors<TransformComponent()>()
+		//"translation", &TransformComponent::Translation,
+		//"scale", &TransformComponent::Scale,
+		//"rotation", &TransformComponent::Rotation
+	);
+	
 }
 
 void Scene::BindEntity(sol::state& lua)

@@ -28,7 +28,7 @@ class Emitter
 public:
 	Emitter();
 
-	void Emit(const ParticleProperties& particleprops, TransformComponent* transformArg);
+	void Emit(TransformComponent* transformArg);
 	void Update(float deltaTime, TransformComponent* transformArg);
 	void Render(Camera* activeCamera);
 
