@@ -1,23 +1,25 @@
 #include "precomp.h"
 #include "Animation.hpp"
 
-Animation::Animation(std::string path, std::string animFileName, bool looped, bool onStartArg, int individualFrameWidthArg, int NumSpritesX, int NumSpritesY, float AnimSpeed)
+Animation::Animation(const std::string& path, const std::string& animFileName, const bool looped, const bool onStartArg, const int NumSpritesX, const int NumSpritesY, const float animDuration)
 {
-	individualFrameWidth = individualFrameWidthArg;
-
-	frameInfo.SpriteRow = 0;
-	frameInfo.SpriteCol = 4;
-	frameInfo.SpriteWidth = individualFrameWidth;
+	texturePath = path;
+	name = animFileName; 
 
 	texturePath = path;
-	name = animFileName;
-	texture = SpriteBatch(path.c_str(), NumSpritesX, NumSpritesY, SCREEN_WIDTH, SCREEN_HEIGHT);
+	texture = Texture2D();
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+	texture.Generate(width, height, data, false);
+	stbi_image_free(data);
+
 	loop = looped;
 	onStart = onStartArg;
-	speed = AnimSpeed;
-}
 
-void Animation::Render(glm::vec2 position, float size, float rotate)
-{
-	texture.RenderSingleSprite(frameInfo, position, size, rotate);
+	m_numSpritesX = NumSpritesX;
+	m_numSpritesY = NumSpritesY;
+	totalFrames = m_numSpritesX * m_numSpritesY;
+
+	m_texUSize = 1.0f / m_numSpritesX;
+	m_texVSize = 1.0f / m_numSpritesY;
 }

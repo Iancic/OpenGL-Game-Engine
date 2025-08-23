@@ -1,5 +1,4 @@
 #pragma once
-#include "Texture2D.hpp"
 #include "SpriteRenderer.hpp"
 
 struct SpriteComponent

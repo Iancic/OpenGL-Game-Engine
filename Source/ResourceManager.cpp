@@ -16,7 +16,7 @@ void ResourceManager::loadResources()
 	spineShader = new Shader("Assets/Shaders", "vSpine.glsl", "fSpine.glsl");
 	perlinShader = new Shader("Assets/Shaders", "vPerlin.glsl", "fPerlin.glsl");
 	textShader = new Shader("Assets/Shaders", "vText.glsl", "fText.glsl");
-	animationShader = new Shader("Assets/Shaders", "vAnim.glsl", "fAnim.glsl");
+	animationShader = new Shader("Assets/Shaders", "vAnimation.glsl", "fAnimation.glsl");
 
 	smileyFace = new Texture2D();
 	textures.push_back(smileyFace);

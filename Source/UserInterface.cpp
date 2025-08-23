@@ -496,7 +496,8 @@ void UserInterface::Hierarchy(Scene* sceneRef)
 
 void UserInterface::PropertiesPanel(Scene* sceneRef)
 {
-	ImGui::Begin((const char*)(ICON_MENU " Properties"));
+	//ImGui::Begin((const char*)(ICON_MENU " Properties"));
+	ImGui::Begin("Properties");
 
 	if (selectedHierarchyItem != entt::null && !sceneRef->registry.valid(selectedHierarchyItem)) {
 		selectedHierarchyItem = entt::null;
@@ -549,7 +550,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(4);
+				ImGui::PushID(1);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -578,7 +579,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 						sprite.texture = Texture2D();
 						int width, height, nrChannels;
 						unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-						sprite.texture.Generate(width, height, data);
+						sprite.texture.Generate(width, height, data, false);
 						stbi_image_free(data);
 					}
 				}
@@ -587,7 +588,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(5);
+				ImGui::PushID(2);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -622,7 +623,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(5);
+				ImGui::PushID(3);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -646,7 +647,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(6);
+				ImGui::PushID(4);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -670,7 +671,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::Spacing();
 				float panelWidth = ImGui::GetContentRegionAvail().x;
 
-				ImGui::PushID(6);
+				ImGui::PushID(5);
 				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 				if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
@@ -709,50 +710,33 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 				ImGui::SetCursorPosX((panelWidth - groupWidth) * 0.5f);
 
 				// Draw the group
-				ImGui::Text("Frame Count: Horizontal");
+				ImGui::Text("Frames Horizontally");
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(input1Width);
 				ImGui::InputInt("##1", &spriteCountHor, 0, 36);
 
 				ImGui::SameLine();
-				ImGui::Text("Vertical");
+				ImGui::Text("Vertically");
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(input2Width);
 				ImGui::InputInt("##2", &spriteCountVer, 0, 36);
 
-				// Second row: "Frame Width: [input]"
-				float label3Width = ImGui::CalcTextSize("Frame Width:").x;
-				float input3Width = inputWidth;
-				float group2Width = label3Width + spacing + input3Width;
-
-				ImGui::SetCursorPosX((panelWidth - group2Width) * 0.5f);
-				ImGui::Text("Frame Width:");
-				ImGui::SameLine();
-				ImGui::SetNextItemWidth(input3Width);
-				ImGui::InputInt("##3", &animFrameWidth, 0, 256);
-
-				static char buffer[64];
-				buffer[sizeof(buffer) - 1] = '\0';
-				std::string animFileName;
-
 				ImGui::Spacing();
 
-				// Button to open popup and create the animation.
 				float buttonWidth = 140.0f, buttonHeight = 25.f;
 				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
 
-				ImGui::Spacing();
-
-				if (ImGui::Button("Add Animation", ImVec2{buttonWidth, buttonHeight}))
+				if (ImGui::Button("Add Animation", ImVec2{buttonWidth, buttonHeight})) // Button to open popup and create the animation.
 				{
 					std::string path = OpenFileDialog(FILE_TYPE::IMAGE);
 					if (!path.empty())
 					{
 						// Extracting name from chosen file.
+						std::string animFileName;
 						animFileName = std::filesystem::path(path).filename().string();
 
 						// Creating a new animation.
-						Animation newAnim(path, animFileName, true, true, animFrameWidth, spriteCountHor, spriteCountVer, 10.f);
+						Animation newAnim(path, animFileName, true, true, spriteCountHor, spriteCountVer, 10.f);
 
 						// Adding the animation to the map inside the component with it's corresponding name.
 						animation.animations.insert({ animFileName, newAnim });
@@ -762,7 +746,7 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 
 				ImGui::Spacing();
 
-				ImGui::Text("Loaded Animations:");
+				if (animation.animations.size() != 0 ) ImGui::Text("Loaded Animations");
 
 				ImGui::Indent(15.f);
 
@@ -771,12 +755,16 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 					std::string animationName = iterator->first;
 					if (ImGui::CollapsingHeader(animationName.c_str()))
 					{
-						ImGui::Text("Speed:"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth + 25); ImGui::InputFloat("##5", &iterator->second.speed, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
-						ImGui::Text("Loop:"); ImGui::SameLine(); ImGui::Checkbox("##4", &iterator->second.loop); ImGui::Text("On Start:"); ImGui::SameLine(); ImGui::Checkbox("##6", &iterator->second.onStart);
-						
+						//ImGui::Text("Duration"); ImGui::SameLine(); ImGui::SetNextItemWidth(inputWidth + 25); ImGui::InputFloat("##5", &iterator->second.duration, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
+						ImGui::Text("Loop"); ImGui::SameLine(); ImGui::Checkbox("##4", &iterator->second.loop); 
+						//ImGui::Text("On Start"); ImGui::SameLine(); ImGui::Checkbox("##6", &iterator->second.onStart);
+
+						ImGui::Text("Playing"); ImGui::SameLine(); ImGui::Checkbox("##Playing", &iterator->second.playing);
+						ImGui::InputFloat("Speed", &iterator->second.speed, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_None);
+
 						ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 						ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
-						if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
+						if (ImGui::Button("Delete Animation", ImVec2(buttonWidth, buttonHeight)))
 						{
 							iterator = animation.animations.erase(iterator); // erase and move to the next element
 							ImGui::PopStyleColor();
@@ -785,8 +773,17 @@ void UserInterface::PropertiesPanel(Scene* sceneRef)
 						ImGui::PopStyleColor();
 					}
 
-					++iterator; // incremenet only if not erased
+					++iterator; // increment only if not erased
 				}
+
+				ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+				ImGui::SetCursorPosX((panelWidth - buttonWidth) * 0.5f);
+				if (ImGui::Button("Delete Component", ImVec2(buttonWidth, buttonHeight)))
+				{
+					sceneRef->registry.remove<AnimationComponent>(selectedHierarchyItem);
+				}
+				ImGui::PopStyleColor();
+				ImGui::Spacing();
 
 				ImGui::Unindent();
 			}
@@ -1323,7 +1320,8 @@ void UserInterface::DrawEntityNode(entt::entity entity, Scene* sceneRef, entt::e
 
 void UserInterface::DrawHierarchyPanel(Scene* sceneRef, entt::entity& selectedEntity)
 {
-	ImGui::Begin((const char*)(ICON_LIST_NESTED " Hierarchy"));
+	//ImGui::Begin((const char*)(ICON_LIST_NESTED " Hierarchy"));
+	ImGui::Begin("Hierarchy");
 
 	int rootDraggedIndex = -1;
 	float selectableHeight = ImGui::GetTextLineHeightWithSpacing();

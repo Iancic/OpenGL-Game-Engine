@@ -241,7 +241,6 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\Segment.cpp" />
     <ClCompile Include="Source\Shader.cpp" />
-    <ClCompile Include="Source\SpriteBatch.cpp" />
     <ClCompile Include="Source\SpriteRenderer.cpp" />
     <ClCompile Include="Source\Star.cpp" />
     <ClCompile Include="Source\Texture2D.cpp" />
@@ -254,6 +253,7 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\AudioComponent.hpp" />
     <ClInclude Include="Headers\BaseWeapon.hpp" />
     <ClInclude Include="Headers\Boid.hpp" />
+    <ClInclude Include="Headers\BoxCollider.hpp" />
     <ClInclude Include="Headers\Bullet.hpp" />
     <ClInclude Include="Headers\Camera.hpp" />
     <ClInclude Include="Headers\Character.hpp" />
@@ -297,12 +297,12 @@ copy /Y "$(SolutionDir)Libraries\yaml\lib\Release\yaml-cppd.dll" "$(OutDir)"
     <ClInclude Include="Headers\ScriptComponent.hpp" />
     <ClInclude Include="Headers\Segment.hpp" />
     <ClInclude Include="Headers\Shader.hpp" />
-    <ClInclude Include="Headers\SpriteBatch.hpp" />
     <ClInclude Include="Headers\SpriteComponent.hpp" />
     <ClInclude Include="Headers\SpriteRenderer.hpp" />
     <ClInclude Include="Headers\Star.hpp" />
     <ClInclude Include="Headers\TextComponent.hpp" />
     <ClInclude Include="Headers\Texture2D.hpp" />
+    <ClInclude Include="Headers\Transform.hpp" />
     <ClInclude Include="Headers\TransformComponent.hpp" />
     <ClInclude Include="Headers\UserInterface.hpp" />
     <ClInclude Include="Headers\Utilities.hpp" />

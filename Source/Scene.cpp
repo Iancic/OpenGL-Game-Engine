@@ -114,15 +114,18 @@ void Scene::Update(float deltaTime, Input& inputSystem)
 			script.onUpdate(deltaTime);
 		}
 	}
+
+	System_Animation(deltaTime);
+
 	System_Emitter(deltaTime);
 	System_Creature(deltaTime);
 }
 
-void Scene::Render(Camera* activeCamera)
+void Scene::Render(float deltaTime, Camera* activeCamera)
 {
 	// TODO: This current system goes through each component and does a draw call.
 	System_Sprite(activeCamera);
-	System_Animation(activeCamera);
+	System_Animation_Render(activeCamera);
 
 	System_Emitter_Render(activeCamera);
 	System_Creature_Render();
@@ -242,35 +245,45 @@ void Scene::DestroyEntity(entt::entity handle)
 
 void Scene::System_Sprite(Camera* activeCamera)
 {
-	auto view = registry.view<TransformComponent, SpriteComponent>();
+	const auto& view = registry.view<TransformComponent, SpriteComponent>();
 
 	for (auto [entity, transform, sprite] : view.each())
 	{
-		sprite.spriteRenderer.DrawSprite(activeCamera, sprite.texture, glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x, transform.GetTranslation(transform.WorldMatrix).y },
+		sprite.spriteRenderer.DrawSprite(*activeCamera, sprite.texture, glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x, transform.GetTranslation(transform.WorldMatrix).y },
 			glm::vec2{ transform.GetScale(transform.WorldMatrix).x,  transform.GetScale(transform.WorldMatrix).y },
 			transform.GetRotationEuler(transform.WorldMatrix).x);
 	}
 }
 
-void Scene::System_Animation(Camera* activeCamera)
+void Scene::System_Animation(float deltaTime)
 {
-	auto view = registry.view<TransformComponent, AnimationComponent>();
+	const auto& view = registry.view<TransformComponent, AnimationComponent>();
+
+	for (auto [entity, transform, animation] : view.each())
+	{
+		if (animation.animations.size() != 0)
+			animation.Update(deltaTime);
+	}
+}
+
+void Scene::System_Animation_Render(Camera* activeCamera)
+{
+	const auto& view = registry.view<TransformComponent, AnimationComponent>();
 
 	for (auto [entity, transform, animation] : view.each())
 	{
 		if (animation.animations.size() != 0)
 		{
-			Animation currentAnim = animation.animations.at(animation.currentAnimation);
-			currentAnim.Render(glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x,  transform.GetTranslation(transform.WorldMatrix).y }, transform.GetScale(transform.WorldMatrix).x, transform.GetRotationEuler(transform.WorldMatrix).y);
-
-			//currentAnim.texture.Render(currentAnim.frameInfo, glm::vec2{ transform.Translation.x, transform.Translation.y }, transform.Scale.x, transform.Rotation.x);
+			animation.renderer.DrawIndexedSprite(animation.animations.at(animation.currentAnimation), *activeCamera, animation.animations.at(animation.currentAnimation).texture, glm::vec2{ transform.GetTranslation(transform.WorldMatrix).x, transform.GetTranslation(transform.WorldMatrix).y },
+				glm::vec2{ transform.GetScale(transform.WorldMatrix).x,  transform.GetScale(transform.WorldMatrix).y },
+				transform.GetRotationEuler(transform.WorldMatrix).x);
 		}
 	}
 }
 
 void Scene::System_SceneGraph()
 {
-	auto viewHierarchy = registry.view<TransformComponent, HierarchyComponent>();
+	const auto& viewHierarchy = registry.view<TransformComponent, HierarchyComponent>();
 
 	for (auto [entity, transform, hierarchy] : viewHierarchy.each())
 	{

@@ -1,23 +1,34 @@
 #pragma once
 #include "precomp.h"
-#include "Common.hpp"
-#include "SpriteBatch.hpp"
+#include "Texture2D.hpp"
+#include "Logger.hpp"
 
 class Animation
 {
 public:
-	Animation(std::string path, std::string animFileName, bool looped, bool onStartArg, int individualFrameWidthArg, int NumSpritesX, int NumSpritesY, float AnimSpeed);
+	Animation(const std::string& path, const std::string& animFileName, const bool looped, const bool onStartArg, const int NumSpritesX, const int NumSpritesY, const float animDuration);
 	~Animation() = default;
-
-	void Render(glm::vec2 position, float size, float rotate);
 
 	std::string name;
 	std::string texturePath;
 
-	SpriteBatch texture;
-	SpriteInfo frameInfo;
+	Texture2D texture;
 
-	int individualFrameWidth;
-	float speed;
-	bool loop, onStart;
+	float speed = 32.f;
+
+	// Indices that dictate which sprite is picked.
+	int SpriteRow = 0;    // Sprite location in the sprite sheet - row
+	int SpriteColumn = 0;    // Sprite location in the sprite sheet - col
+
+	int totalFrames; // pre-calculated so I don't multiply over and over during animation step.
+
+	float m_texUSize = 0.0f;  // Sprite size in tex space - U
+	float m_texVSize = 0.0f;  // Sprite size in tex space - V
+	int m_numSpritesX;
+	int m_numSpritesY;
+
+	bool loop = false, onStart = false, playing = true;
+
+private:
+
 };

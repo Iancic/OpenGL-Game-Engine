@@ -51,7 +51,7 @@ void Game::HandleInput()
 
 void Game::Render()
 {
-	activeScene->Render(activeCamera);
+	activeScene->Render(deltaTime, activeCamera);
 }
 
 void Game::Shutdown()

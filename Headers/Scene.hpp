@@ -13,7 +13,7 @@ public:
 
 	// Cycle
 	void Start();
-	void Render(Camera* activeCamera);
+	void Render(float deltaTime, Camera* activeCamera);
 	void Update(float deltaTime, Input& inputSystem);
 	void Shutdown();
 
@@ -31,7 +31,8 @@ public:
 	
 	// Systems
 	void System_Sprite(Camera* activeCamera);
-	void System_Animation(Camera* activeCamera);
+	void System_Animation(float deltaTime);
+	void System_Animation_Render(Camera* activeCamera);
 	void System_SceneGraph();
 	void System_RecurseTransform(entt::entity ID, const glm::mat4& parentMatrix);
 	void System_Creature(float deltaTime);

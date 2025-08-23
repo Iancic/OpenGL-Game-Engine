@@ -1,17 +1,11 @@
 #pragma once
-#include <glad/glad.h>
-
-struct SpriteInfo
-{
-    int SpriteRow = 0;    // Sprite location in the sprite sheet - row
-    int SpriteCol = 0;    // Sprite location in the sprite sheet - col
-    int SpriteWidth = 0;
-};
+#include "precomp.h"
 
 class Texture2D
 {
 public:
     Texture2D();
+
     unsigned int ID;
     unsigned int Width, Height; // width and height of loaded image in pixels
 
