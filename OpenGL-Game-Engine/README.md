@@ -4,17 +4,13 @@ Custom game engine built to leverage the performace of C++, while integrating Im
 
 Purpose of the engine's is to develop Cosmoboros, a roguelike game about spaceworms and infinite worlds, while also serving as a learning opportunity focused on engine development, scripting, rendering pipelines and data oriented design using ECS and ENTT.
 
-### How To Build:
-The build system for the engine and the game is premake. To compile the engine library go to OpenGL-Game-Engine folder and run the BUILD.bat to generate VS solution files. After the engine is properly compiled, inside the Cosmoboros folder do the same and then run the generated VS solution file.
-
-![alt text](Screenshot_Engine.png)
-
 ### Technology Stack:
-- SDL 3: windowing and input
-- OpenGL 4.6: rendering
+- SDL: windowing and input
+- OpenGL: rendering
 - ENTT: ecs
 - ImGui: engine editor
 - Sol: Lua bindings for scripting
+- Fmod: audio
 - Box2D: physics
 - GLM: maths
 - YAML: serialization

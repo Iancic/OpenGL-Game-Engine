@@ -1,0 +1,24 @@
+# Ignore build outputs
+[Bb]uild/
+bin/
+obj/
+
+# Ignore Visual Studio intermediates
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore compiler outputs
+*.log
+*.tlog
+*.tmp
+*.cache
+*.pdb
+*.opendb
+*.VC.db
+*.idb
+
+# Ignore OS cruft
+.DS_Store
+Thumbs.db

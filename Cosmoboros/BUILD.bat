@@ -1,0 +1,3 @@
+REM === Regenerate project files with premake ===
+echo Running premake...
+premake5 vs2022
